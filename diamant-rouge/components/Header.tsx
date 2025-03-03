@@ -1,46 +1,40 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { signOut, useSession } from "next-auth/react";
 import { useCart } from "../contexts/CartContext";
 import { useWishlist } from "../contexts/WishlistContext";
 import {
     ShoppingCart,
     Heart,
     User,
-    Calendar,
     LogOut,
+    Calendar,
     MessageCircle,
+    ShieldCheck,
     Menu,
     X,
-    ChevronDown,
     Sun,
     Moon,
-    ShieldCheck, // or any other Lucide icon for admin
 } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
-import Image from "next/image";
 
 export default function Header() {
-    const [isScrolled, setIsScrolled] = useState(false);
-    const [menuOpen, setMenuOpen] = useState(false);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-    // ========== THEME STATE ==========
-    // By default, let's check localStorage or fallback to false (light mode)
-    const [isDarkMode, setIsDarkMode] = useState(false);
-
     const { cart } = useCart();
     const { wishlist } = useWishlist();
     const { data: session } = useSession();
 
-    // Track scroll to change header style
+    // Track scroll to apply sticky style
+    const [isScrolled, setIsScrolled] = useState(false);
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 50);
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    // On mount, check if we have a saved theme
+    // ========== THEME STATE ==========
+    const [isDarkMode, setIsDarkMode] = useState(false);
     useEffect(() => {
         const savedTheme = localStorage.getItem("diamantrouge-theme");
         if (savedTheme === "dark") {
@@ -51,287 +45,233 @@ export default function Header() {
             document.documentElement.classList.remove("dark");
         }
     }, []);
-
-    // Toggle theme function
     const handleThemeToggle = () => {
         setIsDarkMode((prev) => {
-            const newTheme = !prev;
-            if (newTheme) {
+            const newVal = !prev;
+            if (newVal) {
                 document.documentElement.classList.add("dark");
                 localStorage.setItem("diamantrouge-theme", "dark");
             } else {
                 document.documentElement.classList.remove("dark");
                 localStorage.setItem("diamantrouge-theme", "light");
             }
-            return newTheme;
+            return newVal;
         });
     };
 
+    // ========== MOBILE NAV FOR 2ND ROW (NAV LINKS) ==========
+    const [navOpen, setNavOpen] = useState(false);
+
     return (
         <header
-            className={`
-        fixed top-0 w-full z-50 transition-all duration-500
-        ${
+            className={`fixed top-0 w-full z-50 transition-all duration-500 ${
                 isScrolled
                     ? "bg-brandIvory/90 shadow-luxury backdrop-blur-md"
                     : "bg-transparent"
-            }
-      `}
+            }`}
         >
-            {/* ====== Top Bar ====== */}
-            <div className="w-full bg-brandIvory/80 py-3 border-b border-platinumGray">
-                <div className="container mx-auto flex items-center justify-between px-6">
-                    {/* Left side: WhatsApp + Appointment */}
-                    <div className="flex items-center gap-4 text-richEbony">
+            {/*
+        ─────────────────────────────────────────
+        1) FIRST ROW: Left(WhatsApp/RendezVous) - Center(Logo) - Right(Icons)
+        ─────────────────────────────────────────
+      */}
+            <div
+                className={`w-full ${
+                    isScrolled ? "bg-brandIvory/80 shadow-subtle" : "bg-brandIvory/70"
+                }`}
+            >
+                <div className="max-w-screen-xl mx-auto px-4 py-2 flex items-center justify-between">
+                    {/* LEFT: WhatsApp & Rendez-vous */}
+                    <div className="flex items-center gap-4">
+                        {/* WhatsApp link */}
                         <a
-                            href="https://wa.me/YOUR_WHATSAPP_NUMBER"
+                            href="https://wa.me/212555000111"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="hover:text-burgundy hover-scale transition duration-300"
+                            className="hover:text-burgundy hover-scale transition duration-300 text-richEbony"
+                            title="Contacter via WhatsApp"
                         >
-                            <MessageCircle size={24} />
+                            <MessageCircle size={22} />
                         </a>
+                        {/* Rendez-vous link */}
                         <Link
                             href="/appointments"
-                            className="flex items-center gap-1 hover:text-brandGold transition duration-300"
+                            className="flex items-center gap-1 text-richEbony hover:text-brandGold transition duration-300"
                         >
-                            <Calendar size={20} />
-                            <span className="hidden md:inline">Prendre Rendez-vous</span>
+                            <Calendar size={18} />
+                            <span className="hidden sm:inline">Rendez-vous</span>
                         </Link>
                     </div>
 
-                    {/* Logo in the center */}
-                    <Link href="/" className="flex items-center justify-center">
-                        <div className="relative w-[140px] h-[57px] hover-scale transition-transform duration-500">
-                            {/* Ensure your logo asset has burgundy & gold colors */}
-                            <Image
-                                src="/images/logo_center.png"
-                                alt="Diamant Rouge"
-                                fill
-                                className="object-contain"
-                            />
-                        </div>
+                    {/* CENTER: Logo */}
+                    <Link
+                        href="/"
+                        className="relative w-[200px] h-[60px] hover-scale transition-transform"
+                    >
+                        <Image
+                            src="/images/1/diamant-rouge-logo.svg"
+                            alt="Diamant Rouge"
+                            fill
+                            className="object-contain"
+                        />
                     </Link>
 
-                    {/* Right side: user icons + Theme Toggle */}
-                    <div className="flex items-center gap-5">
-                        {/* Wishlist Icon */}
-                        <Link
-                            href="/wishlist"
-                            className="relative hover-scale transition-transform duration-300"
-                        >
-                            <Heart className="text-brandGold" size={26} />
+                    {/* RIGHT: Icons (Wishlist, Cart, Admin, User, Theme) */}
+                    <div className="flex items-center gap-4">
+                        {/* Wishlist */}
+                        <Link href="/wishlist" className="relative hover-scale">
+                            <Heart className="text-brandGold" size={22} />
                             {wishlist.length > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-burgundy text-brandIvory text-xs px-2 py-1 rounded-full">
+                                <span className="absolute -top-2 -right-3 bg-burgundy text-brandIvory text-xs px-2 py-0.5 rounded-full">
                   {wishlist.length}
                 </span>
                             )}
                         </Link>
-
-                        {/* Cart Icon */}
-                        <Link
-                            href="/cart"
-                            className="relative hover-scale transition-transform duration-300"
-                        >
-                            <ShoppingCart className="text-brandGold" size={26} />
+                        {/* Cart */}
+                        <Link href="/cart" className="relative hover-scale">
+                            <ShoppingCart className="text-brandGold" size={22} />
                             {cart.length > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-burgundy text-brandIvory text-xs px-2 py-1 rounded-full">
+                                <span className="absolute -top-2 -right-3 bg-burgundy text-brandIvory text-xs px-2 py-0.5 rounded-full">
                   {cart.length}
                 </span>
                             )}
                         </Link>
-
-                        {/* Admin Icon - only if user is admin */}
+                        {/* Admin link (if role=admin) */}
                         {session?.user?.role === "admin" && (
-                            <Link
-                                href="/admin"
-                                className="hover-scale transition-transform duration-300 hover:text-brandGold"
-                            >
-                                <ShieldCheck className="text-brandGold" size={26} />
+                            <Link href="/admin" className="hover-scale">
+                                <ShieldCheck className="text-brandGold" size={22} />
                             </Link>
                         )}
-
-                        {/* Auth Icons */}
+                        {/* Auth */}
                         {session ? (
                             <>
-                                <Link
-                                    href="/profile"
-                                    className="hover:text-brandGold transition duration-300"
-                                >
-                                    <User className="text-brandGold" size={26} />
+                                <Link href="/profile" className="hover-scale">
+                                    <User className="text-brandGold" size={22} />
                                 </Link>
                                 <button
                                     onClick={() => signOut()}
-                                    className="text-brandGold hover:text-burgundy transition duration-300"
+                                    className="hover-scale text-brandGold"
+                                    title="Se déconnecter"
                                 >
-                                    <LogOut size={26} />
+                                    <LogOut size={22} />
                                 </button>
                             </>
                         ) : (
-                            <Link
-                                href="/auth"
-                                className="hover:text-brandGold transition duration-300"
-                            >
-                                <User className="text-brandGold" size={26} />
+                            <Link href="/auth" className="hover-scale" title="Se connecter">
+                                <User className="text-brandGold" size={22} />
                             </Link>
                         )}
 
-                        {/* Dark/Light Mode Toggle Button */}
-                        <button
-                            onClick={handleThemeToggle}
-                            className="text-brandGold hover:text-burgundy transition duration-300"
-                        >
-                            {isDarkMode ? <Sun size={22} /> : <Moon size={22} />}
-                        </button>
-
-                        {/* Mobile Menu Toggle (Burger Icon) */}
-                        <button
-                            onClick={() => setMenuOpen(!menuOpen)}
-                            className="md:hidden text-brandGold hover:text-burgundy transition duration-300"
-                        >
-                            {menuOpen ? <X size={26} /> : <Menu size={26} />}
-                        </button>
                     </div>
                 </div>
             </div>
 
-            {/* ====== Second Bar: Main Nav ====== */}
+            {/*
+        ─────────────────────────────────────────
+        2) SECOND ROW: Navigation (Desktop)
+           Centered content, mobile hidden.
+        ─────────────────────────────────────────
+      */}
             <div
-                className={`hidden md:block w-full bg-brandIvory transition-all duration-500 ${
-                    isScrolled ? "shadow-subtle" : ""
-                }`}
+                className={`${
+                    isScrolled ? "bg-brandIvory/90 shadow-subtle" : "bg-brandIvory/70"
+                } hidden md:block`}
             >
-                <nav className="container mx-auto py-2 flex justify-center space-x-10">
-                    {/* Each nav link */}
-                    <Link
-                        href="/"
-                        className="text-richEbony hover:text-brandGold transition duration-300"
-                    >
-                        Home
+                <nav className="max-w-screen-xl mx-auto px-4 py-2 flex items-center justify-center space-x-8 text-sm font-medium text-richEbony">
+                    <Link href="/" className="hover:text-brandGold transition duration-300">
+                        Accueil
                     </Link>
-
-                    {/* Creations Dropdown */}
-                    <div
-                        className="relative flex items-center gap-1 text-richEbony hover:text-brandGold transition duration-300"
-                        onMouseEnter={() => setIsDropdownOpen(true)}
-                        onMouseLeave={() => setIsDropdownOpen(false)}
+                    <Link
+                        href="/collections"
+                        className="hover:text-brandGold transition duration-300"
                     >
-                        <button className="flex items-center gap-1">
-                            Creations
-                            <ChevronDown size={18} />
-                        </button>
-                        <div
-                            className={`dropdown-menu ${
-                                isDropdownOpen ? "dropdown-menu-active" : ""
-                            } left-1/2 -translate-x-1/2`}
-                        >
-                            <Link
-                                href="/collections/rings"
-                                className="block px-5 py-3 hover:bg-burgundy hover:text-brandIvory transition duration-300"
-                            >
-                                Rings
-                            </Link>
-                            <Link
-                                href="/collections/bracelets"
-                                className="block px-5 py-3 hover:bg-burgundy hover:text-brandIvory transition duration-300"
-                            >
-                                Bracelets
-                            </Link>
-                            <Link
-                                href="/collections/necklaces"
-                                className="block px-5 py-3 hover:bg-burgundy hover:text-brandIvory transition duration-300"
-                            >
-                                Necklaces
-                            </Link>
-                            <Link
-                                href="/collections/bespoke"
-                                className="block px-5 py-3 bg-brandGold text-richEbony font-medium transition duration-300"
-                            >
-                                Bespoke Creations
-                            </Link>
-                        </div>
-                    </div>
-
+                        Collections
+                    </Link>
                     <Link
                         href="/appointments"
-                        className="text-richEbony hover:text-brandGold transition duration-300"
+                        className="hover:text-brandGold transition duration-300"
                     >
-                        Appointments
+                        Rendez-vous
                     </Link>
                     <Link
                         href="/the-house"
-                        className="text-richEbony hover:text-brandGold transition duration-300"
+                        className="hover:text-brandGold transition duration-300"
                     >
-                        The House
+                        La Maison
                     </Link>
                     <Link
                         href="/contact"
-                        className="text-richEbony hover:text-brandGold transition duration-300"
+                        className="hover:text-brandGold transition duration-300"
                     >
                         Contact
                     </Link>
                 </nav>
             </div>
 
-            {/* ====== Mobile Nav Menu ====== */}
-            {menuOpen && (
-                <div className="mobile-menu md:hidden bg-brandIvory p-4 border-t border-platinumGray">
-                    <Link
-                        href="/"
-                        className="block py-3 text-richEbony hover:text-brandGold transition duration-300"
-                        onClick={() => setMenuOpen(false)}
-                    >
-                        Home
-                    </Link>
-                    <Link
-                        href="/collections/rings"
-                        className="block py-3 text-richEbony hover:text-brandGold transition duration-300"
-                        onClick={() => setMenuOpen(false)}
-                    >
-                        Rings
-                    </Link>
-                    <Link
-                        href="/collections/bracelets"
-                        className="block py-3 text-richEbony hover:text-brandGold transition duration-300"
-                        onClick={() => setMenuOpen(false)}
-                    >
-                        Bracelets
-                    </Link>
-                    <Link
-                        href="/collections/necklaces"
-                        className="block py-3 text-richEbony hover:text-brandGold transition duration-300"
-                        onClick={() => setMenuOpen(false)}
-                    >
-                        Necklaces
-                    </Link>
-                    <Link
-                        href="/collections/bespoke"
-                        className="block py-3 text-brandGold font-medium hover:text-brandIvory transition duration-300"
-                        onClick={() => setMenuOpen(false)}
-                    >
-                        Bespoke Creations
-                    </Link>
-                    <Link
-                        href="/appointments"
-                        className="block py-3 text-richEbony hover:text-brandGold transition duration-300"
-                        onClick={() => setMenuOpen(false)}
-                    >
-                        Appointments
-                    </Link>
-                    <Link
-                        href="/the-house"
-                        className="block py-3 text-richEbony hover:text-brandGold transition duration-300"
-                        onClick={() => setMenuOpen(false)}
-                    >
-                        The House
-                    </Link>
-                    <Link
-                        href="/contact"
-                        className="block py-3 text-richEbony hover:text-brandGold transition duration-300"
-                        onClick={() => setMenuOpen(false)}
-                    >
-                        Contact
-                    </Link>
+            {/* Mobile Nav Toggle Button (Hamburger) - visible on small screens */}
+            <button
+                className={`md:hidden absolute top-3 right-4 text-brandGold transition-transform ${
+                    navOpen ? "scale-0" : "scale-100"
+                }`}
+                onClick={() => setNavOpen(true)}
+            >
+                <Menu size={24} />
+            </button>
+
+            {/*
+        MOBILE NAV OVERLAY
+      */}
+            {navOpen && (
+                <div className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex">
+                    {/* Drawer */}
+                    <div className="bg-brandIvory w-3/4 max-w-xs h-full p-5 flex flex-col">
+                        {/* Close button */}
+                        <button
+                            onClick={() => setNavOpen(false)}
+                            className="self-end text-richEbony hover:text-brandGold mb-4"
+                        >
+                            <X size={24} />
+                        </button>
+                        {/* Nav Items */}
+                        <Link
+                            href="/"
+                            className="py-2 text-richEbony hover:text-brandGold"
+                            onClick={() => setNavOpen(false)}
+                        >
+                            Accueil
+                        </Link>
+                        <Link
+                            href="/collections"
+                            className="py-2 text-richEbony hover:text-brandGold"
+                            onClick={() => setNavOpen(false)}
+                        >
+                            Collections
+                        </Link>
+                        <Link
+                            href="/appointments"
+                            className="py-2 text-richEbony hover:text-brandGold"
+                            onClick={() => setNavOpen(false)}
+                        >
+                            Rendez-vous
+                        </Link>
+                        <Link
+                            href="/the-house"
+                            className="py-2 text-richEbony hover:text-brandGold"
+                            onClick={() => setNavOpen(false)}
+                        >
+                            La Maison
+                        </Link>
+                        <Link
+                            href="/contact"
+                            className="py-2 text-richEbony hover:text-brandGold"
+                            onClick={() => setNavOpen(false)}
+                        >
+                            Contact
+                        </Link>
+                    </div>
+
+                    {/* Click outside to close */}
+                    <div className="flex-1" onClick={() => setNavOpen(false)}></div>
                 </div>
             )}
         </header>

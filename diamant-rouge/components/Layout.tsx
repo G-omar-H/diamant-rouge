@@ -1,4 +1,5 @@
-// component/Layout.tsx
+// components/Layout.tsx
+
 import { ReactNode } from "react";
 import Head from "next/head";
 import Header from "./Header";
@@ -13,7 +14,7 @@ type LayoutProps = {
 export default function Layout({ children, title, description }: LayoutProps) {
     return (
         <>
-            {/* ✅ Enhanced SEO Metadata */}
+            {/* Enhanced SEO Metadata */}
             <Head>
                 <title>
                     {title ? `${title} | Diamant-Rouge` : "Diamant-Rouge - Luxury Jewelry House"}
@@ -22,21 +23,25 @@ export default function Layout({ children, title, description }: LayoutProps) {
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
             </Head>
 
-            {/* Luxury Fixed Header */}
-            <Header />
-
             {/*
-        Main Content Area
-        Remove bg-richEbony and text-softIvory so light mode uses your default
-        brandIvory + brandGold + burgundy, and Ebony is applied only in dark mode
-        via .dark body { ... } from your global CSS.
+        Wrapper that applies (100vw - 2in) to the entire site
+        so Header, Main, and Footer are all within that width.
       */}
-            <main className="min-h-screen pt-24 md:pt-28 transition-opacity duration-500 ease-in-out">
-                {children}
-            </main>
+            <div
+                style={{
+                    margin: "0 auto",
+                    width: "calc(100vw - 2in)",
+                }}
+            >
+                {/* Fixed or static Header (depending on your Header.tsx) */}
+                <Header />
 
-            {/* Elegant Footer */}
-            <Footer />
+                <main className="min-h-screen pt-24 md:pt-28 transition-opacity duration-500 ease-in-out">
+                    {children}
+                </main>
+
+                <Footer />
+            </div>
         </>
     );
 }

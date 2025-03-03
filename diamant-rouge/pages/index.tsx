@@ -1,19 +1,24 @@
-import HeroCarousel from "../components/HeroCarousel";
+// pages/index.tsx
+
 import Link from "next/link";
 import Image from "next/image";
 import { NextSeo } from "next-seo";
 import { motion } from "framer-motion";
 import { prisma } from "../lib/prisma";
-import ProductCard from "../components/ProductCard";
 import { jwtVerify } from "jose";
 
-// ✅ Fetch Products and Wishlist Securely
-export async function getServerSideProps(context) {
-    let userId = null;
-    let wishlist = [];
+import HeroCarousel from "../components/HeroCarousel";
+import ProductCard from "../components/ProductCard";
+
+/* ----------------------------------------------------------
+   1. Server-Side Data Fetching
+   ---------------------------------------------------------- */
+export async function getServerSideProps(context: any) {
+    let userId: number | null = null;
+    let wishlist: number[] = [];
 
     try {
-        // ✅ Securely Parse Session Token
+        // Parse session token
         const rawCookie = context.req.headers.cookie || "";
         let match =
             rawCookie.match(/next-auth\.session-token=([^;]+)/) ||
@@ -36,14 +41,13 @@ export async function getServerSideProps(context) {
             }
         }
 
-        console.log("✅ Fetching homepage data...");
-        // ✅ Fetch Featured Products
+        // Fetch featured products
         const featuredProducts = await prisma.product.findMany({
             include: { translations: true, variations: true },
             take: 6,
         });
 
-        // ✅ Fetch Wishlist If User Logged In
+        // If user is logged in, fetch their wishlist
         if (userId) {
             const wishlistItems = await prisma.wishlist.findMany({
                 where: { userId },
@@ -55,79 +59,122 @@ export async function getServerSideProps(context) {
         return {
             props: {
                 products: JSON.parse(JSON.stringify(featuredProducts)),
-                wishlist: JSON.parse(JSON.stringify(wishlist)),
-                locale: context.locale || "en",
+                wishlist,
+                locale: context.locale || "fr",
             },
         };
     } catch (error) {
         console.error("❌ Homepage Data Fetch Error:", error);
-        return { props: { products: [], wishlist: [], locale: context.locale || "en" } };
+        return {
+            props: { products: [], wishlist: [], locale: context.locale || "fr" },
+        };
     }
 }
 
-// ✅ Hero Carousel Data
+/* ----------------------------------------------------------
+   2. Hero Carousel Slides
+   ---------------------------------------------------------- */
 const slides = [
-
     {
-        videoSrc: "/videos/Red Diamond Elegance_simple_compose.mp4",
-        heading: "Red Diamond Elegance",
-        subheading: "A captivating video showcasing our finest collection.",
-    }
+        imageSrc: "/images/parures-colliers-or-bijouterie-casablanca-maroc-825.jpg",
+        heading: "Diamant Rouge",
+        subheading: "Éclat Royal & Héritage Intemporel",
+    },
+    {
+        imageSrc: "/images/bijouterie-casablanca-maroc-parures-pour-mariees-75.jpg",
+        heading: "L’Essence de la Joaillerie",
+        subheading: "Des pièces taillées pour sublimer chaque moment",
+    },
+    {
+        imageSrc: "/images/bijouterie-casablanca-maroc-dimant-rouge-464.jpg",
+        heading: "Héritage Vivant",
+        subheading: "La tradition à travers les siècles, pour vous",
+    },
 ];
 
-export default function HomePage({ products, wishlist, locale }) {
+export default function HomePage({
+                                     products,
+                                     wishlist,
+                                     locale,
+                                 }: {
+    products: any[];
+    wishlist: number[];
+    locale: string;
+}) {
     return (
         <>
             <NextSeo
-                title="Diamant-Rouge | Luxury French Jewelry"
-                description="Discover handcrafted bespoke luxury jewelry at Diamant-Rouge."
+                title="Diamant Rouge | Joaillerie de Luxe"
+                description="Découvrez la joaillerie Diamant Rouge : des pièces intemporelles, un héritage royal et un artisanat d’exception."
             />
 
-            {/* Hero Section */}
+            {/*
+        ----------------------------------------------------
+        ✨ 1. HERO CAROUSEL
+        ----------------------------------------------------
+      */}
             <HeroCarousel slides={slides} />
 
-            {/* Exclusive Creations Section (Light) */}
+            {/*
+        ----------------------------------------------------
+        🔶 2. CRÉATIONS ROYALES (split: text left, image right)
+        ----------------------------------------------------
+      */}
             <motion.section
-                className="section-light py-16 px-6 text-center"
+                className="section-light py-16 px-6 md:px-8"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
                 viewport={{ once: true }}
             >
-                <h2 className="text-5xl font-serif text-brandGold mb-10">
-                    Exclusive Creations
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-                    <Link href="/collections/bespoke" className="card hover-scale">
-                        <h3 className="text-3xl text-brandGold">Bespoke Creations</h3>
-                        <p className="text-platinumGray mt-3">
-                            Custom luxury jewelry tailored to your vision.
+                <div className="flex flex-col md:flex-row items-center gap-10">
+                    {/* Text (Left) */}
+                    <div className="w-full md:w-1/2">
+                        <h2 className="text-3xl md:text-4xl font-serif text-brandGold mb-4">
+                            Créations Royales
+                        </h2>
+                        <p className="text-platinumGray mb-6 leading-relaxed">
+                            Des joyaux inspirés par la splendeur d’autrefois, façonnés pour briller
+                            aujourd’hui. Chaque pièce raconte une histoire de passion et de noblesse.
                         </p>
-                    </Link>
-
-                    <Link href="/appointments" className="card hover-scale">
-                        <h3 className="text-3xl text-brandGold">
-                            Private Showroom Experience
-                        </h3>
-                        <p className="text-platinumGray mt-3">
-                            Book a one-on-one consultation with our artisans.
-                        </p>
-                    </Link>
+                        <Link href="/collections/tresors">
+                            <button className="button-primary">Découvrir Nos Trésors</button>
+                        </Link>
+                    </div>
+                    {/* Image (Right) */}
+                    <div className="w-full md:w-1/2 relative overflow-hidden rounded-xl shadow-luxury">
+                        <Image
+                            src="/images/showroom.jpg"
+                            alt="Showroom Diamant Rouge"
+                            width={900}
+                            height={600}
+                            className="object-cover w-full h-full hover-scale"
+                        />
+                    </div>
                 </div>
             </motion.section>
 
-            {/* Featured Products */}
+            {/*
+        ----------------------------------------------------
+        💎 3. PIÈCES INCONTOURNABLES (heading center, content fill)
+        ----------------------------------------------------
+      */}
             <motion.section
-                className="section-light py-16 px-6"
+                className="section-light py-16 px-6 md:px-8 text-center"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
                 viewport={{ once: true }}
             >
-                <h2 className="text-5xl font-serif text-center text-brandGold mb-10">
-                    Featured Jewelry
+                <h2 className="text-3xl md:text-4xl font-serif text-brandGold mb-2">
+                    Pièces Incontournables
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                <p className="text-platinumGray max-w-2xl mx-auto mb-8">
+                    Sélectionnées par les connaisseurs, ces créations incarnent le meilleur
+                    de Diamant Rouge.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full">
                     {products.map((product) => (
                         <ProductCard
                             key={product.id}
@@ -139,25 +186,109 @@ export default function HomePage({ products, wishlist, locale }) {
                 </div>
             </motion.section>
 
-            {/* Newsletter */}
-            <section className="section-light py-12 px-6 text-center">
-                <h2 className="text-3xl font-serif text-brandGold mb-4">
-                    Join Le Cercle Rouge
-                </h2>
-                <p className="text-platinumGray mb-4">
-                    Exclusive previews, private sales, and early access.
+            {/*
+        ----------------------------------------------------
+        ⚜️ 4. HÉRITAGE & ARTISANAT (split: image left, text right)
+        ----------------------------------------------------
+      */}
+            <motion.section
+                className="section-dark py-16 px-6 md:px-8"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+            >
+                <div className="flex flex-col md:flex-row items-center gap-10">
+                    {/* Image (Left) */}
+                    <div className="w-full md:w-1/2 overflow-hidden rounded-xl shadow-luxury relative">
+                        <Image
+                            src="/images/gemologist.jpg"
+                            alt="Atelier Diamant Rouge"
+                            width={900}
+                            height={600}
+                            className="object-cover w-full h-full hover-scale"
+                        />
+                    </div>
+                    {/* Text (Right) */}
+                    <div className="w-full md:w-1/2 text-right">
+                        <h3 className="text-3xl md:text-4xl font-serif text-brandGold mb-4">
+                            Héritage & Artisanat
+                        </h3>
+                        <p className="text-brandIvory leading-relaxed mb-6">
+                            Les secrets d’une tradition séculaire se révèlent dans chaque détail.
+                            Nos artisans perpétuent un savoir-faire d’exception pour offrir des
+                            bijoux uniques, reflet d’une passion inaltérable.
+                        </p>
+                        <Link href="/about">
+                            <button className="button-secondary">En Savoir Plus</button>
+                        </Link>
+                    </div>
+                </div>
+            </motion.section>
+
+            {/*
+        ----------------------------------------------------
+        🎉 5. Événement Exclusif (full-width bg, text right)
+        ----------------------------------------------------
+      */}
+            <motion.section
+                className="relative py-16 px-6 md:px-8 overflow-hidden"
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+            >
+                {/* Background Image */}
+                <div className="absolute inset-0 z-0">
+                    <Image
+                        src="/images/emerald-ring.png"
+                        alt="Événement Diamant Rouge"
+                        fill
+                        className="object-cover object-center"
+                    />
+                    {/* Burgundy Tint */}
+                    <div className="absolute inset-0 bg-burgundy/40" />
+                </div>
+
+                {/* Text (Right-Aligned) */}
+                <div className="relative z-10 flex flex-col items-end w-full ml-auto">
+                    <h3 className="text-3xl md:text-4xl font-serif text-brandGold mb-4">
+                        Événement Exclusif
+                    </h3>
+                    <p className="text-platinumGray mb-6 max-w-md text-right">
+                        Participez à notre gala privé et découvrez la nouvelle collection
+                        « Dynastie Éblouissante » avant tout le monde.
+                    </p>
+                    <Link href="/appointments">
+                        <button className="button-primary">Réserver</button>
+                    </Link>
+                </div>
+            </motion.section>
+
+            {/*
+        ----------------------------------------------------
+        📨 6. NEWSLETTER (centered CTA, minimal text)
+        ----------------------------------------------------
+      */}
+            <section className="section-light py-12 px-6 md:px-8 text-center">
+                <h4 className="text-2xl md:text-3xl font-serif text-brandGold mb-4">
+                    Rejoignez Le Cercle Diamant Rouge
+                </h4>
+                <p className="text-platinumGray max-w-xl mx-auto mb-6">
+                    Recevez nos invitations privées et découvrez nos nouveautés en
+                    avant-première.
                 </p>
                 <form className="max-w-md mx-auto flex">
                     <input
                         type="email"
-                        placeholder="Your Email"
-                        className="input-field flex-1"
+                        placeholder="Votre adresse e-mail"
+                        className="input-field flex-1 rounded-r-none"
                     />
                     <button
                         type="submit"
-                        className="bg-burgundy hover:bg-brandGold text-brandIvory px-4 rounded-r-lg transition duration-300"
+                        className="bg-burgundy hover:bg-brandGold text-brandIvory hover:text-richEbony px-4 py-2 rounded-r-lg transition duration-300"
                     >
-                        Subscribe
+                        S’inscrire
                     </button>
                 </form>
             </section>

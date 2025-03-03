@@ -1,74 +1,159 @@
+// pages/profile.tsx
+
 import { prisma } from "../lib/prisma";
 import { getSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import { useWishlist } from "../contexts/WishlistContext";
 import { useState } from "react";
-import { Minus, Package, ShoppingBag } from "lucide-react"; // ✅ High-End Luxury Icons
-import { motion, AnimatePresence } from "framer-motion"; // ✅ Import Framer Motion
+import { Minus, Package, ShoppingBag } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-type OrderPlus = {
-    id: number;
-    status: string;
-    trackingNumber?: string | null;
-    totalAmount: string;
-    shippingAddress: string | null;
+// ... your existing types like OrderPlus, WishlistItem, etc.
+
+type ProfilePageProps = {
+    orders: OrderPlus[];
+    wishlist: WishlistItem[];
+    locale: string;
+
+    // Address and phone fields
+    address: string | null;
     city: string | null;
     postalCode: string | null;
     country: string | null;
-    createdAt: string;
-    orderItems: {
-        id: number;
-        productId: number;
-        quantity: number;
-        price: string;
-        product?: {
-            id: number;
-            sku: string;
-            images: string[];
-            translations: {
-                language: string;
-                name: string;
-            }[];
-        };
-    }[];
-};
-
-type WishlistItem = {
-    id: number;
-    productId: number;
-    product: {
-        id: number;
-        sku: string;
-        basePrice: string;
-        images: string[];
-        translations: {
-            language: string;
-            name: string;
-        }[];
-    };
+    phoneNumber: string | null;
 };
 
 export default function ProfilePage({
                                         orders,
                                         wishlist,
                                         locale,
-                                    }: {
-    orders: OrderPlus[];
-    wishlist: WishlistItem[];
-    locale: string;
-}) {
+                                        address: initialAddress,
+                                        city: initialCity,
+                                        postalCode: initialPostal,
+                                        country: initialCountry,
+                                        phoneNumber: initialPhone,
+                                    }: ProfilePageProps) {
     const { removeFromWishlist } = useWishlist();
     const [wishlistItems, setWishlistItems] = useState(wishlist);
+
+    // Address & phone state
+    const [address, setAddress] = useState(initialAddress || "");
+    const [city, setCity] = useState(initialCity || "");
+    const [postalCode, setPostalCode] = useState(initialPostal || "");
+    const [country, setCountry] = useState(initialCountry || "");
+    const [phoneNumber, setPhoneNumber] = useState(initialPhone || "");
+
+    const [updateMsg, setUpdateMsg] = useState("");
 
     async function handleRemoveFromWishlist(productId: number) {
         setWishlistItems((prev) => prev.filter((item) => item.productId !== productId));
         await removeFromWishlist(productId);
     }
 
+    // Handle saving address & phone
+    async function handleSaveAddress(e: React.FormEvent) {
+        e.preventDefault();
+        setUpdateMsg("");
+
+        try {
+            const res = await fetch("/api/user/update-address", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ address, city, postalCode, country, phoneNumber }),
+            });
+            if (res.ok) {
+                setUpdateMsg("Informations mises à jour avec succès !");
+            } else {
+                setUpdateMsg("Erreur lors de la mise à jour des informations.");
+            }
+        } catch (error) {
+            console.error("Update address/phone error:", error);
+            setUpdateMsg("Erreur lors de la mise à jour des informations.");
+        }
+    }
+
     return (
         <main className="section-light p-8 min-h-screen">
-            <h1 className="text-4xl font-serif mb-6 text-brandGold">My Profile</h1>
+            <h1 className="text-4xl font-serif mb-6 text-brandGold">Mon Profil</h1>
+
+            {/* Address & Phone Section */}
+            <section className="mb-10 bg-burgundy/10 p-4 rounded-lg shadow-luxury">
+                <h2 className="text-3xl font-serif mb-4 text-brandGold">
+                    Informations de Livraison
+                </h2>
+                <form onSubmit={handleSaveAddress} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Address */}
+                    <div>
+                        <label className="block text-sm text-platinumGray mb-1">Adresse</label>
+                        <input
+                            type="text"
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            className="input-field w-full"
+                        />
+                    </div>
+
+                    {/* City */}
+                    <div>
+                        <label className="block text-sm text-platinumGray mb-1">Ville</label>
+                        <input
+                            type="text"
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
+                            className="input-field w-full"
+                        />
+                    </div>
+
+                    {/* Postal Code */}
+                    <div>
+                        <label className="block text-sm text-platinumGray mb-1">
+                            Code Postal
+                        </label>
+                        <input
+                            type="text"
+                            value={postalCode}
+                            onChange={(e) => setPostalCode(e.target.value)}
+                            className="input-field w-full"
+                        />
+                    </div>
+
+                    {/* Country */}
+                    <div>
+                        <label className="block text-sm text-platinumGray mb-1">Pays</label>
+                        <input
+                            type="text"
+                            value={country}
+                            onChange={(e) => setCountry(e.target.value)}
+                            className="input-field w-full"
+                        />
+                    </div>
+
+                    {/* Phone Number */}
+                    <div>
+                        <label className="block text-sm text-platinumGray mb-1">
+                            Numéro de Téléphone
+                        </label>
+                        <input
+                            type="text"
+                            value={phoneNumber}
+                            onChange={(e) => setPhoneNumber(e.target.value)}
+                            className="input-field w-full"
+                        />
+                    </div>
+
+                    <div className="col-span-full mt-3">
+                        <button type="submit" className="button-primary">
+                            Enregistrer
+                        </button>
+                        {updateMsg && (
+                            <p className="text-sm text-burgundy mt-2 font-semibold">
+                                {updateMsg}
+                            </p>
+                        )}
+                    </div>
+                </form>
+            </section>
 
             {/* Order History */}
             <section className="mb-10">
@@ -190,6 +275,7 @@ export default function ProfilePage({
     );
 }
 
+// Extend getServerSideProps
 export async function getServerSideProps(context: any) {
     const session = await getSession(context);
     if (!session) {
@@ -200,7 +286,19 @@ export async function getServerSideProps(context: any) {
     const locale = context.locale || "en";
 
     try {
-        // ✅ Fetch orders with tracking numbers & product images
+        // 🆕 Fetch user to get address & phone
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                address: true,
+                city: true,
+                postalCode: true,
+                country: true,
+                phoneNumber: true,
+            },
+        });
+
+        // Orders
         const rawOrders = await prisma.order.findMany({
             where: { userId },
             include: {
@@ -222,7 +320,7 @@ export async function getServerSideProps(context: any) {
             orderBy: { createdAt: "desc" },
         });
 
-        // ✅ Fetch wishlist with product images
+        // Wishlist
         const rawWishlist = await prisma.wishlist.findMany({
             where: { userId },
             include: {
@@ -245,12 +343,26 @@ export async function getServerSideProps(context: any) {
                 orders: JSON.parse(JSON.stringify(rawOrders)),
                 wishlist: JSON.parse(JSON.stringify(rawWishlist)),
                 locale,
+                address: user?.address || null,
+                city: user?.city || null,
+                postalCode: user?.postalCode || null,
+                country: user?.country || null,
+                phoneNumber: user?.phoneNumber || null,
             },
         };
     } catch (error) {
         console.error("❌ Profile SSR error:", error);
         return {
-            props: { orders: [], wishlist: [], locale },
+            props: {
+                orders: [],
+                wishlist: [],
+                locale,
+                address: null,
+                city: null,
+                postalCode: null,
+                country: null,
+                phoneNumber: null,
+            },
         };
     }
 }
