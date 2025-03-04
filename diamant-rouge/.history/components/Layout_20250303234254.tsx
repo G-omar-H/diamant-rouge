@@ -42,7 +42,6 @@ export default function Layout({ children, title, description }: LayoutProps) {
                 </main>
 
                 <Footer />
-                <ChatBot />
             </div>
         </>
     );

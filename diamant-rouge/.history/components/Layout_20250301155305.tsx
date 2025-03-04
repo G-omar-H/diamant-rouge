@@ -4,7 +4,6 @@ import { ReactNode } from "react";
 import Head from "next/head";
 import Header from "./Header";
 import Footer from "./Footer";
-import ChatBot from "./ChatBot";
 
 type LayoutProps = {
     children: ReactNode;
@@ -42,7 +41,6 @@ export default function Layout({ children, title, description }: LayoutProps) {
                 </main>
 
                 <Footer />
-                <ChatBot />
             </div>
         </>
     );
