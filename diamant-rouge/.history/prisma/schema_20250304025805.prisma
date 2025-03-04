@@ -96,8 +96,6 @@ model User {
   orders    Order[]
   wishlists Wishlist[]
   cartItems CartItem[]
-  notifications Notification[]
-
 }
 
 // 

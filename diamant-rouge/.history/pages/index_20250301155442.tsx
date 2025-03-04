@@ -265,6 +265,33 @@ export default function HomePage({
                 </div>
             </motion.section>
 
+            {/*
+        ----------------------------------------------------
+        📨 6. NEWSLETTER (centered CTA, minimal text)
+        ----------------------------------------------------
+      */}
+            <section className="section-light py-12 px-6 md:px-8 text-center">
+                <h4 className="text-2xl md:text-3xl font-serif text-brandGold mb-4">
+                    Rejoignez Le Cercle Diamant Rouge
+                </h4>
+                <p className="text-platinumGray max-w-xl mx-auto mb-6">
+                    Recevez nos invitations privées et découvrez nos nouveautés en
+                    avant-première.
+                </p>
+                <form className="max-w-md mx-auto flex">
+                    <input
+                        type="email"
+                        placeholder="Votre adresse e-mail"
+                        className="input-field flex-1 rounded-r-none"
+                    />
+                    <button
+                        type="submit"
+                        className="bg-burgundy hover:bg-brandGold text-brandIvory hover:text-richEbony px-4 py-2 rounded-r-lg transition duration-300"
+                    >
+                        S’inscrire
+                    </button>
+                </form>
+            </section>
         </>
     );
 }

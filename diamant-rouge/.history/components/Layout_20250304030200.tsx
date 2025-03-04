@@ -5,7 +5,7 @@ import Head from "next/head";
 import Header from "./Header";
 import Footer from "./Footer";
 import ChatBot from "./ChatBot";
-import Notifications from "./Notifications";
+import 
 
 type LayoutProps = {
     children: ReactNode;

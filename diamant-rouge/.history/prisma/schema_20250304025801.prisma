@@ -96,8 +96,6 @@ model User {
   orders    Order[]
   wishlists Wishlist[]
   cartItems CartItem[]
-  notifications Notification[]
-
 }
 
 // 
@@ -176,7 +174,7 @@ model Appointment {
 }
 
 // --------------------------------------------------------------------
-// NOTIFICATION TABLE
+// N TABLE
 // --------------------------------------------------------------------
 model Notification {
   id          Int      @id @default(autoincrement())
