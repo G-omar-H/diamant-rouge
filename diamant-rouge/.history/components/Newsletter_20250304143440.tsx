@@ -21,7 +21,7 @@ export default function Newsletter() {
   };
 
   return (
-    <section className="section-light py-12 px-6 md:px-8 text-center">
+    <section className="section-light py-12 px-6 md:px-8 text-center bg-burgundy">
       <h4 className="text-2xl md:text-3xl font-serif text-brandGold mb-4">
         Rejoignez Le Cercle Diamant Rouge
       </h4>
