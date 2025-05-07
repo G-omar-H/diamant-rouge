@@ -573,6 +573,120 @@ export default function HomePage({
                     scrollbar-width: none;
                 }
             `}</style>
+
+            {/* 
+----------------------------------------------------
+🌟 6. NOS VALEURS - Value props with sticky scroll
+----------------------------------------------------
+*/}
+<section className="relative">
+  <div className="lg:flex">
+    {/* Sticky heading column - narrower width */}
+    <div className="lg:w-2/5 lg:sticky lg:top-[90px] lg:h-[calc(100vh-90px)] bg-richEbony relative aspect-square">
+      <Image
+        src="/images/home/Holiday-03crop_1_1200x.jpg"
+        alt="Nos valeurs"
+        fill
+        className="object-cover"
+      />
+      <div className="absolute inset-0">
+        {/* Geometric art with proportional spacing from image borders */}
+        <div className="absolute inset-[10%] flex items-center justify-center">
+          {/* Rectangle with fine lines */}
+          <div className="absolute inset-0">
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/50"></div>
+            <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/50"></div>
+            <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-white/50"></div>
+            <div className="absolute right-0 top-0 bottom-0 w-[2px] bg-white/50"></div>
+            
+            {/* Ellipse touching the midpoints */}
+            <div className="absolute inset-0 rounded-full border-[2px] border-white/40"></div>
+          </div>
+          
+          {/* Heading text */}
+          <h2 className="text-xl md:text-2xl lg:text-3xl font-thin text-white tracking-wide text-center relative z-10 px-4 max-w-[90%]">
+            Joaillerie d'exception <br/>digne de celles <br/>et ceux qui la portent
+          </h2>
+        </div>
+      </div>
+    </div>
+
+    {/* Scrollable content column - wider width */}
+    <div className="lg:w-3/5 bg-brandIvory text-richEbony">
+      {/* Value prop 1 */}
+      <div className="md:flex flex-col items-center">
+        <div className="relative w-full aspect-[16/6]">
+          <Image
+            src="/images/home/Aurate_Early_Black_Friday-15kira_3_v3_1200x.jpg"
+            alt="Qualité Exceptionnelle"
+            fill
+            className="object-cover object-center"
+          />
+        </div>
+        <div className="py-16 px-10 sm:max-w-4xl md:text-center lg:flex flex-col justify-center">
+          <h3 className="text-3xl md:text-4xl font-serif text-brandGold">Qualité Exceptionnelle</h3>
+          <p className="mt-6 text-lg text-platinumGray">
+            L'or est notre passion, et nous mettons un point d'honneur à rester fidèles à nos racines. Notre or est durable, coulé, poli et perfectionné par des artisans de génération en génération. Chaque création passe par un processus rigoureux de tests en 5 étapes pour que vous puissiez briller de mille feux et porter nos pièces en toute sérénité.
+          </p>
+        </div>
+      </div>
+
+      {/* Value prop 2 */}
+      <div className="md:flex flex-col items-center">
+        <div className="relative w-full aspect-[16/6]">
+          <Image
+            src="/images/home/AurateWinter-29_1_v2_1200x.jpg"
+            alt="Prix Juste"
+            fill
+            className="object-cover object-center"
+          />
+        </div>
+        <div className="py-16 px-10 sm:max-w-4xl md:text-center lg:flex flex-col justify-center">
+          <h3 className="text-3xl md:text-4xl font-serif text-brandGold">Prix Juste</h3>
+          <p className="mt-6 text-lg text-platinumGray">
+            Nous aimons l'or, mais pas les prix excessifs. Notre production locale (sans taxes d'importation), le recyclage des excédents et la fabrication sur commande vous garantissent le luxe sans la majoration. Nous travaillons aussi dur que vous pour que votre investissement dure aussi longtemps que notre or.
+          </p>
+        </div>
+      </div>
+
+      {/* Value prop 3 */}
+      <div className="md:flex flex-col items-center">
+        <div className="relative w-full aspect-[16/6]">
+          <Image
+            src="/images/home/Aurate_Early_Black_Friday-18kira_long_2_v333_1200x.jpg"
+            alt="Éthique Irréprochable"
+            fill
+            className="object-cover object-center"
+          />
+        </div>
+        <div className="py-16 px-10 sm:max-w-4xl md:text-center lg:flex flex-col justify-center">
+          <h3 className="text-3xl md:text-4xl font-serif text-brandGold">Éthique Irréprochable</h3>
+          <p className="mt-6 text-lg text-platinumGray">
+            L'approvisionnement éthique et la fabrication durable ne sont pas seulement notre devise, c'est notre méthode. Tout ce que vous voyez est fabriqué à partir d'or recyclé. Nos diamants sans conflit sont soigneusement sélectionnés pour maintenir la qualité et adhérer au Processus de Kimberley. Et nous parcourons le globe pour trouver nos perles et pierres précieuses auprès d'établissements familiaux qui soutiennent les communautés locales.
+          </p>
+        </div>
+      </div>
+
+      {/* Value prop 4 */}
+      <div className="md:flex flex-col items-center">
+        <div className="relative w-full aspect-[16/6]">
+          <Image
+            src="/images/home/Aurate_Early_Black_Friday-16_2_v3_1200x.jpg"
+            alt="Durabilité Inégalée"
+            fill
+            className="object-cover object-center"
+          />
+        </div>
+        <div className="py-16 px-10 sm:max-w-4xl md:text-center lg:flex flex-col justify-center">
+          <h3 className="text-3xl md:text-4xl font-serif text-brandGold">Durabilité Inégalée</h3>
+          <p className="mt-6 text-lg text-platinumGray">
+            Des bijoux authentiques pour une vie authentique. Toutes nos créations sont conçues pour résister et briller quels que soient les aléas de la vie. Et nous tenons parole : elles sont garanties à vie. Faites pour durer, pour raconter une histoire, pour conserver un souvenir. Pour que vous puissiez les transmettre à vos enfants. Et à leurs enfants. Et peut-être aux leurs, s'ils ont de la chance.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
         </>
     );
 }

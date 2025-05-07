@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -14,6 +14,19 @@ export default function Authentication() {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const router = useRouter();
+  
+  // Extract redirect parameters
+  const { redirect, action, productId, returnUrl } = router.query;
+
+  // Set appropriate title based on action context
+  const getContextTitle = () => {
+    if (action === 'favorite') return 'pour sauvegarder vos favoris';
+    if (action === 'cart') return 'pour accéder à votre panier';
+    if (action === 'checkout') return 'pour finaliser votre commande';
+    return '';
+  };
+  
+  const contextTitle = getContextTitle();
 
   const isLogin = mode === 'login';
   const isSignup = mode === 'signup';
@@ -37,8 +50,8 @@ export default function Authentication() {
         if (result?.error) {
           setError('Identifiants incorrects. Veuillez réessayer.');
         } else {
-          // Redirect to dashboard or homepage on successful login
-          router.push('/');
+          // Handle post-login redirection with appropriate action
+          handlePostAuthAction();
         }
       } else if (isSignup) {
         // Handle signup with our API
@@ -71,10 +84,11 @@ export default function Authentication() {
           setError('Compte créé avec succès. Veuillez vous connecter.');
           setMode('login');
         } else {
-          router.push('/');
+          // Handle post-signup redirection with appropriate action
+          handlePostAuthAction();
         }
       } else if (isForgotPassword) {
-        // Handle forgot password request
+        // Handle forgot password request (unchanged)
         if (!email) {
           setError('Veuillez saisir votre adresse email');
           setLoading(false);
@@ -94,13 +108,61 @@ export default function Authentication() {
         }
 
         setSuccessMessage('Instructions de réinitialisation envoyées à votre adresse email.');
-        // We keep the user on the same page but with a success message
       }
     } catch (err) {
       console.error('Authentication error:', err);
       setError(err.message || 'Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Function to handle post-authentication actions
+  const handlePostAuthAction = async () => {
+    // Perform action based on query parameters
+    if (action === 'favorite' && productId) {
+      // Add product to favorites
+      try {
+        await fetch('/api/user/favorites', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId })
+        });
+        
+        // Redirect to product page or favorites page
+        router.push(returnUrl || `/product/${productId}?added=favorite`);
+      } catch (err) {
+        console.error('Error adding to favorites:', err);
+        router.push(returnUrl || '/');
+      }
+    } 
+    else if (action === 'cart' && productId) {
+      // Add to cart if product ID is provided
+      try {
+        await fetch('/api/cart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId, quantity: 1 })
+        });
+        
+        // Redirect to cart page
+        router.push('/cart');
+      } catch (err) {
+        console.error('Error adding to cart:', err);
+        router.push('/');
+      }
+    }
+    else if (action === 'cart' && !productId) {
+      // Just view cart if no product ID
+      router.push('/cart');
+    } 
+    else if (action === 'checkout') {
+      // Go to checkout
+      router.push('/checkout');
+    }
+    else {
+      // Default redirect if no specific action
+      router.push(returnUrl || '/');
     }
   };
 
@@ -133,7 +195,7 @@ export default function Authentication() {
           />
           <div className="absolute inset-0 flex flex-col justify-center items-center p-12">
             {/* Logo with ivory backdrop */}
-            <div className="bg-brandIvory bg-opacity-90 p-6 rounded-xl  mb-8">
+            <div className="bg-brandIvory bg-opacity-90 p-6 rounded-xl mb-8">
               <Image 
                 src="/images/1/diamant-rouge-logo-full.svg" 
                 alt="Diamant Rouge" 
@@ -141,16 +203,21 @@ export default function Authentication() {
                 height={120} 
               />
             </div>
+            
+            {/* Context-aware messaging */}
             <h2 className="text-brandIvory text-5xl mb-6 font-serif text-center drop-shadow-lg">
-              Un Luxe Exceptionnel <br />Vous Attend
+              {action ? 'Un moment privilégié' : 'Un Luxe Exceptionnel'} <br />
+              {action ? 'vous attend' : 'Vous Attend'}
             </h2>
             <p className="text-brandIvory text-xl text-center max-w-lg">
-              Découvrez le summum du luxe et de la sophistication avec Diamant Rouge.
+              {action ? 
+                `Connectez-vous ${contextTitle} et profiter pleinement de l'univers Diamant Rouge.` : 
+                'Découvrez le summum du luxe et de la sophistication avec Diamant Rouge.'}
             </p>
           </div>
         </div>
 
-        {/* Right side - Authentication form */}
+        {/* Right side - Authentication form with context-aware messaging */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-16">
           <div className="w-full max-w-md animate-slideIn">
             <div className="text-center mb-10">
@@ -165,16 +232,30 @@ export default function Authentication() {
               <h1 className="text-4xl font-serif mb-3">
                 {isLogin ? 'Bienvenue' : isSignup ? 'Rejoignez Diamant Rouge' : 'Réinitialisation du Mot de Passe'}
               </h1>
+              
+              {/* Context-aware subtitle */}
               <p className="text-platinumGray">
-                {isLogin ? 'Connectez-vous pour accéder à votre compte' : 
-                 isSignup ? 'Créez votre compte pour commencer votre expérience de luxe' :
-                 'Entrez votre adresse email pour réinitialiser votre mot de passe'}
+                {action ? (
+                  isLogin ? 
+                    `Connectez-vous ${contextTitle}` : 
+                    `Créez votre compte ${contextTitle}`
+                ) : (
+                  isLogin ? 'Connectez-vous pour accéder à votre compte' : 
+                  isSignup ? 'Créez votre compte pour commencer votre expérience de luxe' :
+                  'Entrez votre adresse email pour réinitialiser votre mot de passe'
+                )}
               </p>
             </div>
 
             {error && (
               <div className="bg-red-50 border border-red-300 text-red-800 rounded-lg p-4 mb-6 text-sm">
                 {error}
+              </div>
+            )}
+
+            {successMessage && (
+              <div className="bg-green-50 border border-green-300 text-green-800 rounded-lg p-4 mb-6 text-sm">
+                {successMessage}
               </div>
             )}
 
