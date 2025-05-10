@@ -405,19 +405,19 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                         </div>
                         
                         {/* Refined filters section */}
-                        <div className="bg-brandIvory/30 rounded-lg p-5 border border-brandGold/10 shadow-sm">
-                            <div className="flex flex-col items-center gap-6">
+                        <div className="bg-gradient-to-b from-brandIvory/30 to-brandIvory/10 rounded-lg p-6 border border-brandGold/20 shadow-sm">
+                            <div className="flex flex-col items-center gap-8">
                                 {/* Category buttons - centered */}
                                 <div className="w-full">
-                                    <label className="block text-sm font-medium text-brandGold mb-3 text-center">
+                                    <h3 className="font-serif text-center text-lg text-brandGold mb-5 relative after:content-[''] after:absolute after:w-12 after:h-px after:bg-brandGold/30 after:bottom-[-8px] after:left-1/2 after:-translate-x-1/2">
                                         Catégorie
-                                    </label>
-                                    <div className="flex flex-wrap justify-center gap-2 max-w-3xl mx-auto">
+                                    </h3>
+                                    <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
                                         <button
                                             onClick={() => setSelectedCategory("")}
-                                            className={`text-xs px-4 py-2 rounded-full transition-all ${selectedCategory === "" 
-                                                ? "bg-brandGold text-white shadow-sm" 
-                                                : "bg-brandIvory text-platinumGray hover:bg-brandGold/10 border border-brandGold/20"}`}
+                                            className={`text-xs px-5 py-2.5 rounded-full transition-all duration-300 ${selectedCategory === "" 
+                                                ? "bg-gradient-to-r from-brandGold to-brandGold/90 text-white shadow-md" 
+                                                : "bg-brandIvory/80 text-platinumGray hover:bg-brandGold/10 hover:text-brandGold hover:border-brandGold/40 border border-brandGold/20"}`}
                                         >
                                             Toutes
                                         </button>
@@ -425,9 +425,9 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                                             <button
                                                 key={cat.slug}
                                                 onClick={() => setSelectedCategory(cat.slug)}
-                                                className={`text-xs px-4 py-2 rounded-full transition-all ${selectedCategory === cat.slug 
-                                                    ? "bg-brandGold text-white shadow-sm" 
-                                                    : "bg-brandIvory text-platinumGray hover:bg-brandGold/10 border border-brandGold/20"}`}
+                                                className={`text-xs px-5 py-2.5 rounded-full transition-all duration-300 ${selectedCategory === cat.slug 
+                                                    ? "bg-gradient-to-r from-brandGold to-brandGold/90 text-white shadow-md" 
+                                                    : "bg-brandIvory/80 text-platinumGray hover:bg-brandGold/10 hover:text-brandGold hover:border-brandGold/40 border border-brandGold/20"}`}
                                             >
                                                 {getCategoryName(cat.slug)}
                                             </button>
@@ -436,19 +436,19 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                                 </div>
 
                                 {/* Price filter toggle button */}
-                                <div className="w-full flex justify-center mt-2">
+                                <div className="w-full flex justify-center my-1">
                                     <button
                                         onClick={() => setIsPriceFilterVisible(!isPriceFilterVisible)}
-                                        className="flex items-center gap-2 text-sm text-brandGold hover:text-burgundy transition-colors"
+                                        className="flex items-center gap-2 px-4 py-1.5 text-sm text-brandGold border border-brandGold/20 rounded-full hover:bg-brandGold/5 transition-colors duration-300 group"
                                     >
-                                        <span>Filtrer par prix</span>
+                                        <span className="font-serif">Affiner par prix</span>
                                         <svg 
                                             xmlns="http://www.w3.org/2000/svg" 
-                                            width="16" 
-                                            height="16" 
+                                            width="12" 
+                                            height="12" 
                                             fill="currentColor" 
                                             viewBox="0 0 16 16"
-                                            className={`transform transition-transform ${isPriceFilterVisible ? 'rotate-180' : ''}`}
+                                            className={`transform transition-transform duration-300 group-hover:translate-y-0.5 ${isPriceFilterVisible ? 'rotate-180 group-hover:-translate-y-0.5' : ''}`}
                                         >
                                             <path d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
                                         </svg>
@@ -456,124 +456,138 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                                 </div>
 
                                 {/* Price range slider - collapsible */}
-                                {isPriceFilterVisible && (
-                                    <div className="w-full max-w-xl mx-auto bg-brandIvory/50 p-4 rounded-lg border border-brandGold/20 mt-2">
-                                        <div className="flex justify-between items-center mb-3">
-                                            <label className="text-sm font-medium text-brandGold">Prix</label>
-                                            <div className="flex items-center gap-2 text-xs text-platinumGray">
-                                                <span>{formatPrice(priceRange[0])}</span>
-                                                <span>-</span>
-                                                <span>{priceRange[1] === priceRangeLimits[1] ? `${formatPrice(priceRange[1])}` : formatPrice(priceRange[1])}</span>
-                                                <span className="text-2xs">MAD</span>
-                                            </div>
-                                        </div>
-                                        
-                                        {/* Show price distribution indicator */}
-                                        <div className="relative h-1 mb-3 w-full bg-brandGold/5 rounded-full">
-                                            {products.map((product, index) => {
-                                                const price = Number(product.basePrice);
-                                                const position = ((price - priceRangeLimits[0]) / (priceRangeLimits[1] - priceRangeLimits[0])) * 100;
-                                                return (
-                                                    <div 
-                                                        key={index}
-                                                        className="absolute w-0.5 h-2 -mt-0.5 rounded-full bg-brandGold/40" 
-                                                        style={{ left: `${Math.min(Math.max(position, 0), 100)}%` }}
-                                                    />
-                                                );
-                                            })}
-                                        </div>
-                                        
-                                        {/* Enhanced slider track */}
-                                        <div 
-                                            id="price-slider-track"
-                                            className="relative h-1.5 w-full bg-gradient-to-r from-brandGold/10 via-brandGold/20 to-brandGold/10 rounded-full cursor-pointer"
-                                            onClick={handleTrackClick}
-                                            aria-label="Ajuster la fourchette de prix"
-                                        >
-                                            {/* Active track */}
-                                            <div 
-                                                className="absolute h-full bg-gradient-to-r from-brandGold/70 to-brandGold rounded-full"
-                                                style={{
-                                                    left: calculateThumbPosition(priceRange[0]),
-                                                    right: `calc(100% - ${calculateThumbPosition(priceRange[1])})`
-                                                }}
-                                            ></div>
-                                            
-                                            {/* Min thumb */}
-                                            <div 
-                                                className={`absolute w-3.5 h-3.5 -mt-1 -ml-1.5 rounded-full cursor-grab ${isDragging === 'min' ? 'cursor-grabbing ring-2 ring-brandGold/30 shadow-md scale-110' : 'shadow-sm'} transition-all`}
-                                                style={{
-                                                    left: calculateThumbPosition(priceRange[0]),
-                                                    background: 'linear-gradient(to bottom right, #f2e9d0, #d4af37)'
-                                                }}
-                                                onMouseDown={handleThumbMouseDown('min')}
-                                                aria-label="Prix minimum"
-                                            >
-                                            </div>
-                                            
-                                            {/* Max thumb */}
-                                            <div 
-                                                className={`absolute w-3.5 h-3.5 -mt-1 -ml-1.5 rounded-full cursor-grab ${isDragging === 'max' ? 'cursor-grabbing ring-2 ring-brandGold/30 shadow-md scale-110' : 'shadow-sm'} transition-all`}
-                                                style={{
-                                                    left: calculateThumbPosition(priceRange[1]),
-                                                    background: 'linear-gradient(to bottom right, #f2e9d0, #d4af37)'
-                                                }}
-                                                onMouseDown={handleThumbMouseDown('max')}
-                                                aria-label="Prix maximum"
-                                            >
-                                            </div>
-                                        </div>
-                                        
-                                        {/* Price inputs */}
-                                        <div className="flex items-center gap-2 mt-4">
-                                            <div className="flex-1">
-                                                <div className="relative">
-                                                    <input
-                                                        type="text"
-                                                        value={minPrice === "" ? "" : formatPrice(minPrice)}
-                                                        onChange={(e) => {
-                                                            const value = e.target.value.replace(/[^\d]/g, "");
-                                                            const numValue = value === "" ? "" : Number(value);
-                                                            if (numValue === "" || (typeof numValue === 'number' && numValue <= priceRange[1] - 1000)) {
-                                                                setMinPrice(numValue);
-                                                                if (numValue !== "" && typeof numValue === 'number') {
-                                                                    setPriceRange([numValue, priceRange[1]]);
-                                                                }
-                                                            }
-                                                        }}
-                                                        className="w-full py-1 px-2 pr-10 border border-brandGold/40 rounded bg-transparent text-platinumGray placeholder-platinumGray/50 text-xs focus:outline-none focus:ring-1 focus:ring-brandGold"
-                                                        placeholder="Min"
-                                                        aria-label="Prix minimum"
-                                                    />
-                                                    <div className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-platinumGray/60">MAD</div>
+                                <motion.div 
+                                    className="w-full max-w-xl mx-auto"
+                                    initial={false}
+                                    animate={{ 
+                                        height: isPriceFilterVisible ? 'auto' : 0,
+                                        opacity: isPriceFilterVisible ? 1 : 0,
+                                        marginTop: isPriceFilterVisible ? 16 : 0
+                                    }}
+                                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                >
+                                    {isPriceFilterVisible && (
+                                        <div className="bg-gradient-to-r from-brandIvory/60 to-brandIvory/40 p-5 rounded-lg border border-brandGold/30 shadow-inner">
+                                            <div className="flex justify-between items-center mb-4">
+                                                <h4 className="text-sm font-serif text-brandGold">Fourchette de prix</h4>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs text-platinumGray font-light bg-brandIvory/80 px-3 py-1 rounded-full border border-brandGold/10">
+                                                        {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])} <span className="text-2xs opacity-70">MAD</span>
+                                                    </span>
                                                 </div>
                                             </div>
-                                            <span className="text-xs text-platinumGray">à</span>
-                                            <div className="flex-1">
-                                                <div className="relative">
-                                                    <input
-                                                        type="text"
-                                                        value={maxPrice === "" ? "" : formatPrice(maxPrice)}
-                                                        onChange={(e) => {
-                                                            const value = e.target.value.replace(/[^\d]/g, "");
-                                                            const numValue = value === "" ? "" : Number(value);
-                                                            if (numValue === "" || (typeof numValue === 'number' && numValue >= priceRange[0] + 1000)) {
-                                                                setMaxPrice(numValue);
-                                                                if (numValue !== "" && typeof numValue === 'number') {
-                                                                    setPriceRange([priceRange[0], numValue]);
+                                            
+                                            {/* Show price distribution indicator */}
+                                            <div className="relative h-1 mb-5 mt-6 w-full bg-brandGold/5 rounded-full overflow-hidden">
+                                                {products.map((product, index) => {
+                                                    const price = Number(product.basePrice);
+                                                    const position = ((price - priceRangeLimits[0]) / (priceRangeLimits[1] - priceRangeLimits[0])) * 100;
+                                                    return (
+                                                        <div 
+                                                            key={index}
+                                                            className="absolute w-0.5 h-3 -mt-1 rounded-full bg-gradient-to-b from-brandGold/20 to-brandGold/60" 
+                                                            style={{ left: `${Math.min(Math.max(position, 0), 100)}%` }}
+                                                        />
+                                                    );
+                                                })}
+                                            </div>
+                                            
+                                            {/* Enhanced slider track */}
+                                            <div 
+                                                id="price-slider-track"
+                                                className="relative h-1.5 w-full bg-gradient-to-r from-brandGold/10 via-brandGold/5 to-brandGold/10 rounded-full cursor-pointer"
+                                                onClick={handleTrackClick}
+                                                aria-label="Ajuster la fourchette de prix"
+                                            >
+                                                {/* Active track */}
+                                                <div 
+                                                    className="absolute h-full bg-gradient-to-r from-brandGold/70 to-brandGold/80 rounded-full"
+                                                    style={{
+                                                        left: calculateThumbPosition(priceRange[0]),
+                                                        right: `calc(100% - ${calculateThumbPosition(priceRange[1])})`
+                                                    }}
+                                                ></div>
+                                                
+                                                {/* Min thumb */}
+                                                <div 
+                                                    className={`absolute w-4 h-4 -mt-[5px] -ml-2 rounded-full cursor-grab border border-brandGold/30 
+                                                        ${isDragging === 'min' ? 'cursor-grabbing ring-2 ring-brandGold/20 shadow-lg scale-110' : 'shadow-md hover:scale-110'} 
+                                                        transition-all duration-150`}
+                                                    style={{
+                                                        left: calculateThumbPosition(priceRange[0]),
+                                                        background: 'linear-gradient(to bottom right, #f8efdb, #d4af37)'
+                                                    }}
+                                                    onMouseDown={handleThumbMouseDown('min')}
+                                                    aria-label="Prix minimum"
+                                                >
+                                                </div>
+                                                
+                                                {/* Max thumb */}
+                                                <div 
+                                                    className={`absolute w-4 h-4 -mt-[5px] -ml-2 rounded-full cursor-grab border border-brandGold/30 
+                                                        ${isDragging === 'max' ? 'cursor-grabbing ring-2 ring-brandGold/20 shadow-lg scale-110' : 'shadow-md hover:scale-110'} 
+                                                        transition-all duration-150`}
+                                                    style={{
+                                                        left: calculateThumbPosition(priceRange[1]),
+                                                        background: 'linear-gradient(to bottom right, #f8efdb, #d4af37)'
+                                                    }}
+                                                    onMouseDown={handleThumbMouseDown('max')}
+                                                    aria-label="Prix maximum"
+                                                >
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Price inputs */}
+                                            <div className="flex items-center gap-3 mt-6">
+                                                <div className="flex-1">
+                                                    <div className="relative">
+                                                        <input
+                                                            type="text"
+                                                            value={minPrice === "" ? "" : formatPrice(minPrice)}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value.replace(/[^\d]/g, "");
+                                                                const numValue = value === "" ? "" : Number(value);
+                                                                if (numValue === "" || (typeof numValue === 'number' && numValue <= priceRange[1] - 1000)) {
+                                                                    setMinPrice(numValue);
+                                                                    if (numValue !== "" && typeof numValue === 'number') {
+                                                                        setPriceRange([numValue, priceRange[1]]);
+                                                                    }
                                                                 }
-                                                            }
-                                                        }}
-                                                        className="w-full py-1 px-2 pr-10 border border-brandGold/40 rounded bg-transparent text-platinumGray placeholder-platinumGray/50 text-xs focus:outline-none focus:ring-1 focus:ring-brandGold"
-                                                        placeholder="Max"
-                                                        aria-label="Prix maximum"
-                                                    />
-                                                    <div className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-platinumGray/60">MAD</div>
+                                                            }}
+                                                            className="w-full py-1.5 px-3 pr-12 border border-brandGold/40 rounded-full bg-brandIvory/40 text-platinumGray placeholder-platinumGray/50 text-xs focus:outline-none focus:ring-1 focus:ring-brandGold/50 focus:border-brandGold/60 transition-colors duration-200"
+                                                            placeholder="Min"
+                                                            aria-label="Prix minimum"
+                                                        />
+                                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-2xs text-platinumGray/60 font-light">MAD</div>
+                                                    </div>
+                                                </div>
+                                                <span className="text-xs text-brandGold/60">à</span>
+                                                <div className="flex-1">
+                                                    <div className="relative">
+                                                        <input
+                                                            type="text"
+                                                            value={maxPrice === "" ? "" : formatPrice(maxPrice)}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value.replace(/[^\d]/g, "");
+                                                                const numValue = value === "" ? "" : Number(value);
+                                                                if (numValue === "" || (typeof numValue === 'number' && numValue >= priceRange[0] + 1000)) {
+                                                                    setMaxPrice(numValue);
+                                                                    if (numValue !== "" && typeof numValue === 'number') {
+                                                                        setPriceRange([priceRange[0], numValue]);
+                                                                    }
+                                                                }
+                                                            }}
+                                                            className="w-full py-1.5 px-3 pr-12 border border-brandGold/40 rounded-full bg-brandIvory/40 text-platinumGray placeholder-platinumGray/50 text-xs focus:outline-none focus:ring-1 focus:ring-brandGold/50 focus:border-brandGold/60 transition-colors duration-200"
+                                                            placeholder="Max"
+                                                            aria-label="Prix maximum"
+                                                        />
+                                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-2xs text-platinumGray/60 font-light">MAD</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
+                                </motion.div>
                             </div>
                         </div>
                     </div>
