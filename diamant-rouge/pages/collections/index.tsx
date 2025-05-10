@@ -1,13 +1,14 @@
 import { GetServerSideProps } from "next";
 import { prisma } from "../../lib/prisma";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "../../components/ProductCard";
 import Image from "next/image";
-import { FiFilter, FiChevronDown } from "react-icons/fi";
+import { FiFilter } from "react-icons/fi";
 import type { Product } from "@prisma/client";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { FaSpinner } from 'react-icons/fa';
 
 type CollectionPageProps = {
     products: Array<Product & { category?: { slug: string; translations?: any[] } | null }>;
@@ -54,11 +55,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 export default function CollectionsPage({ products, categories }: CollectionPageProps) {
     const router = useRouter();
-    const { category: categoryParam, maxPrice: maxPriceParam } = router.query;
+    const { category: categoryParam, minPrice: minPriceParam, maxPrice: maxPriceParam } = router.query;
     
     // Initialize state from URL parameters
     const [selectedCategory, setSelectedCategory] = useState<string>(
       typeof categoryParam === 'string' ? categoryParam : ""
+    );
+    
+    const [minPrice, setMinPrice] = useState<number | "">(
+      typeof minPriceParam === 'string' && !isNaN(Number(minPriceParam)) 
+        ? Number(minPriceParam) 
+        : ""
     );
     
     const [maxPrice, setMaxPrice] = useState<number | "">(
@@ -67,39 +74,106 @@ export default function CollectionsPage({ products, categories }: CollectionPage
         : ""
     );
     
-    const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-    const [sortOption, setSortOption] = useState("latest");
+    const [loading, setLoading] = useState(true);
     
+    // Price range states
+    const [priceRangeLimits, setPriceRangeLimits] = useState<[number, number]>([0, 100000]);
+    const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);
+    const [isDragging, setIsDragging] = useState<null | 'min' | 'max'>(null);
+    
+    // Toggle state for price filter visibility
+    const [isPriceFilterVisible, setIsPriceFilterVisible] = useState(false);
+    
+    const trackRef = useRef<HTMLDivElement>(null);
+    
+    // Get current locale from router
+    const locale = router.locale || "fr";
+    
+    // Prepare products data for ProductCard component to fix type issues
+    const prepareProductsForDisplay = useCallback((products: Array<Product & { category?: { slug: string; translations?: any[] } | null; translations?: any[] }>) => {
+        return products.map(product => ({
+            ...product,
+            basePrice: String(product.basePrice),
+            translations: product.translations || [], // Ensure translations exist
+        }));
+    }, []);
+    
+    // Find min and max product prices for slider bounds
     useEffect(() => {
-        // Skip during initial mount to avoid double navigation
-        if (router.isReady) {
-          // Build query object from current filters
-          const query: {[key: string]: string} = {};
-          
-          if (selectedCategory) {
-            query.category = selectedCategory;
-          }
-          
-          if (maxPrice !== "") {
-            query.maxPrice = maxPrice.toString();
-          }
-          
-          // Only update URL if the query params have actually changed
-          const currentQuery = router.query;
-          const hasChanged = 
-            (query.category !== currentQuery.category) || 
-            (query.maxPrice !== currentQuery.maxPrice);
-          
-          if (hasChanged) {
-            // Replace state instead of pushing to avoid navigation history issues
-            router.replace(
-              { pathname: router.pathname, query },
-              undefined,
-              { shallow: true, scroll: false }
-            );
-          }
+        if (products && products.length > 0) {
+            const prices = products.map(p => Number(p.basePrice));
+            
+            // Find actual min and max prices rather than rounding
+            const actualMinPrice = Math.min(...prices);
+            const actualMaxPrice = Math.max(...prices);
+            
+            // Round min down to nearest 100
+            const minProductPrice = Math.floor(actualMinPrice / 100) * 100;
+            
+            // Round max up to nearest 100
+            const maxProductPrice = Math.ceil(actualMaxPrice / 100) * 100;
+            
+            // Set limits with actual product price range
+            setPriceRangeLimits([minProductPrice, maxProductPrice]);
+            
+            // Initialize price range with URL params if present, otherwise use product limits
+            setPriceRange([
+                minPrice !== "" ? Number(minPrice) : minProductPrice,
+                maxPrice !== "" ? Number(maxPrice) : maxProductPrice
+            ]);
+            
+            // Log the actual price range for debugging
+            console.log(`Product price range: ${minProductPrice} - ${maxProductPrice} MAD`);
         }
-      }, [selectedCategory, maxPrice, router.isReady]);
+    }, [products, minPrice, maxPrice]);
+    
+    // Read query params from URL
+    useEffect(() => {
+        const { category, minPrice: minPriceParam, maxPrice: maxPriceParam } = router.query;
+
+        // Only set states if different from current to avoid loops
+        if (category && typeof category === 'string' && category !== selectedCategory) {
+            setSelectedCategory(category);
+        }
+
+        if (minPriceParam && typeof minPriceParam === 'string' && minPriceParam !== String(minPrice)) {
+            setMinPrice(Number(minPriceParam));
+            setPriceRange([Number(minPriceParam), priceRange[1]]);
+        }
+
+        if (maxPriceParam && typeof maxPriceParam === 'string' && maxPriceParam !== String(maxPrice)) {
+            setMaxPrice(Number(maxPriceParam));
+            setPriceRange([priceRange[0], Number(maxPriceParam)]);
+        }
+    }, [router.query]); // Only depend on router.query to avoid infinite loops
+
+    // Update URL with debouncing when slider is being dragged
+    useEffect(() => {
+        // Skip URL updates during active dragging to prevent excessive state changes
+        if (isDragging) return;
+        
+        // Use timeout for debouncing URL updates
+        const updateTimeout = setTimeout(() => {
+            const categoryQuery = selectedCategory ? { category: selectedCategory } : {};
+            const minPriceQuery = minPrice !== "" ? { minPrice: String(minPrice) } : {};
+            const maxPriceQuery = maxPrice !== "" ? { maxPrice: String(maxPrice) } : {};
+            
+            router.push(
+                {
+                    pathname: router.pathname,
+                    query: {
+                        ...categoryQuery,
+                        ...minPriceQuery,
+                        ...maxPriceQuery,
+                    },
+                },
+              undefined,
+                { shallow: true }
+            );
+        }, 300); // 300ms debounce
+        
+        return () => clearTimeout(updateTimeout);
+    }, [selectedCategory, minPrice, maxPrice, isDragging, router]);
     
     // Get translated category names
     const getCategoryName = (slug: string) => {
@@ -111,30 +185,110 @@ export default function CollectionsPage({ products, categories }: CollectionPage
         return translation?.name || slug;
     };
 
+    // Format price with commas for thousands
+    const formatPrice = (price: number | string): string => {
+        if (price === "" || price === undefined) return "";
+        return Number(price).toLocaleString('fr-FR');
+    };
+    
+    // Calculate percentage position for slider thumbs
+    const calculateThumbPosition = (value: number): string => {
+        const [min, max] = priceRangeLimits;
+        const percentage = ((value - min) / (max - min)) * 100;
+        return `${Math.min(Math.max(percentage, 0), 100)}%`;
+    };
+    
+    // Handle slider track click
+    const handleTrackClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+        const trackRect = e.currentTarget.getBoundingClientRect();
+        const clickPosition = (e.clientX - trackRect.left) / trackRect.width;
+        const [min, max] = priceRangeLimits;
+        const clickValue = min + clickPosition * (max - min);
+        
+        // Determine which thumb to move based on the click position
+        const [currentMin, currentMax] = priceRange;
+        const distToMin = Math.abs(clickValue - currentMin);
+        const distToMax = Math.abs(clickValue - currentMax);
+        
+        if (distToMin <= distToMax) {
+            setMinPrice(Math.round(clickValue));
+            setPriceRange([Math.round(clickValue), currentMax]);
+        } else {
+            setMaxPrice(Math.round(clickValue));
+            setPriceRange([currentMin, Math.round(clickValue)]);
+        }
+    }, [priceRange, priceRangeLimits]);
+    
+    // Handle thumb drag start
+    const handleThumbMouseDown = (type: 'min' | 'max') => (e: React.MouseEvent) => {
+        e.preventDefault();
+        setIsDragging(type);
+    };
+    
+    // Handle thumb drag
+    useEffect(() => {
+        if (!isDragging) return;
+        
+        const handleMouseMove = (e: MouseEvent) => {
+            const sliderTrack = document.getElementById('price-slider-track');
+            if (!sliderTrack) return;
+            
+            const trackRect = sliderTrack.getBoundingClientRect();
+            const position = (e.clientX - trackRect.left) / trackRect.width;
+            const [min, max] = priceRangeLimits;
+            let value = Math.round(min + position * (max - min));
+            
+            // Constrain value within limits
+            value = Math.max(min, Math.min(max, value));
+            
+            if (isDragging === 'min') {
+                const newMinPrice = Math.min(value, priceRange[1] - 1000);
+                setMinPrice(newMinPrice);
+                setPriceRange([newMinPrice, priceRange[1]]);
+            } else {
+                const newMaxPrice = Math.max(value, priceRange[0] + 1000);
+                setMaxPrice(newMaxPrice);
+                setPriceRange([priceRange[0], newMaxPrice]);
+            }
+        };
+        
+        const handleMouseUp = () => {
+            setIsDragging(null);
+        };
+        
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+        
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isDragging, priceRange, priceRangeLimits]);
+
     // Filter products
     const filteredProducts = products.filter((product) => {
         // Category filter
         if (selectedCategory && product.category?.slug !== selectedCategory) {
             return false;
         }
-        // Price filter
-        if (maxPrice !== "") {
+        
             const basePriceNum = Number(product.basePrice);
-            if (basePriceNum > Number(maxPrice)) {
+        
+        // Min price filter
+        if (minPrice !== "" && basePriceNum < Number(minPrice)) {
                 return false;
             }
+        
+        // Max price filter
+        if (maxPrice !== "" && basePriceNum > Number(maxPrice)) {
+            return false;
         }
+        
         return true;
     });
     
-    // Sort products
+    // Sort products - always sort by latest since we removed the dropdown
     const sortedProducts = [...filteredProducts].sort((a, b) => {
-        if (sortOption === "price-asc") {
-            return Number(a.basePrice) - Number(b.basePrice);
-        } 
-        if (sortOption === "price-desc") {
-            return Number(b.basePrice) - Number(a.basePrice);
-        }
         // Default: latest
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
@@ -142,8 +296,8 @@ export default function CollectionsPage({ products, categories }: CollectionPage
     // Reset filters
     const resetFilters = () => {
         setSelectedCategory("");
+        setMinPrice("");
         setMaxPrice("");
-        setSortOption("latest");
     };
 
 
@@ -187,103 +341,241 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                 </div>
 
                 <div className="container mx-auto px-4 py-12">
-                    {/* FILTERS SECTION */}
-                    <div className="mb-12 border-b border-brandGold/20 pb-6">
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-                            <div className="mb-4 md:mb-0">
+                    {/* FILTERS SECTION - Always visible */}
+                    <div className="mb-8 border-b border-brandGold/10 pb-6">
+                        <div className="flex justify-between items-start mb-6">
+                            <div>
                                 <h2 className="text-2xl font-serif text-brandGold">
                                     {sortedProducts.length} {sortedProducts.length > 1 ? 'Créations' : 'Création'}
                                 </h2>
-                                {(selectedCategory || maxPrice) && (
-                                    <p className="text-sm text-platinumGray mt-1">
-                                        Filtres appliqués: {selectedCategory && `${getCategoryName(selectedCategory)}`} 
-                                        {selectedCategory && maxPrice && ', '}
-                                        {maxPrice && `Prix max ${maxPrice} MAD`}
-                                    </p>
-                                )}
+                                {(selectedCategory || minPrice !== "" || maxPrice !== "") && (
+                                    <div className="flex flex-wrap gap-2 mt-1.5 items-center">
+                                        <span className="text-xs text-platinumGray">Filtres:</span>
+                                        {selectedCategory && (
+                                            <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-brandGold/5 rounded text-xs border border-brandGold/20">
+                                                <span className="text-platinumGray">{getCategoryName(selectedCategory)}</span>
+                                                <button 
+                                                    onClick={() => setSelectedCategory("")}
+                                                    className="text-brandGold hover:text-burgundy transition-colors ml-1"
+                                                    aria-label="Supprimer le filtre de catégorie"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        )}
+                                        {minPrice !== "" && (
+                                            <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-brandGold/5 rounded text-xs border border-brandGold/20">
+                                                <span className="text-platinumGray">Min: {formatPrice(minPrice)} MAD</span>
+                                                <button 
+                                                    onClick={() => {
+                                                        setMinPrice("");
+                                                        setPriceRange([priceRangeLimits[0], priceRange[1]]);
+                                                    }}
+                                                    className="text-brandGold hover:text-burgundy transition-colors ml-1"
+                                                    aria-label="Supprimer le filtre de prix minimum"
+                                                >
+                                                    ×
+                                                </button>
                             </div>
-                            
-                            <div className="flex items-center gap-4">
+                                        )}
+                                        {maxPrice !== "" && (
+                                            <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-brandGold/5 rounded text-xs border border-brandGold/20">
+                                                <span className="text-platinumGray">Max: {formatPrice(maxPrice)} MAD</span>
                                 <button 
-                                    onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-                                    className="flex items-center gap-2 px-4 py-2 border border-brandGold/30 rounded hover:bg-brandGold/5 transition"
-                                >
-                                    <FiFilter className="text-brandGold" />
-                                    <span className="text-brandGold">Filtres</span>
-                                    <FiChevronDown className={`text-brandGold transition-transform ${isFiltersOpen ? 'rotate-180' : ''}`} />
+                                                    onClick={() => {
+                                                        setMaxPrice("");
+                                                        setPriceRange([priceRange[0], priceRangeLimits[1]]);
+                                                    }}
+                                                    className="text-brandGold hover:text-burgundy transition-colors ml-1"
+                                                    aria-label="Supprimer le filtre de prix maximum"
+                                                >
+                                                    ×
                                 </button>
-                                
-                                <select
-                                    value={sortOption}
-                                    onChange={(e) => setSortOption(e.target.value)}
-                                    className="border border-brandGold/30 rounded bg-transparent p-2 text-brandGold focus:outline-none focus:ring-1 focus:ring-brandGold"
-                                >
-                                    <option value="latest">Plus récents</option>
-                                    <option value="price-asc">Prix: croissant</option>
-                                    <option value="price-desc">Prix: décroissant</option>
-                                </select>
+                                            </div>
+                                        )}
+                                        <button 
+                                            onClick={resetFilters}
+                                            className="text-xs text-burgundy hover:underline transition-colors"
+                                        >
+                                            Réinitialiser
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                         
-                        {/* Collapsible Filter Panel */}
-                        <AnimatePresence>
-                            {isFiltersOpen && (
-                                <motion.div 
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: "auto", opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{ duration: 0.3 }}
-                                    className="overflow-hidden"
-                                >
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 p-6 bg-white/50 rounded-lg shadow-sm">
-                                        {/* Category Filter */}
-                                        <div>
-                                            <label htmlFor="category" className="block text-sm font-medium text-brandGold mb-2">
-                                                Catégorie
-                                            </label>
-                                            <select
-                                                id="category"
-                                                value={selectedCategory}
-                                                onChange={(e) => setSelectedCategory(e.target.value)}
-                                                className="w-full border border-brandGold/30 rounded bg-transparent p-2.5 text-platinumGray focus:outline-none focus:ring-1 focus:ring-brandGold"
+                        {/* Refined filters section */}
+                        <div className="bg-brandIvory/30 rounded-lg p-5 border border-brandGold/10 shadow-sm">
+                            <div className="flex flex-col items-center gap-6">
+                                {/* Category buttons - centered */}
+                                <div className="w-full">
+                                    <label className="block text-sm font-medium text-brandGold mb-3 text-center">
+                                        Catégorie
+                                    </label>
+                                    <div className="flex flex-wrap justify-center gap-2 max-w-3xl mx-auto">
+                                        <button
+                                            onClick={() => setSelectedCategory("")}
+                                            className={`text-xs px-4 py-2 rounded-full transition-all ${selectedCategory === "" 
+                                                ? "bg-brandGold text-white shadow-sm" 
+                                                : "bg-brandIvory text-platinumGray hover:bg-brandGold/10 border border-brandGold/20"}`}
+                                        >
+                                            Toutes
+                                        </button>
+                                        {categories.map((cat) => (
+                                            <button
+                                                key={cat.slug}
+                                                onClick={() => setSelectedCategory(cat.slug)}
+                                                className={`text-xs px-4 py-2 rounded-full transition-all ${selectedCategory === cat.slug 
+                                                    ? "bg-brandGold text-white shadow-sm" 
+                                                    : "bg-brandIvory text-platinumGray hover:bg-brandGold/10 border border-brandGold/20"}`}
                                             >
-                                                <option value="">Toutes les catégories</option>
-                                                {categories.map((cat) => (
-                                                    <option key={cat.slug} value={cat.slug}>
-                                                        {getCategoryName(cat.slug)}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
+                                                {getCategoryName(cat.slug)}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
 
-                                        {/* Price Filter */}
-                                        <div>
-                                            <label htmlFor="price" className="block text-sm font-medium text-brandGold mb-2">
-                                                Prix Maximum (MAD)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                id="price"
-                                                placeholder="ex: 50000"
-                                                value={maxPrice}
-                                                onChange={(e) => setMaxPrice(e.target.value ? Number(e.target.value) : "")}
-                                                className="w-full border border-brandGold/30 rounded bg-transparent p-2.5 text-platinumGray focus:outline-none focus:ring-1 focus:ring-brandGold"
-                                            />
+                                {/* Price filter toggle button */}
+                                <div className="w-full flex justify-center mt-2">
+                                    <button
+                                        onClick={() => setIsPriceFilterVisible(!isPriceFilterVisible)}
+                                        className="flex items-center gap-2 text-sm text-brandGold hover:text-burgundy transition-colors"
+                                    >
+                                        <span>Filtrer par prix</span>
+                                        <svg 
+                                            xmlns="http://www.w3.org/2000/svg" 
+                                            width="16" 
+                                            height="16" 
+                                            fill="currentColor" 
+                                            viewBox="0 0 16 16"
+                                            className={`transform transition-transform ${isPriceFilterVisible ? 'rotate-180' : ''}`}
+                                        >
+                                            <path d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                {/* Price range slider - collapsible */}
+                                {isPriceFilterVisible && (
+                                    <div className="w-full max-w-xl mx-auto bg-brandIvory/50 p-4 rounded-lg border border-brandGold/20 mt-2">
+                                        <div className="flex justify-between items-center mb-3">
+                                            <label className="text-sm font-medium text-brandGold">Prix</label>
+                                            <div className="flex items-center gap-2 text-xs text-platinumGray">
+                                                <span>{formatPrice(priceRange[0])}</span>
+                                                <span>-</span>
+                                                <span>{priceRange[1] === priceRangeLimits[1] ? `${formatPrice(priceRange[1])}` : formatPrice(priceRange[1])}</span>
+                                                <span className="text-2xs">MAD</span>
+                                            </div>
                                         </div>
                                         
-                                        {/* Reset Filters Button */}
-                                        <div className="flex items-end">
-                                            <button 
-                                                onClick={resetFilters}
-                                                className="px-6 py-2.5 border border-brandGold/30 rounded hover:bg-brandGold/5 transition text-brandGold"
+                                        {/* Show price distribution indicator */}
+                                        <div className="relative h-1 mb-3 w-full bg-brandGold/5 rounded-full">
+                                            {products.map((product, index) => {
+                                                const price = Number(product.basePrice);
+                                                const position = ((price - priceRangeLimits[0]) / (priceRangeLimits[1] - priceRangeLimits[0])) * 100;
+                                                return (
+                                                    <div 
+                                                        key={index}
+                                                        className="absolute w-0.5 h-2 -mt-0.5 rounded-full bg-brandGold/40" 
+                                                        style={{ left: `${Math.min(Math.max(position, 0), 100)}%` }}
+                                                    />
+                                                );
+                                            })}
+                                        </div>
+                                        
+                                        {/* Enhanced slider track */}
+                                        <div 
+                                            id="price-slider-track"
+                                            className="relative h-1.5 w-full bg-gradient-to-r from-brandGold/10 via-brandGold/20 to-brandGold/10 rounded-full cursor-pointer"
+                                            onClick={handleTrackClick}
+                                            aria-label="Ajuster la fourchette de prix"
+                                        >
+                                            {/* Active track */}
+                                            <div 
+                                                className="absolute h-full bg-gradient-to-r from-brandGold/70 to-brandGold rounded-full"
+                                                style={{
+                                                    left: calculateThumbPosition(priceRange[0]),
+                                                    right: `calc(100% - ${calculateThumbPosition(priceRange[1])})`
+                                                }}
+                                            ></div>
+                                            
+                                            {/* Min thumb */}
+                                            <div 
+                                                className={`absolute w-3.5 h-3.5 -mt-1 -ml-1.5 rounded-full cursor-grab ${isDragging === 'min' ? 'cursor-grabbing ring-2 ring-brandGold/30 shadow-md scale-110' : 'shadow-sm'} transition-all`}
+                                                style={{
+                                                    left: calculateThumbPosition(priceRange[0]),
+                                                    background: 'linear-gradient(to bottom right, #f2e9d0, #d4af37)'
+                                                }}
+                                                onMouseDown={handleThumbMouseDown('min')}
+                                                aria-label="Prix minimum"
                                             >
-                                                Réinitialiser les filtres
-                                            </button>
+                                            </div>
+                                            
+                                            {/* Max thumb */}
+                                            <div 
+                                                className={`absolute w-3.5 h-3.5 -mt-1 -ml-1.5 rounded-full cursor-grab ${isDragging === 'max' ? 'cursor-grabbing ring-2 ring-brandGold/30 shadow-md scale-110' : 'shadow-sm'} transition-all`}
+                                                style={{
+                                                    left: calculateThumbPosition(priceRange[1]),
+                                                    background: 'linear-gradient(to bottom right, #f2e9d0, #d4af37)'
+                                                }}
+                                                onMouseDown={handleThumbMouseDown('max')}
+                                                aria-label="Prix maximum"
+                                            >
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Price inputs */}
+                                        <div className="flex items-center gap-2 mt-4">
+                                            <div className="flex-1">
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        value={minPrice === "" ? "" : formatPrice(minPrice)}
+                                                        onChange={(e) => {
+                                                            const value = e.target.value.replace(/[^\d]/g, "");
+                                                            const numValue = value === "" ? "" : Number(value);
+                                                            if (numValue === "" || (typeof numValue === 'number' && numValue <= priceRange[1] - 1000)) {
+                                                                setMinPrice(numValue);
+                                                                if (numValue !== "" && typeof numValue === 'number') {
+                                                                    setPriceRange([numValue, priceRange[1]]);
+                                                                }
+                                                            }
+                                                        }}
+                                                        className="w-full py-1 px-2 pr-10 border border-brandGold/40 rounded bg-transparent text-platinumGray placeholder-platinumGray/50 text-xs focus:outline-none focus:ring-1 focus:ring-brandGold"
+                                                        placeholder="Min"
+                                                        aria-label="Prix minimum"
+                                                    />
+                                                    <div className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-platinumGray/60">MAD</div>
+                                                </div>
+                                            </div>
+                                            <span className="text-xs text-platinumGray">à</span>
+                                            <div className="flex-1">
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        value={maxPrice === "" ? "" : formatPrice(maxPrice)}
+                                                        onChange={(e) => {
+                                                            const value = e.target.value.replace(/[^\d]/g, "");
+                                                            const numValue = value === "" ? "" : Number(value);
+                                                            if (numValue === "" || (typeof numValue === 'number' && numValue >= priceRange[0] + 1000)) {
+                                                                setMaxPrice(numValue);
+                                                                if (numValue !== "" && typeof numValue === 'number') {
+                                                                    setPriceRange([priceRange[0], numValue]);
+                                                                }
+                                                            }
+                                                        }}
+                                                        className="w-full py-1 px-2 pr-10 border border-brandGold/40 rounded bg-transparent text-platinumGray placeholder-platinumGray/50 text-xs focus:outline-none focus:ring-1 focus:ring-brandGold"
+                                                        placeholder="Max"
+                                                        aria-label="Prix maximum"
+                                                    />
+                                                    <div className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-platinumGray/60">MAD</div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
                     {/* PRODUCTS GRID */}
@@ -309,7 +601,7 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
-                                {sortedProducts.map((product) => (
+                                {prepareProductsForDisplay(sortedProducts).map((product) => (
                                     <motion.div
                                         key={product.id}
                                         initial={{ opacity: 0, y: 20 }}
@@ -317,7 +609,7 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                                         transition={{ duration: 0.4 }}
                                         whileHover={{ y: -5, transition: { duration: 0.2 } }}
                                     >
-                                        <ProductCard product={product} />
+                                        <ProductCard product={product} locale={locale} />
                                     </motion.div>
                                 ))}
                             </div>

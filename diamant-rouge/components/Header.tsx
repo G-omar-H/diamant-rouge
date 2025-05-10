@@ -182,22 +182,55 @@ export default function Header() {
                         </button>
 
                         <div className={`absolute top-full left-0 w-48 bg-brandIvory shadow-luxury border border-brandGold/10 rounded py-2 z-50 transition-all duration-300 ${collectionsOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'}`}>
-                          {/* Collections dropdown when scrolled */}
   <div className="absolute -top-2 left-6 w-4 h-4 rotate-45 bg-brandIvory border-t border-l border-brandGold/10"></div>
-  <Link href="/collections?category=bagues" className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
+                          <Link 
+                            href="/collections?category=bagues" 
+                            as="/collections?category=bagues"
+                            passHref
+                            legacyBehavior
+                          >
+                            <a className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
     Bagues
+                            </a>
   </Link>
-  <Link href="/collections?category=colliers" className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
+                          <Link 
+                            href="/collections?category=colliers" 
+                            as="/collections?category=colliers"
+                            passHref
+                            legacyBehavior
+                          >
+                            <a className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
     Colliers
+                            </a>
   </Link>
-  <Link href="/collections?category=bracelets" className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
+                          <Link 
+                            href="/collections?category=bracelets" 
+                            as="/collections?category=bracelets"
+                            passHref
+                            legacyBehavior
+                          >
+                            <a className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
     Bracelets
+                            </a>
   </Link>
-  <Link href="/collections?category=boucles" className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
+                          <Link 
+                            href="/collections?category=boucles" 
+                            as="/collections?category=boucles"
+                            passHref
+                            legacyBehavior
+                          >
+                            <a className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
     Boucles d'oreilles
+                            </a>
   </Link>
-  <Link href="/collections" className="block px-4 py-2 text-sm text-brandGold hover:bg-brandGold/5 transition-colors duration-200">
+                          <Link 
+                            href="/collections" 
+                            passHref
+                            legacyBehavior
+                          >
+                            <a className="block px-4 py-2 text-sm text-brandGold hover:bg-brandGold/5 transition-colors duration-200">
     Voir toutes les collections
+                            </a>
   </Link>
 </div>
                       </div>
@@ -368,22 +401,56 @@ export default function Header() {
                     </button>
 
                     <div className={`absolute top-full left-1/2 transform -translate-x-1/2 w-48 bg-brandIvory shadow-luxury border border-brandGold/10 rounded py-2 mt-1 transition-all duration-300 ${collectionsOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'} z-50`}>
-  <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 rotate-45 bg-brandIvory border-t border-l border-brandGold/10"></div>
-  <Link href="/collections?category=bagues" className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
+                      <div className="absolute -top-2 left-6 w-4 h-4 rotate-45 bg-brandIvory border-t border-l border-brandGold/10"></div>
+                      <Link 
+                        href="/collections?category=bagues" 
+                        as="/collections?category=bagues"
+                        passHref
+                        legacyBehavior
+                      >
+                        <a className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
     Bagues
+                        </a>
   </Link>
-  <Link href="/collections?category=colliers" className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
+                      <Link 
+                        href="/collections?category=colliers" 
+                        as="/collections?category=colliers"
+                        passHref
+                        legacyBehavior
+                      >
+                        <a className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
     Colliers
+                        </a>
   </Link>
-  <Link href="/collections?category=bracelets" className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
+                      <Link 
+                        href="/collections?category=bracelets" 
+                        as="/collections?category=bracelets"
+                        passHref
+                        legacyBehavior
+                      >
+                        <a className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
     Bracelets
+                        </a>
   </Link>
-  <Link href="/collections?category=boucles" className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
+                      <Link 
+                        href="/collections?category=boucles" 
+                        as="/collections?category=boucles"
+                        passHref
+                        legacyBehavior
+                      >
+                        <a className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
     Boucles d'oreilles
+                        </a>
   </Link>
   <div className="h-px w-full bg-brandGold/10 my-1"></div>
-  <Link href="/collections" className="block px-4 py-2 text-sm text-brandGold hover:bg-brandGold/5 transition-colors duration-200">
+                      <Link 
+                        href="/collections" 
+                        passHref
+                        legacyBehavior
+                      >
+                        <a className="block px-4 py-2 text-sm text-brandGold hover:bg-brandGold/5 transition-colors duration-200">
     Voir toutes les collections
+                        </a>
   </Link>
 </div>
                   </div>

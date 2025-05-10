@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { X, Eye, HeartOff } from 'lucide-react';
+import { X, Eye, HeartOff, LogIn, Mail, Lock, User } from 'lucide-react';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useCart } from '../contexts/CartContext';
 import { Product, ProductTranslation } from '@prisma/client';
+import { redirectToAuth } from '../lib/authUtils';
+import { signIn } from 'next-auth/react';
 
 type WishlistPanelProps = {
     isOpen: boolean;
@@ -13,18 +15,30 @@ type WishlistPanelProps = {
     locale: string;
 };
 
+// Use the type from WishlistContext
 type WishlistItemType = {
-    id: number;
-    userId: number;
+    id?: number;
+    userId?: number;
     productId: number;
-    product: Product & {
+    product?: Product & {
         translations: ProductTranslation[];
-        images: string[];
+        images?: string[];
     };
 };
 
 const WishlistPanel = ({ isOpen, onClose, locale = 'fr' }: WishlistPanelProps) => {
-    const { wishlist, removeFromWishlist } = useWishlist();
+    const { wishlist, removeFromWishlist, isAuthenticated } = useWishlist();
+    
+    // Added states for authentication form
+    const [authMode, setAuthMode] = useState('login'); // 'login' or 'signup'
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    
+    const isLogin = authMode === 'login';
+    const isSignup = authMode === 'signup';
 
     useEffect(() => {
         if (isOpen) {
@@ -37,12 +51,94 @@ const WishlistPanel = ({ isOpen, onClose, locale = 'fr' }: WishlistPanelProps) =
             document.body.style.overflow = 'auto';
         };
     }, [isOpen]);
+    
+    // Clear form when closing panel
+    useEffect(() => {
+        if (!isOpen) {
+            setEmail('');
+            setPassword('');
+            setName('');
+            setError('');
+            setAuthMode('login');
+        }
+    }, [isOpen]);
 
     const handleRemove = (productId: number) => {
         removeFromWishlist(productId);
     };
+    
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+
+        try {
+            if (isLogin) {
+                // Handle login with NextAuth
+                const result = await signIn('credentials', {
+                    redirect: false,
+                    email,
+                    password
+                });
+
+                if (result?.error) {
+                    setError('Identifiants incorrects. Veuillez réessayer.');
+                }
+            } else if (isSignup) {
+                // Handle signup with API
+                if (!name) {
+                    setError('Veuillez saisir votre nom');
+                    setLoading(false);
+                    return;
+                }
+
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, name })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // Better error handling for different scenarios
+                    if (response.status === 409 || data.error?.includes('existe déjà') || data.error?.includes('already exists')) {
+                        setError('Cette adresse email est déjà utilisée. Veuillez vous connecter ou utiliser une autre adresse.');
+                        return;
+                    }
+                    throw new Error(data.error || 'Une erreur est survenue lors de la création de votre compte');
+                }
+
+                // Auto login after successful signup
+                const loginResult = await signIn('credentials', {
+                    redirect: false,
+                    email,
+                    password
+                });
+
+                if (loginResult?.error) {
+                    setError('Compte créé avec succès. Veuillez vous connecter.');
+                    setAuthMode('login');
+                }
+            }
+        } catch (err: any) {
+            console.error('Authentication error:', err);
+            setError(err.message || 'Une erreur est survenue. Veuillez réessayer.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const switchMode = (mode: string) => {
+        setAuthMode(mode);
+        setError('');
+    };
 
     const getProductName = (item: WishlistItemType) => {
+        if (!item.product || !item.product.translations || item.product.translations.length === 0) {
+            return 'Création Diamant Rouge';
+        }
+
         const translation =
             item.product.translations.find(t => t.language === locale) ||
             item.product.translations.find(t => t.language === 'fr') ||
@@ -53,6 +149,10 @@ const WishlistPanel = ({ isOpen, onClose, locale = 'fr' }: WishlistPanelProps) =
 
     // Extract material info from product name or description
     const getMaterialInfo = (item: WishlistItemType) => {
+        if (!item.product || !item.product.translations || item.product.translations.length === 0) {
+            return 'Or 18 carats, pierres précieuses sélectionnées';
+        }
+
         const translation =
             item.product.translations.find(t => t.language === locale) ||
             item.product.translations.find(t => t.language === 'fr') ||
@@ -129,10 +229,135 @@ const WishlistPanel = ({ isOpen, onClose, locale = 'fr' }: WishlistPanelProps) =
 
                         {/* Refined content with horizontal layout */}
                         <div className="flex-1 overflow-y-auto scrollbar-hide pt-8 pb-6 px-10">
-                            {wishlist.length > 0 ? (
+                            {!isAuthenticated ? (
+                                <motion.div 
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.1, duration: 0.4 }}
+                                    className="flex flex-col items-center justify-center h-full text-center py-12"
+                                >
+                                    <div className="w-16 h-16 bg-brandIvory/40 rounded-full flex items-center justify-center mb-6 shadow-sm">
+                                        <LogIn size={24} className="text-brandGold/70" />
+                                    </div>
+                                    
+                                    <h4 className="font-serif text-xl text-richEbony mb-4">
+                                        {isLogin ? 'Connectez-vous à Votre Compte' : 'Créez Votre Compte'}
+                                    </h4>
+                                    
+                                    <p className="text-sm text-platinumGray max-w-xs leading-relaxed mb-8">
+                                        {isLogin ? 
+                                            'Accédez à votre collection privée pour retrouver vos créations favorites.' : 
+                                            'Rejoignez Diamant Rouge pour sauvegarder vos créations préférées.'}
+                                    </p>
+                                    
+                                    {error && (
+                                        <div className="bg-burgundy/10 text-burgundy text-sm py-3 px-4 rounded mb-6 w-full max-w-sm">
+                                            {error}
+                                        </div>
+                                    )}
+                                    
+                                    <form onSubmit={handleSubmit} className="w-full max-w-sm">
+                                        {/* Name field - only for signup */}
+                                        {isSignup && (
+                                            <div className="mb-4">
+                                                <div className="relative">
+                                                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-platinumGray">
+                                                        <User size={18} />
+                                                    </span>
+                                                    <input
+                                                        type="text"
+                                                        value={name}
+                                                        onChange={(e) => setName(e.target.value)}
+                                                        placeholder="Votre nom"
+                                                        className="w-full pl-10 pr-4 py-3 border border-brandGold/30 focus:border-brandGold focus:outline-none bg-white"
+                                                        required={isSignup}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                    
+                                        {/* Email field */}
+                                        <div className="mb-4">
+                                            <div className="relative">
+                                                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-platinumGray">
+                                                    <Mail size={18} />
+                                                </span>
+                                                <input
+                                                    type="email"
+                                                    value={email}
+                                                    onChange={(e) => setEmail(e.target.value)}
+                                                    placeholder="Adresse email"
+                                                    className="w-full pl-10 pr-4 py-3 border border-brandGold/30 focus:border-brandGold focus:outline-none bg-white"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Password field */}
+                                        <div className="mb-6">
+                                            <div className="relative">
+                                                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-platinumGray">
+                                                    <Lock size={18} />
+                                                </span>
+                                                <input
+                                                    type="password"
+                                                    value={password}
+                                                    onChange={(e) => setPassword(e.target.value)}
+                                                    placeholder="Mot de passe"
+                                                    className="w-full pl-10 pr-4 py-3 border border-brandGold/30 focus:border-brandGold focus:outline-none bg-white"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Submit button */}
+                                        <button
+                                            type="submit"
+                                            disabled={loading}
+                                            className={`w-full py-3.5 bg-richEbony text-white hover:bg-burgundy transition-all duration-300 tracking-wide ${loading ? 'opacity-70 cursor-wait' : ''}`}
+                                        >
+                                            {loading ? 'Traitement en cours...' : (isLogin ? 'Se connecter' : 'Créer un compte')}
+                                        </button>
+                                    </form>
+                                    
+                                    {/* Switch between login and signup */}
+                                    <div className="mt-6 text-sm text-platinumGray">
+                                        {isLogin ? (
+                                            <p>
+                                                Nouveau client ?{' '}
+                                                <button
+                                                    onClick={() => switchMode('signup')}
+                                                    className="text-brandGold underline hover:text-richEbony transition-colors"
+                                                >
+                                                    Créer un compte
+                                                </button>
+                                            </p>
+                                        ) : (
+                                            <p>
+                                                Déjà client ?{' '}
+                                                <button
+                                                    onClick={() => switchMode('login')}
+                                                    className="text-brandGold underline hover:text-richEbony transition-colors"
+                                                >
+                                                    Se connecter
+                                                </button>
+                                            </p>
+                                        )}
+                                    </div>
+                                    
+                                    {/* Forgot password link - only for login */}
+                                    {isLogin && (
+                                        <div className="mt-4">
+                                            <Link href="/auth?mode=forgotPassword" className="text-xs text-platinumGray hover:text-brandGold transition-colors">
+                                                Mot de passe oublié ?
+                                            </Link>
+                                        </div>
+                                    )}
+                                </motion.div>
+                            ) : wishlist.length > 0 ? (
                                 <div className="space-y-8">
                                     {wishlist.map((item: WishlistItemType) => {
-                                        const imageSrc = item.product.images && item.product.images.length > 0
+                                        const imageSrc = item.product && item.product.images && item.product.images.length > 0
                                             ? item.product.images[0]
                                             : '/images/placeholder.jpg';
 
@@ -229,7 +454,7 @@ const WishlistPanel = ({ isOpen, onClose, locale = 'fr' }: WishlistPanelProps) =
                         </div>
 
                         {/* Elegant footer */}
-                        {wishlist.length > 0 && (
+                        {isAuthenticated && wishlist.length > 0 && (
                             <div className="border-t border-brandGold/10 py-8 px-10 bg-white">
                                 <Link href="/collections" className="block">
                                     <button className="w-full py-4 bg-richEbony text-white hover:bg-burgundy transition-all duration-300 tracking-wide text-sm">

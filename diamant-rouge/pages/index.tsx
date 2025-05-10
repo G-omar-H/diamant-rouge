@@ -505,74 +505,7 @@ export default function HomePage({
                 </div>
             </motion.section>
 
-            {/* 
-            ----------------------------------------------------
-            🎉 5. ÉVÉNEMENTS EXCLUSIFS - With elegant presentation
-            ----------------------------------------------------
-            */}
-            <motion.section
-                className="relative py-28 overflow-hidden"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ duration: 0.8 }}
-                viewport={{ once: true }}
-            >
-                {/* Background Image */}
-                <div className="absolute inset-0 z-0">
-                    <Image
-                        src="/images/rings/08a58c59664d--Aurate-Holiday-36kira-1v2.jpg"
-                        alt="Événement Diamant Rouge"
-                        fill
-                        className="object-cover object-center"
-                    />
-                    {/* Elegant overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-richEbony/90 via-richEbony/50 to-richEbony/90" />
-                </div>
-
-                {/* Content */}
-                <div className="container mx-auto px-6 md:px-10 relative z-10">
-                    <div className="max-w-lg ml-auto">
-                        <h3 className="text-4xl md:text-5xl font-serif text-brandGold mb-6">
-                            Événements Exclusifs
-                        </h3>
-                        
-                        <div className="h-0.5 w-16 bg-brandGold mb-8"></div>
-                        
-                        <p className="text-xl text-brandIvory/90 mb-8 leading-relaxed">
-                            Découvrez en avant-première nos collections lors de nos soirées privées.
-                            Une expérience intime où le luxe se révèle dans chaque détail.
-                        </p>
-                        
-                        <div className="bg-brandGold/10 backdrop-blur-sm border border-brandGold/30 p-6 mb-10">
-                            <h4 className="font-serif text-2xl text-brandGold mb-3">Dynastie Éblouissante</h4>
-                            <p className="text-brandIvory mb-4">
-                                Notre nouvelle collection sera dévoilée le 15 décembre
-                                lors d'une soirée exclusive dans notre boutique de Casablanca.
-                            </p>
-                            <p className="text-sm text-brandIvory/70">
-                                Sur invitation uniquement • Places limitées
-                            </p>
-                        </div>
-                        
-                        <Link href="/appointments">
-                            <button className="px-10 py-3 bg-brandGold text-richEbony hover:bg-brandIvory transition-colors duration-300 tracking-wider">
-                                Demander une Invitation
-                            </button>
-                        </Link>
-                    </div>
-                </div>
-            </motion.section>
-
-            {/* CSS for hiding scrollbars */}
-            <style jsx global>{`
-                .scrollbar-hide::-webkit-scrollbar {
-                    display: none;
-                }
-                .scrollbar-hide {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
-                }
-            `}</style>
+ 
 
             {/* 
 ----------------------------------------------------
@@ -687,6 +620,76 @@ export default function HomePage({
     </div>
   </div>
 </section>
+
+           {/* 
+            ----------------------------------------------------
+            🎉 5. ÉVÉNEMENTS EXCLUSIFS - With elegant presentation
+            ----------------------------------------------------
+            */}
+            <motion.section
+                className="relative py-28 overflow-hidden"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+            >
+                {/* Background Image */}
+                <div className="absolute inset-0 z-0">
+                    <Image
+                        src="/images/rings/08a58c59664d--Aurate-Holiday-36kira-1v2.jpg"
+                        alt="Événement Diamant Rouge"
+                        fill
+                        className="object-cover object-center"
+                    />
+                    {/* Elegant overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-richEbony/90 via-richEbony/50 to-richEbony/90" />
+                </div>
+
+                {/* Content */}
+                <div className="container mx-auto px-6 md:px-10 relative z-10">
+                    <div className="max-w-lg ml-auto">
+                        <h3 className="text-4xl md:text-5xl font-serif text-brandGold mb-6">
+                            Événements Exclusifs
+                        </h3>
+                        
+                        <div className="h-0.5 w-16 bg-brandGold mb-8"></div>
+                        
+                        <p className="text-xl text-brandIvory/90 mb-8 leading-relaxed">
+                            Découvrez en avant-première nos collections lors de nos soirées privées.
+                            Une expérience intime où le luxe se révèle dans chaque détail.
+                        </p>
+                        
+                        <div className="bg-brandGold/10 backdrop-blur-sm border border-brandGold/30 p-6 mb-10">
+                            <h4 className="font-serif text-2xl text-brandGold mb-3">Dynastie Éblouissante</h4>
+                            <p className="text-brandIvory mb-4">
+                                Notre nouvelle collection sera dévoilée le 15 décembre
+                                lors d'une soirée exclusive dans notre boutique de Casablanca.
+                            </p>
+                            <p className="text-sm text-brandIvory/70">
+                                Sur invitation uniquement • Places limitées
+                            </p>
+                        </div>
+                        
+                        <Link href="/appointments">
+                            <button className="px-10 py-3 bg-brandGold text-richEbony hover:bg-brandIvory transition-colors duration-300 tracking-wider">
+                                Demander une Invitation
+                            </button>
+                        </Link>
+                    </div>
+                </div>
+            </motion.section>
+
+            {/* CSS for hiding scrollbars */}
+            <style jsx global>{`
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+                .scrollbar-hide {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+            `}</style>
+
         </>
     );
 }

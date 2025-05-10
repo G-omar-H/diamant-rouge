@@ -1,7 +1,16 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import { useSession } from "next-auth/react";
+import { redirectToAuth } from "../lib/authUtils";
+import { Product, ProductTranslation } from "@prisma/client";
 
 type WishlistItem = {
+    id?: number;
+    userId?: number;
     productId: number;
+    product?: Product & {
+        translations: ProductTranslation[];
+        images?: string[];
+    };
 };
 
 type WishlistContextType = {
@@ -12,6 +21,7 @@ type WishlistContextType = {
     isWishlistOpen: boolean;
     toggleWishlist: () => void;
     closeWishlist: () => void;
+    isAuthenticated: boolean;
 };
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
@@ -21,9 +31,17 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     const [isWishlistOpen, setIsWishlistOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [lastFetched, setLastFetched] = useState(0);
+    
+    // Get authentication status from NextAuth session
+    const { data: session, status } = useSession();
+    const isAuthenticated = !!session;
+    const isSessionLoading = status === "loading";
 
     // Use useCallback to avoid recreation of this function on each render
     const fetchWishlist = useCallback(async () => {
+        // Don't fetch if not authenticated
+        if (!isAuthenticated || isSessionLoading) return;
+        
         // Prevent multiple concurrent requests
         if (isLoading) return;
         
@@ -46,21 +64,30 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
         } finally {
             setIsLoading(false);
         }
-    }, [isLoading, lastFetched, wishlist.length]);
+    }, [isLoading, lastFetched, wishlist.length, isAuthenticated, isSessionLoading]);
 
-    // Initial fetch on component mount
+    // Initial fetch on component mount only if authenticated
     useEffect(() => {
+        if (isAuthenticated && !isSessionLoading) {
         fetchWishlist();
-    }, []);
+        }
+    }, [isAuthenticated, isSessionLoading, fetchWishlist]);
 
-    // Fetch wishlist when panel is opened
+    // Fetch wishlist when panel is opened and user is authenticated
     useEffect(() => {
-        if (isWishlistOpen) {
+        if (isWishlistOpen && isAuthenticated && !isSessionLoading) {
             fetchWishlist();
         }
-    }, [isWishlistOpen, fetchWishlist]);
+    }, [isWishlistOpen, isAuthenticated, isSessionLoading, fetchWishlist]);
 
     async function addToWishlist(productId: number) {
+        // Redirect to auth if not authenticated
+        if (!isAuthenticated) {
+            closeWishlist();
+            redirectToAuth('favorite', productId);
+            return;
+        }
+        
         try {
             const res = await fetch("/api/wishlist", {
                 method: "POST",
@@ -75,6 +102,9 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     }
 
     async function removeFromWishlist(productId: number) {
+        // Safety check - should not happen but just in case
+        if (!isAuthenticated) return;
+        
         try {
             const res = await fetch("/api/wishlist", {
                 method: "DELETE",
@@ -110,7 +140,8 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
                 fetchWishlist,
                 isWishlistOpen,
                 toggleWishlist,
-                closeWishlist
+                closeWishlist,
+                isAuthenticated
             }}
         >
             {children}
