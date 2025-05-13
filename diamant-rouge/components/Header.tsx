@@ -22,6 +22,7 @@ import {
   Clock,
   ChevronDown
 } from "lucide-react";
+import { useRouter } from "next/router";
 
 export default function Header() {
   const { cart } = useCart();
@@ -32,7 +33,7 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [collectionsOpen, setCollectionsOpen] = useState(false);
-
+  const router = useRouter();
 
   // Ref for dropdown menu
   const collectionsMenuRef = useRef<HTMLDivElement>(null);
@@ -128,7 +129,11 @@ export default function Header() {
               <div className="flex items-center gap-5">
                 {session ? (
                   <>
-                    <Link href="/profile" className="hover:text-brandGold transition-colors duration-300">
+                    <Link 
+                      href="/profile" 
+                      locale={router.locale} 
+                      className="hover:text-brandGold transition-colors duration-300"
+                    >
                       Mon Compte
                     </Link>
                     <button
@@ -140,7 +145,11 @@ export default function Header() {
                     </button>
                   </>
                 ) : (
-                  <Link href="/auth" className="hover:text-brandGold transition-colors duration-300">
+                  <Link 
+                    href="/auth" 
+                    locale={router.locale} 
+                    className="hover:text-brandGold transition-colors duration-300"
+                  >
                     Connexion / Inscription
                   </Link>
                 )}
@@ -168,7 +177,11 @@ export default function Header() {
                   {/* Left: Desktop Navigation when scrolled */}
                   <div className="hidden md:flex items-center justify-start">
                     <nav className="flex items-center space-x-2 font-serif">
-                      <Link href="/" className="px-3 text-sm tracking-widest font-medium hover:text-brandGold transition-all duration-300">
+                      <Link 
+                        href="/" 
+                        locale={router.locale} 
+                        className="px-3 text-sm tracking-widest font-medium hover:text-brandGold transition-all duration-300"
+                      >
                         ACCUEIL
                       </Link>
                       <span className="text-brandGold/30 text-xs">•</span>
@@ -182,60 +195,50 @@ export default function Header() {
                         </button>
 
                         <div className={`absolute top-full left-0 w-48 bg-brandIvory shadow-luxury border border-brandGold/10 rounded py-2 z-50 transition-all duration-300 ${collectionsOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'}`}>
-  <div className="absolute -top-2 left-6 w-4 h-4 rotate-45 bg-brandIvory border-t border-l border-brandGold/10"></div>
+                          <div className="absolute -top-2 left-6 w-4 h-4 rotate-45 bg-brandIvory border-t border-l border-brandGold/10"></div>
                           <Link 
-                            href="/collections?category=bagues" 
-                            as="/collections?category=bagues"
-                            passHref
-                            legacyBehavior
+                            href="/collections?category=bagues"
+                            locale={router.locale}
+                            className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200"
                           >
-                            <a className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
-    Bagues
-                            </a>
-  </Link>
+                            Bagues
+                          </Link>
                           <Link 
                             href="/collections?category=colliers" 
-                            as="/collections?category=colliers"
-                            passHref
-                            legacyBehavior
+                            locale={router.locale}
+                            className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200"
                           >
-                            <a className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
-    Colliers
-                            </a>
-  </Link>
+                            Colliers
+                          </Link>
                           <Link 
-                            href="/collections?category=bracelets" 
-                            as="/collections?category=bracelets"
-                            passHref
-                            legacyBehavior
+                            href="/collections?category=bracelets"
+                            locale={router.locale}
+                            className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200"
                           >
-                            <a className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
-    Bracelets
-                            </a>
-  </Link>
+                            Bracelets
+                          </Link>
                           <Link 
-                            href="/collections?category=boucles" 
-                            as="/collections?category=boucles"
-                            passHref
-                            legacyBehavior
+                            href="/collections?category=boucles"
+                            locale={router.locale}
+                            className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200"
                           >
-                            <a className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
-    Boucles d'oreilles
-                            </a>
-  </Link>
+                            Boucles d'oreilles
+                          </Link>
                           <Link 
-                            href="/collections" 
-                            passHref
-                            legacyBehavior
+                            href="/collections"
+                            locale={router.locale}
+                            className="block px-4 py-2 text-sm text-brandGold hover:bg-brandGold/5 transition-colors duration-200"
                           >
-                            <a className="block px-4 py-2 text-sm text-brandGold hover:bg-brandGold/5 transition-colors duration-200">
-    Voir toutes les collections
-                            </a>
-  </Link>
-</div>
+                            Voir toutes les collections
+                          </Link>
+                        </div>
                       </div>
                       <span className="text-brandGold/30 text-xs">•</span>
-                      <Link href="/jewelry" className="px-3 text-sm tracking-widest font-medium hover:text-brandGold transition-all duration-300">
+                      <Link 
+                        href="/jewelry"
+                        locale={router.locale}
+                        className="px-3 text-sm tracking-widest font-medium hover:text-brandGold transition-all duration-300"
+                      >
                         JOAILLERIE
                       </Link>
                     </nav>
@@ -274,6 +277,7 @@ export default function Header() {
             <div className="flex justify-center items-center">
               <Link
                 href="/"
+                locale={router.locale}
                 title="Accueil Diamant Rouge"
                 className="inline-block relative group"
               >
@@ -295,15 +299,27 @@ export default function Header() {
               {scrolled ? (
                 <div className="hidden md:flex items-center justify-end mr-5">
                   <nav className="flex items-center space-x-2 font-serif">
-                    <Link href="/appointments" className="px-3 text-sm tracking-widest font-medium hover:text-brandGold transition-all duration-300">
+                    <Link 
+                      href="/appointments" 
+                      locale={router.locale} 
+                      className="px-3 text-sm tracking-widest font-medium hover:text-brandGold transition-all duration-300"
+                    >
                       RENDEZ-VOUS
                     </Link>
                     <span className="text-brandGold/30 text-xs">•</span>
-                    <Link href="/the-house" className="px-3 text-sm tracking-widest font-medium hover:text-brandGold transition-all duration-300">
+                    <Link 
+                      href="/the-house" 
+                      locale={router.locale} 
+                      className="px-3 text-sm tracking-widest font-medium hover:text-brandGold transition-all duration-300"
+                    >
                       LA MAISON
                     </Link>
                     <span className="text-brandGold/30 text-xs">•</span>
-                    <Link href="/contact" className="px-3 text-sm tracking-widest font-medium hover:text-brandGold transition-all duration-300">
+                    <Link 
+                      href="/contact" 
+                      locale={router.locale} 
+                      className="px-3 text-sm tracking-widest font-medium hover:text-brandGold transition-all duration-300"
+                    >
                       CONTACT
                     </Link>
                   </nav>
@@ -338,7 +354,12 @@ export default function Header() {
                   )}
                 </button>
 
-                <Link href="/cart" title="Votre panier" className="relative group">
+                <Link 
+                  href="/cart" 
+                  locale={router.locale}
+                  title="Votre panier" 
+                  className="relative group"
+                >
                   <ShoppingBag
                     size={scrolled ? 18 : 20}
                     strokeWidth={1.5}
@@ -353,7 +374,12 @@ export default function Header() {
 
                 {/* User account icon - visible when logged in */}
                 {session?.user?.role === "customer" && (
-                  <Link href="/profile" title="Mon compte" className="relative group">
+                  <Link 
+                    href="/profile" 
+                    locale={router.locale}
+                    title="Mon compte" 
+                    className="relative group"
+                  >
                     <User
                       size={scrolled ? 18 : 20}
                       strokeWidth={1.5}
@@ -363,7 +389,12 @@ export default function Header() {
                 )}
 
                 {session?.user?.role === "admin" && (
-                  <Link href="/admin" title="Administration" className="hidden md:block">
+                  <Link 
+                    href="/admin" 
+                    locale={router.locale}
+                    title="Administration" 
+                    className="hidden md:block"
+                  >
                     <ShieldCheck size={scrolled ? 18 : 20} strokeWidth={1.5} className="text-brandGold hover:scale-110 transition-transform duration-300" />
                   </Link>
                 )}
@@ -383,6 +414,7 @@ export default function Header() {
                 <div className="flex items-center justify-center">
                   <Link
                     href="/"
+                    locale={router.locale}
                     className="px-5 py-1 text-center text-sm tracking-widest font-medium hover:text-brandGold transition-all duration-300 relative group"
                   >
                     <span>ACCUEIL</span>
@@ -403,61 +435,47 @@ export default function Header() {
                     <div className={`absolute top-full left-1/2 transform -translate-x-1/2 w-48 bg-brandIvory shadow-luxury border border-brandGold/10 rounded py-2 mt-1 transition-all duration-300 ${collectionsOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'} z-50`}>
                       <div className="absolute -top-2 left-6 w-4 h-4 rotate-45 bg-brandIvory border-t border-l border-brandGold/10"></div>
                       <Link 
-                        href="/collections?category=bagues" 
-                        as="/collections?category=bagues"
-                        passHref
-                        legacyBehavior
+                        href="/collections?category=bagues"
+                        locale={router.locale}
+                        className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200"
                       >
-                        <a className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
-    Bagues
-                        </a>
-  </Link>
+                        Bagues
+                      </Link>
                       <Link 
                         href="/collections?category=colliers" 
-                        as="/collections?category=colliers"
-                        passHref
-                        legacyBehavior
+                        locale={router.locale}
+                        className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200"
                       >
-                        <a className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
-    Colliers
-                        </a>
-  </Link>
+                        Colliers
+                      </Link>
                       <Link 
-                        href="/collections?category=bracelets" 
-                        as="/collections?category=bracelets"
-                        passHref
-                        legacyBehavior
+                        href="/collections?category=bracelets"
+                        locale={router.locale}
+                        className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200"
                       >
-                        <a className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
-    Bracelets
-                        </a>
-  </Link>
+                        Bracelets
+                      </Link>
                       <Link 
-                        href="/collections?category=boucles" 
-                        as="/collections?category=boucles"
-                        passHref
-                        legacyBehavior
+                        href="/collections?category=boucles"
+                        locale={router.locale}
+                        className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200"
                       >
-                        <a className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200">
-    Boucles d'oreilles
-                        </a>
-  </Link>
-  <div className="h-px w-full bg-brandGold/10 my-1"></div>
+                        Boucles d'oreilles
+                      </Link>
                       <Link 
-                        href="/collections" 
-                        passHref
-                        legacyBehavior
+                        href="/collections"
+                        locale={router.locale}
+                        className="block px-4 py-2 text-sm text-brandGold hover:bg-brandGold/5 transition-colors duration-200"
                       >
-                        <a className="block px-4 py-2 text-sm text-brandGold hover:bg-brandGold/5 transition-colors duration-200">
-    Voir toutes les collections
-                        </a>
-  </Link>
-</div>
+                        Voir toutes les collections
+                      </Link>
+                    </div>
                   </div>
 
                   <span className="text-brandGold/30 mx-1">•</span>
                   <Link
                     href="/jewelry"
+                    locale={router.locale}
                     className="px-5 py-1 text-center text-sm tracking-widest font-medium hover:text-brandGold transition-all duration-300 relative group"
                   >
                     <span>JOAILLERIE</span>
@@ -466,6 +484,7 @@ export default function Header() {
                   <span className="text-brandGold/30 mx-1">•</span>
                   <Link
                     href="/appointments"
+                    locale={router.locale}
                     className="px-5 py-1 text-center text-sm tracking-widest font-medium hover:text-brandGold transition-all duration-300 relative group"
                   >
                     <span>RENDEZ-VOUS</span>
@@ -474,6 +493,7 @@ export default function Header() {
                   <span className="text-brandGold/30 mx-1">•</span>
                   <Link
                     href="/the-house"
+                    locale={router.locale}
                     className="px-5 py-1 text-center text-sm tracking-widest font-medium hover:text-brandGold transition-all duration-300 relative group"
                   >
                     <span>LA MAISON</span>
@@ -482,6 +502,7 @@ export default function Header() {
                   <span className="text-brandGold/30 mx-1">•</span>
                   <Link
                     href="/contact"
+                    locale={router.locale}
                     className="px-5 py-1 text-center text-sm tracking-widest font-medium hover:text-brandGold transition-all duration-300 relative group"
                   >
                     <span>CONTACT</span>
@@ -554,10 +575,10 @@ export default function Header() {
                 <h3 className="text-brandIvory/70 text-sm uppercase tracking-widest mb-6 text-center">Explorez nos collections</h3>
 
 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-  <CategoryLink href="/collections?category=bagues" label="Bagues" count={22} onClick={() => setSearchOpen(false)} />
-  <CategoryLink href="/collections?category=colliers" label="Colliers" count={18} onClick={() => setSearchOpen(false)} />
-  <CategoryLink href="/collections?category=bracelets" label="Bracelets" count={14} onClick={() => setSearchOpen(false)} />
-  <CategoryLink href="/collections?category=boucles" label="Boucles d'oreilles" count={16} onClick={() => setSearchOpen(false)} />
+  <CategoryLink href="/collections?category=bagues" label="Bagues" count={22} onClick={() => setSearchOpen(false)} locale={router.locale} />
+  <CategoryLink href="/collections?category=colliers" label="Colliers" count={18} onClick={() => setSearchOpen(false)} locale={router.locale} />
+  <CategoryLink href="/collections?category=bracelets" label="Bracelets" count={14} onClick={() => setSearchOpen(false)} locale={router.locale} />
+  <CategoryLink href="/collections?category=boucles" label="Boucles d'oreilles" count={16} onClick={() => setSearchOpen(false)} locale={router.locale} />
 </div>
 
                 <div className="text-center mt-10">
@@ -615,12 +636,12 @@ export default function Header() {
 
               <div className="flex-grow overflow-y-auto py-6 px-6">
                 <nav className="space-y-5">
-                  <MobileLink href="/" onClick={() => setNavOpen(false)}>Accueil</MobileLink>
-                  <MobileLink href="/collections" onClick={() => setNavOpen(false)}>Collections</MobileLink>
-                  <MobileLink href="/jewelry" onClick={() => setNavOpen(false)}>Joaillerie</MobileLink>
-                  <MobileLink href="/appointments" onClick={() => setNavOpen(false)}>Rendez-vous</MobileLink>
-                  <MobileLink href="/the-house" onClick={() => setNavOpen(false)}>La Maison</MobileLink>
-                  <MobileLink href="/contact" onClick={() => setNavOpen(false)}>Contact</MobileLink>
+                  <MobileLink href="/" locale={router.locale} onClick={() => setNavOpen(false)}>Accueil</MobileLink>
+                  <MobileLink href="/collections" locale={router.locale} onClick={() => setNavOpen(false)}>Collections</MobileLink>
+                  <MobileLink href="/jewelry" locale={router.locale} onClick={() => setNavOpen(false)}>Joaillerie</MobileLink>
+                  <MobileLink href="/appointments" locale={router.locale} onClick={() => setNavOpen(false)}>Rendez-vous</MobileLink>
+                  <MobileLink href="/the-house" locale={router.locale} onClick={() => setNavOpen(false)}>La Maison</MobileLink>
+                  <MobileLink href="/contact" locale={router.locale} onClick={() => setNavOpen(false)}>Contact</MobileLink>
                 </nav>
 
                 <div className="h-px w-full bg-gradient-to-r from-transparent via-brandGold/30 to-transparent my-6"></div>
@@ -628,9 +649,9 @@ export default function Header() {
                 <div className="space-y-3">
                   {session ? (
                     <>
-                      <MobileLink href="/profile" onClick={() => setNavOpen(false)}>Mon Compte</MobileLink>
-                      <MobileLink href="/orders" onClick={() => setNavOpen(false)}>Mes Commandes</MobileLink>
-                      <MobileLink href="/wishlist" onClick={() => setNavOpen(false)}>Mes Favoris</MobileLink>
+                      <MobileLink href="/profile" locale={router.locale} onClick={() => setNavOpen(false)}>Mon Compte</MobileLink>
+                      <MobileLink href="/orders" locale={router.locale} onClick={() => setNavOpen(false)}>Mes Commandes</MobileLink>
+                      <MobileLink href="/wishlist" locale={router.locale} onClick={() => setNavOpen(false)}>Mes Favoris</MobileLink>
                       <button
                         onClick={() => {
                           signOut();
@@ -643,7 +664,7 @@ export default function Header() {
                       </button>
                     </>
                   ) : (
-                    <MobileLink href="/auth" onClick={() => setNavOpen(false)}>Connexion / Inscription</MobileLink>
+                    <MobileLink href="/auth" locale={router.locale} onClick={() => setNavOpen(false)}>Connexion / Inscription</MobileLink>
                   )}
                 </div>
               </div>
@@ -654,5 +675,53 @@ export default function Header() {
         )}
       </AnimatePresence>
     </motion.header>
+  );
+}
+
+// Helper components
+interface CategoryLinkProps {
+  href: string;
+  label: string;
+  count: number;
+  onClick: () => void;
+  locale?: string | undefined;
+}
+
+// Category link component for search overlay using modern Next.js Link
+function CategoryLink({ href, label, count, onClick, locale }: CategoryLinkProps) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      locale={locale}
+      className="group flex flex-col items-center"
+    >
+      <span className="text-brandGold text-xs mb-1">{count}</span>
+      <span className="text-brandIvory group-hover:text-brandGold transition-colors duration-300 mb-1">
+        {label}
+      </span>
+      <span className="block h-[1px] w-0 bg-brandGold transition-all duration-300 group-hover:w-12"></span>
+    </Link>
+  );
+}
+
+// Mobile link component for mobile navigation using modern Next.js Link
+interface MobileLinkProps {
+  href: string;
+  children: React.ReactNode;
+  onClick: () => void;
+  locale?: string | undefined;
+}
+
+function MobileLink({ href, children, onClick, locale }: MobileLinkProps) {
+  return (
+    <Link
+      href={href}
+      locale={locale}
+      onClick={onClick}
+      className="block py-2 font-medium hover:text-brandGold transition-colors duration-200"
+    >
+      {children}
+    </Link>
   );
 }

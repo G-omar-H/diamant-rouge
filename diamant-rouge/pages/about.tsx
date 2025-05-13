@@ -7,7 +7,7 @@ export default function AboutPage() {
             <Head>
                 <title>About Diamant-Rouge</title>
             </Head>
-            <main className="section-light min-h-screen p-8 max-w-3xl mx-auto">
+            <main className="section-light hero-section min-h-screen p-8 max-w-3xl mx-auto">
                 <h1 className="text-4xl font-serif text-brandGold mb-6">Our Story</h1>
                 <p className="mb-4 text-platinumGray leading-relaxed">
                     Founded in the heart of Paris, Diamant-Rouge has been crafting exquisite jewelry since
@@ -24,7 +24,7 @@ export default function AboutPage() {
                 <h2 className="text-2xl font-serif text-brandGold mt-8 mb-4">Awards & Recognition</h2>
                 <ul className="list-disc list-inside text-richEbony space-y-2">
                     <li>Member of the French Jewelry Federation</li>
-                    <li>Featured in Vogue, Elle, and Harper’s Bazaar</li>
+                    <li>Featured in Vogue, Elle, and Harper's Bazaar</li>
                     <li>Best Luxury Design House 2025 - Paris Style Awards</li>
                 </ul>
             </main>

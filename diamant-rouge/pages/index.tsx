@@ -237,10 +237,12 @@ export default function HomePage({
     return (
         <>
             <NextSeo
-                title="Diamant Rouge | Joaillerie de Luxe"
-                description="Découvrez la joaillerie Diamant Rouge : des pièces intemporelles, un héritage royal et un artisanat d'exception à Casablanca."
+                title="Diamant Rouge | Joaillerie de Luxe depuis 1896"
+                description="Découvrez notre collection de bijoux de luxe faits main. Bagues, colliers, bracelets et diamants d'exception pour des moments inoubliables."
+                canonical="https://www.diamant-rouge.fr/"
             />
 
+            {/* Hero Carousel - no additional hero-section class needed */}
             <HeroCarousel slides={slides} />
 
             {/* 

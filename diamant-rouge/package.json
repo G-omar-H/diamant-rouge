@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts",
+    "seed": "npx ts-node --transpile-only prisma/seed.ts",
     "postbuild": "next-sitemap"
   },
   "dependencies": {
@@ -61,5 +61,8 @@
     "tailwindcss-rtl": "^0.9.0",
     "ts-node": "^10.9.2",
     "typescript": "^5"
+  },
+  "prisma": {
+    "seed": "npx ts-node --transpile-only prisma/seed.ts"
   }
 }

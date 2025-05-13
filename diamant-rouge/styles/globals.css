@@ -6,13 +6,21 @@
    🎩 Root Theme Variables for Luxury Experience
    ========================================================== */
 :root {
-    --header-height: 100px;
+    --header-height: 200px; /* Default taller height when not scrolled */
+    --header-height-scrolled: 100px; /* Shorter height when scrolled */
     --brand-gold: #D4AF37;
     --brand-burgundy: #6A0F23;
     --brand-ivory: #FAF3E3;
 
     --platinum-gray: #B0B0B0;
     --diamond-white: #FCFCFC;
+}
+
+@media (max-width: 768px) {
+    :root {
+        --header-height: 170px; /* Mobile taller height when not scrolled */
+        --header-height-scrolled: 90px; /* Mobile shorter height when scrolled */
+    }
 }
 
 /* ==========================================================
@@ -47,6 +55,43 @@ p {
    🔥 Custom Components (Buttons, Cards, Sections)
    ========================================================== */
 @layer components {
+    /* Initial current-header-height fallback */
+    :root {
+        --current-header-height: var(--header-height);
+    }
+    
+    /* Content container for pages without hero sections */
+    .content-container {
+        padding-top: var(--current-header-height);
+        transition: padding-top 0.4s ease;
+    }
+    
+    /* Hero section that accounts for fixed header */
+    .hero-section {
+        margin-top: calc(-1 * var(--current-header-height));
+        padding-top: var(--current-header-height);
+        transition: margin-top 0.4s ease, padding-top 0.4s ease;
+    }
+
+    /* Home page hero - no additional padding needed as it has its own layout */
+    .home-hero {
+        margin-top: 0;
+        padding-top: 0;
+    }
+
+    /* Home page hero section needs to account for the header height */
+    .home-hero-section {
+        height: 100vh;
+        padding-top: 0;
+    }
+
+    /* Special fix for profile page hero section */
+    .profile-hero {
+        margin-top: calc(-1 * var(--current-header-height));
+        padding-top: calc(var(--current-header-height) + 20px) !important;
+        padding-bottom: 2rem !important;
+    }
+
     /* 🎭 Primary Action Button */
     .button-primary {
         @apply bg-brandGold text-richEbony px-6 py-3 rounded-full font-medium
@@ -155,3 +200,16 @@ p {
 .dark .dropdown-menu {
     @apply bg-richEbony text-brandIvory;
 }
+
+/* Debug visualizer for header height - uncomment for debugging
+.header-height-debug {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 30px;
+    height: var(--current-header-height);
+    background-color: rgba(255, 0, 0, 0.3);
+    z-index: 9999;
+    pointer-events: none;
+}
+*/

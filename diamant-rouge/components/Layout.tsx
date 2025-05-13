@@ -31,6 +31,27 @@ export default function Layout({ children, title, description }: LayoutProps) {
         };
     }, [router, closeWishlist]);
 
+    // Handle dynamic header height adjustment
+    useEffect(() => {
+        const adjustMainPadding = () => {
+            const scrolled = window.scrollY > 50;
+            document.documentElement.style.setProperty(
+                '--current-header-height', 
+                scrolled ? 'var(--header-height-scrolled)' : 'var(--header-height)'
+            );
+        };
+        
+        // Initial setting
+        adjustMainPadding();
+        
+        // Listen for scroll
+        window.addEventListener('scroll', adjustMainPadding);
+        
+        return () => {
+            window.removeEventListener('scroll', adjustMainPadding);
+        };
+    }, []);
+
     return (
         <>
             {/* Enhanced SEO Metadata */}
@@ -46,7 +67,7 @@ export default function Layout({ children, title, description }: LayoutProps) {
             <div className="w-full">
                 <Header />
 
-                <main className="pt-[var(--header-height)] min-h-screen transition-opacity duration-500 ease-in-out">
+                <main className="content-container min-h-screen transition-opacity duration-500 ease-in-out">
                     {children}
                 </main>
 
@@ -57,7 +78,7 @@ export default function Layout({ children, title, description }: LayoutProps) {
                 <WishlistPanel 
                     isOpen={isWishlistOpen} 
                     onClose={closeWishlist}
-                    locale={router.locale || 'fr'}
+                    locale={router.locale || router.defaultLocale || 'en'}
                 />
             </div>
         </>

@@ -192,7 +192,7 @@ export default function ProductPage({
       />
 
       {/* Breadcrumb navigation */}
-      <div className="bg-brandIvory pt-6 pb-2 px-6 text-sm">
+      <div className="bg-brandIvory hero-section pt-6 pb-2 px-6 text-sm">
         <div className="max-w-7xl mx-auto">
           <nav className="text-platinumGray flex items-center space-x-2">
             <Link href="/" className="hover:text-brandGold transition-colors">Accueil</Link>

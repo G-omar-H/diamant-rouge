@@ -81,7 +81,11 @@ export default function ProductCard({ product, locale, isWishlisted = false }: P
         >
             {/* Product Image - with refined hover effect */}
             <div className="relative overflow-hidden mb-6 aspect-[1/1]">
-                <Link href={`/products/${product.id}`} className="block h-full w-full">
+                <Link 
+                    href={`/products/${product.id}`} 
+                    locale={locale}
+                    className="block h-full w-full"
+                >
                     <div className="relative h-full w-full">
                         {/* Fallback div in case Image fails */}
                         <div className="absolute inset-0 bg-brandIvory/50 flex items-center justify-center">
@@ -113,7 +117,11 @@ export default function ProductCard({ product, locale, isWishlisted = false }: P
             <div className="px-0">
                 {/* Product Name and Wishlist button in the same row */}
                 <div className="flex items-start justify-between mb-2">
-                    <Link href={`/products/${product.id}`} className="flex-1">
+                    <Link 
+                        href={`/products/${product.id}`} 
+                        locale={locale}
+                        className="flex-1"
+                    >
                         <h3 className="text-base font-serif text-platinumGray hover:text-brandGold transition-colors duration-300 pr-3">
                             {getProductName()}
                         </h3>
@@ -153,7 +161,10 @@ export default function ProductCard({ product, locale, isWishlisted = false }: P
 
                 {/* View Product Link - Refined to match title styling with elegant borders */}
                 <div className="mt-3">
-                    <Link href={`/products/${product.id}`}>
+                    <Link 
+                        href={`/products/${product.id}`}
+                        locale={locale}
+                    >
                         <span className="inline-block text-sm text-platinumGray hover:text-brandGold transition-colors duration-300 border border-platinumGray/30 hover:border-brandGold/50 px-4 py-1.5 rounded-sm">
                             Voir la création
                         </span>

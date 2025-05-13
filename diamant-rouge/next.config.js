@@ -5,6 +5,7 @@ const nextConfig = {
     i18n: {
         locales: ['en', 'fr', 'ar'],
         defaultLocale: 'en',
+        localeDetection: false,  // Changed from true to false to resolve the warning
     },
     eslint: {
         // Allow production builds to successfully complete
@@ -12,7 +13,18 @@ const nextConfig = {
         ignoreDuringBuilds: true,
     },
     images: {
-        domains: ['amantys.fr', 'localhost'], // Add your image domain here
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'amantys.fr',
+                pathname: '**',
+            },
+            {
+                protocol: 'http',
+                hostname: 'localhost',
+                pathname: '**',
+            },
+        ],
     },
     // other config if needed...
 }

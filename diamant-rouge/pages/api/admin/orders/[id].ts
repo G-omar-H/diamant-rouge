@@ -50,12 +50,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (req.method === "PUT") {
         const { status } = req.body;
+        console.log(`🔄 Updating order #${id} with status: "${status}" (${typeof status})`);
+        
         try {
             // ✅ Update the order in the database
             const updatedOrder = await prisma.order.update({
                 where: { id: Number(id) },
                 data: { status },
                 include: { user: true },
+            });
+
+            console.log(`✅ Order #${id} updated successfully:`, {
+                id: updatedOrder.id,
+                newStatus: updatedOrder.status,
+                statusType: typeof updatedOrder.status
             });
 
             // ✅ Send Email Notification if user email exists

@@ -62,7 +62,8 @@ export default function HeroCarousel({
 
   return (
     <section 
-      className="relative w-full h-[90vh] overflow-hidden bg-richEbony"
+      className="relative w-full h-[100vh] overflow-hidden bg-richEbony home-hero-section"
+      style={{ marginTop: 'calc(-1 * var(--current-header-height))' }}
       onMouseEnter={pauseAutoplay}
       onMouseLeave={resumeAutoplay}
     >

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import AdminLayout from "../../components/AdminLayout";
 import { ManageProducts } from "../../components/admin/ManageProducts";
 import { ManageCategories } from "../../components/admin/ManageCategories";
 import { ManageOrders } from "../../components/admin/ManageOrders";
@@ -131,35 +132,9 @@ const DashboardOverview = () => {
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<"overview" | "products" | "categories" | "orders" | "users" | "newsletter">("overview");
-  const { data: session } = useSession();
-  const username = session?.user?.name || "Artisan";
 
   return (
-    <div className="flex flex-col min-h-screen bg-brandIvory">
-      {/* Elegant Header */}
-      <header className="bg-white/50 backdrop-blur-sm border-b border-brandGold/20 shadow-subtle">
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-3">
-            <div className="relative w-8 h-8">
-              <Image 
-                src="/logo1.jpeg" 
-                alt="Diamant Rouge" 
-                fill
-                className="object-contain"
-              />
-            </div>
-            <h1 className="text-xl font-serif text-brandGold">Maison Diamant Rouge</h1>
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-platinumGray">
-              Bienvenue, <span className="text-brandGold">{username}</span>
-            </p>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content Area */}
-      <main className="flex-grow container mx-auto px-6 py-8">
+    <AdminLayout title="Dashboard Admin">
         {/* Navigation Tabs */}
         <nav className="mb-8 pb-4 border-b border-brandGold/20">
           <div className="flex flex-nowrap overflow-x-auto space-x-4 pb-2">
@@ -206,7 +181,7 @@ export default function AdminDashboard() {
                   "bg-brandGold text-richEbony shadow-luxury" : 
                   "bg-transparent border border-brandGold/50 text-brandGold hover:bg-brandGold/10"}`}
             >
-              Clients
+            Utilisateurs
             </button>
             <button
               onClick={() => setActiveTab("newsletter")}
@@ -220,24 +195,16 @@ export default function AdminDashboard() {
           </div>
         </nav>
 
-        {/* Content Area with Fade Transition */}
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="pt-2"
-        >
+      {/* Tab Content */}
+      <div>
           {activeTab === "overview" && <DashboardOverview />}
           {activeTab === "products" && <ManageProducts />}
           {activeTab === "categories" && <ManageCategories />}
           {activeTab === "orders" && <ManageOrders />}
           {activeTab === "users" && <ManageUsers />}
           {activeTab === "newsletter" && <ManageNewsletter />}
-        </motion.div>
-      </main>
-
     </div>
+    </AdminLayout>
   );
 }
 

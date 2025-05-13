@@ -147,7 +147,7 @@ export default function CollectionsPage({ products, categories }: CollectionPage
         }
     }, [router.query]); // Only depend on router.query to avoid infinite loops
 
-    // Update URL with debouncing when slider is being dragged
+    // Update URL when filters change
     useEffect(() => {
         // Skip URL updates during active dragging to prevent excessive state changes
         if (isDragging) return;
@@ -158,22 +158,30 @@ export default function CollectionsPage({ products, categories }: CollectionPage
             const minPriceQuery = minPrice !== "" ? { minPrice: String(minPrice) } : {};
             const maxPriceQuery = maxPrice !== "" ? { maxPrice: String(maxPrice) } : {};
             
-            router.push(
-                {
-                    pathname: router.pathname,
-                    query: {
-                        ...categoryQuery,
-                        ...minPriceQuery,
-                        ...maxPriceQuery,
+            // Create a new URL with the updated query parameters
+            const newQuery = {
+                ...categoryQuery,
+                ...minPriceQuery,
+                ...maxPriceQuery,
+            };
+            
+            // Only update if the query is different to avoid unnecessary navigation
+            if (JSON.stringify(newQuery) !== JSON.stringify(router.query)) {
+                // Use the router.replace instead of push to prevent adding to history stack
+                // This prevents the browser from creating multiple history entries
+                router.replace(
+                    {
+                        pathname: '/collections',
+                        query: newQuery,
                     },
-                },
-              undefined,
-                { shallow: true }
-            );
+                    undefined,
+                    { locale: router.locale, scroll: false }
+                );
+            }
         }, 300); // 300ms debounce
         
         return () => clearTimeout(updateTimeout);
-    }, [selectedCategory, minPrice, maxPrice, isDragging, router]);
+    }, [selectedCategory, minPrice, maxPrice, isDragging, router.locale]);
     
     // Get translated category names
     const getCategoryName = (slug: string) => {
@@ -304,10 +312,11 @@ export default function CollectionsPage({ products, categories }: CollectionPage
     return (
         <>
             <Head>
-                <title>Collections | Diamant Rouge</title>
-                <meta name="description" content="Découvrez nos pièces intemporelles, façonnées dans l'excellence." />
+                <title>Diamant Rouge | Collections</title>
+                <meta name="description" content="Découvrez notre collection de bijoux de luxe. Bagues, colliers, bracelets et diamants d'exception." />
             </Head>
         
+            <div className="hero-section">
             <div className="min-h-screen bg-white">
                 {/* HERO SECTION */}
                 <div className="relative h-72 md:h-96 bg-gradient-to-r from-brandGold/20 to-burgundy/20 overflow-hidden">
@@ -475,8 +484,8 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                                                         {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])} <span className="text-2xs opacity-70">MAD</span>
                                                     </span>
                                                 </div>
-                                            </div>
-                                            
+                                        </div>
+
                                             {/* Show price distribution indicator */}
                                             <div className="relative h-1 mb-5 mt-6 w-full bg-brandGold/5 rounded-full overflow-hidden">
                                                 {products.map((product, index) => {
@@ -490,8 +499,8 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                                                         />
                                                     );
                                                 })}
-                                            </div>
-                                            
+                                        </div>
+                                        
                                             {/* Enhanced slider track */}
                                             <div 
                                                 id="price-slider-track"
@@ -629,6 +638,7 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                             </div>
                         )}
                     </motion.div>
+                    </div>
                 </div>
             </div>
         </>
