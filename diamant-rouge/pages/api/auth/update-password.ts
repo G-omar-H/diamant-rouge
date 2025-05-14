@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 export default async function updatePasswordHandler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
+        return res.status(405).json({ error: 'Méthode non autorisée' });
     }
 
     const { token, password } = req.body;

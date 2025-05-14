@@ -14,7 +14,7 @@ export default function HauteJoailleriePage() {
       {/* Hero Section */}
       <section className="relative h-[70vh] w-full overflow-hidden">
         <Image 
-          src="/images/jewelry-hero.jpg" 
+          src="/images/home/herolarged_icons.avif" 
           alt="Haute Joaillerie Diamant Rouge" 
           fill
           sizes="100vw"
@@ -62,7 +62,7 @@ export default function HauteJoailleriePage() {
             <div className="group">
               <div className="relative h-80 overflow-hidden mb-4">
                 <Image 
-                  src="/images/jewelry-materials.jpg" 
+                  src="/images/products/Collections/Royale/royale.jpg" 
                   alt="Collection Royale" 
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
@@ -81,7 +81,7 @@ export default function HauteJoailleriePage() {
             <div className="group">
               <div className="relative h-80 overflow-hidden mb-4">
                 <Image 
-                  src="/images/haute-joaillerie-collection2.jpg" 
+                  src="/images/products/Collections/Sahara/Multi-COLOUR-JEWELLERY-BANNER_7.jpg" 
                   alt="Collection Sahara" 
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
@@ -100,7 +100,7 @@ export default function HauteJoailleriePage() {
             <div className="group">
               <div className="relative h-80 overflow-hidden mb-4">
                 <Image 
-                  src="/images/haute-joaillerie-collection3.jpg" 
+                  src="/images/products/Collections/Fes/fes.jpg" 
                   alt="Collection Fès" 
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
@@ -141,7 +141,7 @@ export default function HauteJoailleriePage() {
           </div>
           <div className="relative h-[500px]">
             <Image 
-              src="/images/haute-joaillerie-craftsmanship.jpg" 
+              src="/images/home/ate_bdf_art_cou_300_dem_bla_22.jpg" 
               alt="Savoir-faire exceptionnel Diamant Rouge" 
               fill
               sizes="(max-width: 768px) 100vw, 50vw"

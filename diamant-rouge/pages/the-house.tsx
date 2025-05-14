@@ -8,16 +8,17 @@ export default function LaMaisonPage() {
     <>
       <Head>
         <title>La Maison | Diamant Rouge</title>
-        <meta name="description" content="Découvrez l'histoire et les valeurs de la Maison Diamant Rouge - Un héritage joaillier marocain d'excellence et d'innovation." />
+        <meta name="description" content="Découvrez l'histoire et les valeurs de la Maison Diamant Rouge - Un héritage joaillier marocain d'excellence fondé par la famille Miyara depuis 1957 à Fès." />
       </Head>
       
       {/* Hero Section */}
       <section className="relative h-[70vh] w-full overflow-hidden">
         <Image 
-          src="/images/la-maison-hero.jpg" 
+          src="/images/home/find-my-harry-winston.avif" 
           alt="La Maison Diamant Rouge" 
           layout="fill"
           objectFit="cover"
+          objectPosition="center bottom"
           priority
           className="brightness-[0.85]"
         />
@@ -25,7 +26,7 @@ export default function LaMaisonPage() {
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-4">La Maison</h1>
           <div className="h-[1px] w-40 bg-gradient-to-r from-transparent via-brandGold to-transparent my-4"></div>
-          <p className="text-lg md:text-xl text-white/90 max-w-2xl">Notre héritage d'excellence marocaine</p>
+          <p className="text-lg md:text-xl text-white/90 max-w-2xl">Notre héritage d'excellence depuis 1957</p>
         </div>
       </section>
       
@@ -37,23 +38,24 @@ export default function LaMaisonPage() {
             <h2 className="text-3xl md:text-4xl font-serif text-brandGold mb-6">Notre Histoire</h2>
             <div className="h-[1px] w-32 bg-gradient-to-r from-brandGold via-brandGold to-transparent mb-6"></div>
             <p className="text-platinumGray leading-relaxed mb-4">
-              Fondée à Casablanca en 1978, la Maison Diamant Rouge est née de la passion de Youssef El Mansouri, 
-              un visionnaire dans l'art de la joaillerie marocaine. Son rêve : créer des pièces d'exception qui 
-              transcendent le temps, alliant savoir-faire artisanal marocain et design contemporain.
+              Fondée à Fès en 1957, la Maison Diamant Rouge est née de la passion de Monsieur Miyara, 
+              un maître joaillier visionnaire. Son ambition : perpétuer l'art séculaire de la joaillerie marocaine 
+              en y apportant une touche de modernité, tout en préservant l'authenticité des techniques ancestrales.
             </p>
             <p className="text-platinumGray leading-relaxed mb-4">
-              Au fil des décennies, notre Maison a développé une signature unique, reconnaissable par son 
-              approche audacieuse des formes et son attention méticuleuse aux détails. Des ateliers casablancais 
-              aux vitrines internationales, Diamant Rouge est devenu synonyme d'excellence joaillière marocaine.
+              Au cœur de la médina de Fès, l'atelier familial s'est rapidement imposé comme une référence 
+              pour les amateurs de haute joaillerie, attirés par le savoir-faire exceptionnel et la qualité 
+              irréprochable des créations Miyara.
             </p>
             <p className="text-platinumGray leading-relaxed">
-              Aujourd'hui, sous la direction artistique de Leila El Mansouri, fille du fondateur, Diamant Rouge 
-              continue d'innover tout en préservant l'héritage artisanal qui a fait sa renommée.
+              Aujourd'hui, sous la direction artistique de Leila Miyara, fille du fondateur, Diamant Rouge 
+              poursuit l'œuvre familiale avec passion et créativité, alliant héritage traditionnel et vision contemporaine 
+              pour créer des pièces d'exception qui traversent les générations.
             </p>
           </div>
           <div className="relative h-[500px] order-1 md:order-2">
             <Image 
-              src="/images/la-maison-history.jpg" 
+              src="/images/home/5e4bfb93cc98e5e4bfb8b641fe_mohamed5.webp" 
               alt="Histoire de Diamant Rouge" 
               layout="fill"
               objectFit="cover"
@@ -72,38 +74,38 @@ export default function LaMaisonPage() {
             
             {/* Timeline Events */}
             <div className="space-y-16 relative">
-              {/* 1978 */}
+              {/* 1957 */}
               <div className="flex flex-col md:flex-row items-center">
                 <div className="md:w-1/2 md:pr-12 md:text-right">
-                  <h4 className="text-xl font-serif text-brandGold mb-2">1978</h4>
-                  <h5 className="text-lg font-medium text-richEbony mb-2">Création de la Maison</h5>
-                  <p className="text-platinumGray">Fondation de Diamant Rouge par Youssef El Mansouri dans le quartier historique des artisans à Casablanca.</p>
+                  <h4 className="text-xl font-serif text-brandGold mb-2">1957</h4>
+                  <h5 className="text-lg font-medium text-richEbony mb-2">Fondation à Fès</h5>
+                  <p className="text-platinumGray">Monsieur Miyara ouvre son premier atelier de joaillerie dans la médina historique de Fès, berceau de l'artisanat marocain.</p>
                 </div>
                 <div className="flex items-center justify-center my-4 md:my-0">
                   <div className="w-4 h-4 rounded-full bg-brandGold z-10"></div>
                 </div>
                 <div className="md:w-1/2 md:pl-12 md:block hidden"></div>
+              </div>
+              
+              {/* 1968 */}
+              <div className="flex flex-col md:flex-row items-center">
+                <div className="md:w-1/2 md:pr-12 md:text-right md:block hidden"></div>
+                <div className="flex items-center justify-center my-4 md:my-0">
+                  <div className="w-4 h-4 rounded-full bg-brandGold z-10"></div>
+                </div>
+                <div className="md:w-1/2 md:pl-12">
+                  <h4 className="text-xl font-serif text-brandGold mb-2">1968</h4>
+                  <h5 className="text-lg font-medium text-richEbony mb-2">Première collection iconique</h5>
+                  <p className="text-platinumGray">Création de la collection "Héritage de Fès", inspirée des motifs géométriques des zellige marocains, qui devient rapidement emblématique de la Maison.</p>
+                </div>
               </div>
               
               {/* 1985 */}
               <div className="flex flex-col md:flex-row items-center">
-                <div className="md:w-1/2 md:pr-12 md:text-right md:block hidden"></div>
-                <div className="flex items-center justify-center my-4 md:my-0">
-                  <div className="w-4 h-4 rounded-full bg-brandGold z-10"></div>
-                </div>
-                <div className="md:w-1/2 md:pl-12">
-                  <h4 className="text-xl font-serif text-brandGold mb-2">1985</h4>
-                  <h5 className="text-lg font-medium text-richEbony mb-2">Première collection iconique</h5>
-                  <p className="text-platinumGray">Lancement de la collection "Étoile du Maghreb" qui établit la signature unique de la Maison.</p>
-                </div>
-              </div>
-              
-              {/* 1997 */}
-              <div className="flex flex-col md:flex-row items-center">
                 <div className="md:w-1/2 md:pr-12 md:text-right">
-                  <h4 className="text-xl font-serif text-brandGold mb-2">1997</h4>
-                  <h5 className="text-lg font-medium text-richEbony mb-2">Expansion internationale</h5>
-                  <p className="text-platinumGray">Ouverture de la première boutique internationale à Paris, marquant le début d'une présence mondiale.</p>
+                  <h4 className="text-xl font-serif text-brandGold mb-2">1985</h4>
+                  <h5 className="text-lg font-medium text-richEbony mb-2">Formation de Leila Miyara</h5>
+                  <p className="text-platinumGray">Leila Miyara commence son apprentissage auprès de son père, s'imprégnant des techniques ancestrales tout en apportant un regard nouveau sur la joaillerie marocaine.</p>
                 </div>
                 <div className="flex items-center justify-center my-4 md:my-0">
                   <div className="w-4 h-4 rounded-full bg-brandGold z-10"></div>
@@ -111,16 +113,16 @@ export default function LaMaisonPage() {
                 <div className="md:w-1/2 md:pl-12 md:block hidden"></div>
               </div>
               
-              {/* 2010 */}
+              {/* 2003 */}
               <div className="flex flex-col md:flex-row items-center">
                 <div className="md:w-1/2 md:pr-12 md:text-right md:block hidden"></div>
                 <div className="flex items-center justify-center my-4 md:my-0">
                   <div className="w-4 h-4 rounded-full bg-brandGold z-10"></div>
                 </div>
                 <div className="md:w-1/2 md:pl-12">
-                  <h4 className="text-xl font-serif text-brandGold mb-2">2010</h4>
+                  <h4 className="text-xl font-serif text-brandGold mb-2">2003</h4>
                   <h5 className="text-lg font-medium text-richEbony mb-2">Nouvelle direction artistique</h5>
-                  <p className="text-platinumGray">Leila El Mansouri prend la direction artistique, apportant une vision contemporaine tout en préservant l'héritage de la Maison.</p>
+                  <p className="text-platinumGray">Leila Miyara prend officiellement la direction artistique de la Maison, insufflant une vision contemporaine tout en préservant l'héritage familial.</p>
                 </div>
               </div>
               
@@ -128,8 +130,8 @@ export default function LaMaisonPage() {
               <div className="flex flex-col md:flex-row items-center">
                 <div className="md:w-1/2 md:pr-12 md:text-right">
                   <h4 className="text-xl font-serif text-brandGold mb-2">2023</h4>
-                  <h5 className="text-lg font-medium text-richEbony mb-2">Innovation numérique</h5>
-                  <p className="text-platinumGray">Lancement de l'expérience numérique complète de Diamant Rouge, offrant une nouvelle façon de découvrir nos créations.</p>
+                  <h5 className="text-lg font-medium text-richEbony mb-2">Innovation et tradition</h5>
+                  <p className="text-platinumGray">Lancement de l'expérience numérique de Diamant Rouge, permettant de faire découvrir au monde entier le patrimoine joaillier unique de la famille Miyara.</p>
                 </div>
                 <div className="flex items-center justify-center my-4 md:my-0">
                   <div className="w-4 h-4 rounded-full bg-brandGold z-10"></div>
@@ -162,11 +164,11 @@ export default function LaMaisonPage() {
               </div>
               <h4 className="text-xl font-serif text-brandGold mb-3">Excellence</h4>
               <p className="text-platinumGray">
-                La recherche constante de la perfection dans chaque détail, de la conception à la finition, fidèle à la tradition artisanale marocaine.
+                La recherche constante de la perfection dans chaque détail, de la conception à la finition, fidèle à la tradition artisanale de Fès transmise de génération en génération.
               </p>
             </div>
             
-            {/* Créativité */}
+            {/* Authenticité */}
             <div className="text-center p-6 bg-gradient-to-b from-brandGold/5 to-transparent rounded-sm">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 rounded-full flex items-center justify-center border border-brandGold/30">
@@ -177,9 +179,9 @@ export default function LaMaisonPage() {
                   </svg>
                 </div>
               </div>
-              <h4 className="text-xl font-serif text-brandGold mb-3">Créativité</h4>
+              <h4 className="text-xl font-serif text-brandGold mb-3">Authenticité</h4>
               <p className="text-platinumGray">
-                L'audace artistique qui nous pousse à allier les motifs traditionnels marocains avec des designs contemporains.
+                Notre engagement à rester fidèles aux techniques ancestrales tout en les faisant évoluer avec délicatesse pour créer des pièces intemporelles.
               </p>
             </div>
             
@@ -195,127 +197,85 @@ export default function LaMaisonPage() {
               </div>
               <h4 className="text-xl font-serif text-brandGold mb-3">Héritage</h4>
               <p className="text-platinumGray">
-                Notre engagement à préserver et célébrer les techniques ancestrales de la joaillerie marocaine dans chaque création.
+                La transmission du savoir-faire familial qui se perpétue depuis 1957, enrichi par les innovations de chaque génération de la famille Miyara.
               </p>
             </div>
           </div>
         </div>
         
-        {/* Team Section */}
+        {/* Founder Section */}
         <div className="mb-20">
-          <h3 className="text-2xl md:text-3xl font-serif text-brandGold text-center mb-12">Notre Équipe</h3>
+          <h3 className="text-2xl md:text-3xl font-serif text-brandGold text-center mb-12">Notre Fondatrice</h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Team Member 1 */}
-            <div className="text-center">
-              <div className="relative h-72 overflow-hidden mb-4 rounded-sm">
-                <Image 
-                  src="/images/team-marie-laurent.jpg" 
-                  alt="Leila El Mansouri" 
-                  layout="fill"
-                  objectFit="cover"
-                />
-              </div>
-              <h4 className="text-xl font-serif text-richEbony mb-1">Leila El Mansouri</h4>
-              <p className="text-sm text-brandGold mb-3">Directrice Artistique</p>
-              <p className="text-platinumGray text-sm">
-                Visionnaire créative qui dirige l'identité artistique de Diamant Rouge depuis 2010.
-              </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="relative h-[500px]">
+              <Image 
+                src="/images/home/founder.jpg" 
+                alt="Leila Miyara" 
+                layout="fill"
+                objectFit="cover"
+                className="rounded-sm"
+              />
             </div>
-            
-            {/* Team Member 2 */}
-            <div className="text-center">
-              <div className="relative h-72 overflow-hidden mb-4 rounded-sm">
-                <Image 
-                  src="/images/team-philippe-dubois.jpg" 
-                  alt="Karim Tazi" 
-                  layout="fill"
-                  objectFit="cover"
-                />
-              </div>
-              <h4 className="text-xl font-serif text-richEbony mb-1">Karim Tazi</h4>
-              <p className="text-sm text-brandGold mb-3">Maître Joaillier</p>
-              <p className="text-platinumGray text-sm">
-                Expert dans les techniques traditionnelles marocaines, avec plus de 30 ans d'expérience dans la joaillerie de luxe.
+            <div>
+              <h4 className="text-2xl font-serif text-brandGold mb-3">Leila Miyara</h4>
+              <p className="text-sm text-brandGold mb-6">Directrice Artistique & Héritière</p>
+              <div className="h-[1px] w-32 bg-gradient-to-r from-brandGold via-brandGold to-transparent mb-6"></div>
+              <p className="text-platinumGray leading-relaxed mb-4">
+                Fille du fondateur de Diamant Rouge, Leila Miyara a grandi au milieu des pierres précieuses et des métaux nobles. 
+                Formée dès son plus jeune âge aux techniques traditionnelles de la joaillerie marocaine par son père, 
+                elle a ensuite perfectionné son art en étudiant le design contemporain.
               </p>
-            </div>
-            
-            {/* Team Member 3 */}
-            <div className="text-center">
-              <div className="relative h-72 overflow-hidden mb-4 rounded-sm">
-                <Image 
-                  src="/images/team-sophie-mercier.jpg" 
-                  alt="Nadia Bensouda" 
-                  layout="fill"
-                  objectFit="cover"
-                />
-              </div>
-              <h4 className="text-xl font-serif text-richEbony mb-1">Nadia Bensouda</h4>
-              <p className="text-sm text-brandGold mb-3">Directrice des Collections</p>
-              <p className="text-platinumGray text-sm">
-                Responsable du développement des nouvelles collections, fusionnant tradition marocaine et tendances contemporaines.
+              <p className="text-platinumGray leading-relaxed mb-4">
+                Prenant la direction artistique de la Maison en 2003, Leila a su préserver l'héritage familial tout en 
+                insufflant une vision moderne et audacieuse. Sa philosophie : honorer les racines tout en regardant vers l'avenir.
+              </p>
+              <p className="text-platinumGray leading-relaxed">
+                "Notre histoire commence à Fès en 1957, mais chaque création raconte une nouvelle page de cette aventure familiale. 
+                Je porte cet héritage avec fierté et responsabilité, consciente que nos bijoux sont des témoins de notre culture 
+                qui traverseront le temps."
               </p>
             </div>
           </div>
         </div>
         
-        {/* Testimonials */}
+        {/* Atelier Section */}
         <div className="mb-20">
-          <h3 className="text-2xl md:text-3xl font-serif text-brandGold text-center mb-12">Ce qu'ils Disent de Nous</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Testimonial 1 */}
-            <div className="p-8 bg-gradient-to-br from-brandGold/10 to-transparent rounded-sm relative">
-              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-brandGold/20 absolute top-4 left-4">
-                <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"></path>
-                <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"></path>
-              </svg>
-              <div className="relative z-10">
-                <p className="text-platinumGray italic mb-6">
-                  "Diamant Rouge représente parfaitement l'élégance et le savoir-faire marocain. Leurs créations allient avec brio la richesse de notre patrimoine et les tendances contemporaines."
-                </p>
-                <div className="flex items-center">
-                  <div className="relative w-12 h-12 rounded-full overflow-hidden mr-4">
-                    <Image 
-                      src="/images/testimonial-1.jpg" 
-                      alt="Sofia Bennani" 
-                      layout="fill"
-                      objectFit="cover"
-                    />
-                  </div>
-                  <div>
-                    <h5 className="font-medium text-richEbony">Sofia Bennani</h5>
-                    <p className="text-sm text-platinumGray">Magazine Luxury Maroc</p>
-                  </div>
-                </div>
+          <h3 className="text-2xl md:text-3xl font-serif text-brandGold text-center mb-6">Notre Atelier</h3>
+          <div className="flex justify-center mb-12">
+            <div className="relative">
+              <div className="h-[1px] w-40 bg-gradient-to-r from-transparent via-brandGold to-transparent"></div>
+              <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <Diamond size={8} className="text-brandGold fill-brandGold" />
               </div>
             </div>
-            
-            {/* Testimonial 2 */}
-            <div className="p-8 bg-gradient-to-br from-brandGold/10 to-transparent rounded-sm relative">
-              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-brandGold/20 absolute top-4 left-4">
-                <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"></path>
-                <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"></path>
-              </svg>
-              <div className="relative z-10">
-                <p className="text-platinumGray italic mb-6">
-                  "Chaque bijou de Diamant Rouge raconte une histoire, celle d'un Maroc riche en traditions et résolument tourné vers l'avenir. Une marque qui fait honneur à notre artisanat."
-                </p>
-                <div className="flex items-center">
-                  <div className="relative w-12 h-12 rounded-full overflow-hidden mr-4">
-                    <Image 
-                      src="/images/testimonial-2.jpg" 
-                      alt="Omar Alaoui" 
-                      layout="fill"
-                      objectFit="cover"
-                    />
-                  </div>
-                  <div>
-                    <h5 className="font-medium text-richEbony">Omar Alaoui</h5>
-                    <p className="text-sm text-platinumGray">Critique de Mode</p>
-                  </div>
-                </div>
-              </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+              <p className="text-platinumGray leading-relaxed mb-4">
+                Au cœur de la médina de Fès, notre atelier perpétue les techniques ancestrales de la joaillerie marocaine. 
+                C'est dans ce lieu chargé d'histoire que chaque création Diamant Rouge prend vie, entre les mains d'artisans 
+                d'exception formés selon la tradition.
+              </p>
+              <p className="text-platinumGray leading-relaxed mb-4">
+                L'atelier Miyara est à la fois un espace de création et de transmission. Les techniques séculaires 
+                s'y transmettent de maître à apprenti, préservant ainsi un savoir-faire précieux qui se raréfie dans 
+                notre monde moderne.
+              </p>
+              <p className="text-platinumGray leading-relaxed">
+                Chaque bijou qui sort de notre atelier porte en lui l'âme de Fès et l'empreinte de cette longue 
+                tradition d'excellence que la famille Miyara s'efforce de perpétuer depuis plus de six décennies.
+              </p>
+            </div>
+            <div className="relative h-[500px]">
+              <Image 
+                src="/images/home/atelier.jpg" 
+                alt="Atelier Diamant Rouge" 
+                layout="fill"
+                objectFit="cover"
+                className="rounded-sm"
+              />
             </div>
           </div>
         </div>
@@ -324,7 +284,7 @@ export default function LaMaisonPage() {
         <div className="text-center bg-gradient-to-r from-richEbony/5 via-brandGold/10 to-richEbony/5 py-16 px-4 rounded-sm">
           <h3 className="text-2xl md:text-3xl font-serif text-brandGold mb-6">Découvrez Notre Héritage</h3>
           <p className="text-platinumGray max-w-2xl mx-auto mb-8">
-            Nous vous invitons à découvrir l'univers Diamant Rouge, où tradition marocaine et excellence contemporaine se rencontrent pour créer des pièces d'exception.
+            Nous vous invitons à découvrir l'univers Diamant Rouge, où tradition fassi et excellence contemporaine se rencontrent pour créer des pièces d'exception qui traversent les générations.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link 

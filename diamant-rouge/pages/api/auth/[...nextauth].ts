@@ -22,7 +22,7 @@ export const authOptions: NextAuthOptions = {
         // Provide custom encode/decode to skip JWE
         async encode({ token, secret }) {
             if (!token) {
-                throw new Error('Token is undefined');
+                throw new Error('Le token est indéfini');
             }
             // Ensure secret is a string
             const secretString = typeof secret === 'string' ? secret : secret.toString();
@@ -70,15 +70,15 @@ export const authOptions: NextAuthOptions = {
                 console.log('authorize => user login attempt =>', credentials);
 
                 if (!credentials?.email || !credentials.password) {
-                    throw new Error('Missing email or password');
+                    throw new Error('Email ou mot de passe manquant');
                 }
                 const user = await prisma.user.findUnique({
                     where: { email: credentials.email },
                 });
-                if (!user) throw new Error('No user found');
+                if (!user) throw new Error('Aucun utilisateur trouvé');
 
                 const isValid = await compare(credentials.password, user.password);
-                if (!isValid) throw new Error('Invalid credentials');
+                if (!isValid) throw new Error('Identifiants invalides');
 
                 console.log('authorize => user =>', user);
                 return {
@@ -114,10 +114,6 @@ export const authOptions: NextAuthOptions = {
             console.log('Session callback => final session =>', session);
             return session;
         },
-    },
-
-    pages: {
-        signIn: '/login',
     },
 };
 

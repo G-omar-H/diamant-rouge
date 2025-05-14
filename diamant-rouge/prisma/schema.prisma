@@ -104,10 +104,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  orders    Order[]
-  wishlists Wishlist[]
-  cartItems CartItem[]
+  orders       Order[]
+  wishlists    Wishlist[]
+  cartItems    CartItem[]
   notifications Notification[]
+  appointments Appointment[]
 }
 
 // 
@@ -180,9 +181,25 @@ model Wishlist {
 // APPOINTMENT TABLE
 // --------------------------------------------------------------------
 model Appointment {
-  id   Int      @id @default(autoincrement())
-  date DateTime
-  time String
+  id                Int      @id @default(autoincrement())
+  clientName        String
+  clientEmail       String
+  clientPhone       String
+  appointmentDate   String
+  appointmentTime   String
+  duration          String
+  status            String   @default("PENDING")  // PENDING, CONFIRMED, COMPLETED, CANCELLED
+  notes             String?
+  location          String   // casablanca, virtual
+  locationType      String?
+  appointmentType   String   // discovery, bespoke, bridal, investment
+  appointmentTypeLabel String?
+  guestCount        Int      @default(1)
+  preferences       String?  // moroccan_tea, arabic_coffee, fruit_juice, water, none
+  specialRequests   String?
+  createdAt         DateTime @default(now())
+  userId            Int?
+  user              User?    @relation(fields: [userId], references: [id])
 }
 
 // --------------------------------------------------------------------

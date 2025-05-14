@@ -1,11 +1,12 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { NextSeo } from "next-seo";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSession, signIn } from "next-auth/react";
 import { 
   Calendar, Clock, MapPin, Video, Users, Coffee, Diamond, ChevronDown, 
-  User, UserPlus, Wine, GlassWater, Utensils
+  User, UserPlus, GlassWater, Utensils, Mail, Lock, Eye, EyeOff
 } from "lucide-react";
 
 // Luxury Dropdown Component
@@ -96,6 +97,26 @@ export default function AppointmentPage() {
     const [guests, setGuests] = useState(1);
     const [preferences, setPreferences] = useState("");
     const [specialRequests, setSpecialRequests] = useState("");
+    
+    // State for form handling
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState("");
+    const [submitSuccess, setSubmitSuccess] = useState(false);
+    const [showAuthModal, setShowAuthModal] = useState(false);
+    const [pendingSubmission, setPendingSubmission] = useState(false);
+    
+    // Authentication form state
+    const [authMode, setAuthMode] = useState("login"); // login or signup
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [name, setName] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [authError, setAuthError] = useState("");
+    const [authLoading, setAuthLoading] = useState(false);
+    
+    // Get authentication session
+    const { data: session, status } = useSession();
+    const isAuthenticated = status === "authenticated";
 
     // Animation variants
     const fadeIn = {
@@ -112,7 +133,7 @@ export default function AppointmentPage() {
     const morningAppointments = [
         {
             time: "10:00",
-            description: "Séance matinale avec champagne de bienvenue",
+            description: "Séance matinale avec thé marocain de bienvenue",
             availability: "Disponible"
         },
         {
@@ -135,7 +156,7 @@ export default function AppointmentPage() {
         },
         {
             time: "17:00",
-            description: "Séance au crépuscule avec dégustation de vin",
+            description: "Séance au crépuscule avec jus de fruits frais",
             availability: "Disponible"
         }
     ];
@@ -183,12 +204,204 @@ export default function AppointmentPage() {
     // Options for preferences dropdown with icons
     const preferenceOptions = [
       { value: "", label: "Sélectionnez une option", icon: null },
-      { value: "champagne_rose", label: "Champagne Rosé", icon: Wine },
-      { value: "champagne_brut", label: "Champagne Brut", icon: Wine },
-      { value: "tea", label: "Thé et pâtisseries marocaines", icon: Coffee },
-      { value: "coffee", label: "Café arabe et douceurs", icon: Coffee },
+      { value: "moroccan_tea", label: "Thé marocain", icon: Coffee },
+      { value: "arabic_coffee", label: "Café arabe", icon: Coffee },
+      { value: "fruit_juice", label: "Jus de fruits", icon: GlassWater },
+      { value: "water", label: "Eau minérale", icon: GlassWater },
       { value: "none", label: "Aucune préférence", icon: Utensils }
     ];
+
+    // Handle authentication status changes for pending submissions
+    const handlePendingSubmission = useCallback(async () => {
+        if (isAuthenticated && pendingSubmission) {
+            setPendingSubmission(false); // Clear flag first to prevent loops
+            await submitAppointment();
+        }
+    }, [isAuthenticated, pendingSubmission]);
+
+    // Monitor authentication status changes with cleanup to prevent multiple calls
+    useEffect(() => {
+        // Only run if we have both conditions, with a check to prevent multiple executions
+        if (isAuthenticated && pendingSubmission) {
+            handlePendingSubmission();
+        }
+        
+        // No cleanup needed as we're manually controlling the state
+    }, [isAuthenticated, pendingSubmission, handlePendingSubmission]);
+
+    // Handle form submission
+    async function handleSubmitAppointment(e) {
+        e.preventDefault();
+        
+        // Basic validation
+        if (!selectedType || !selectedDate || !selectedTime) {
+            setSubmitError("Veuillez sélectionner un type de consultation, une date et une heure");
+            return;
+        }
+        
+        // If not authenticated, show auth modal and mark as pending submission
+        if (!isAuthenticated) {
+            setShowAuthModal(true);
+            setPendingSubmission(true);
+            return;
+        }
+        
+        // Continue with submission if authenticated
+        await submitAppointment();
+    }
+    
+    // Function to submit appointment after authentication
+    const submitAppointment = useCallback(async () => {
+        // Prevent multiple submissions
+        if (isSubmitting) return;
+        
+        setIsSubmitting(true);
+        setSubmitError("");
+        
+        try {
+            const response = await fetch('/api/appointments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    appointmentDate: selectedDate,
+                    appointmentTime: selectedTime,
+                    location: selectedLocation,
+                    appointmentType: selectedType,
+                    guestCount: guests,
+                    preferences,
+                    specialRequests,
+                }),
+                credentials: 'include', // Important for sending cookies/session
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Une erreur est survenue');
+            }
+            
+            // Clear form and show success message
+            setSubmitSuccess(true);
+            setShowAuthModal(false);
+            
+            // Scroll to success message
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            
+        } catch (error) {
+            console.error('Erreur lors de la soumission du rendez-vous:', error);
+            setSubmitError(error.message || 'Une erreur est survenue lors de la réservation');
+        } finally {
+            setIsSubmitting(false);
+        }
+    }, [
+        selectedDate, 
+        selectedTime, 
+        selectedLocation, 
+        selectedType, 
+        guests, 
+        preferences, 
+        specialRequests, 
+        isSubmitting
+    ]);
+    
+    // Handle authentication with a single submission attempt
+    async function handleAuthentication(e: React.FormEvent) {
+        e.preventDefault();
+        
+        // Prevent multiple submissions
+        if (authLoading) return;
+        
+        setAuthError("");
+        setAuthLoading(true);
+        
+        try {
+            if (authMode === "login") {
+                // Login
+                const result = await signIn("credentials", {
+                    redirect: false,
+                    email,
+                    password,
+                });
+                
+                if (result?.error) {
+                    setAuthError("Email ou mot de passe incorrect");
+                    setPendingSubmission(false); // Clear pending flag on error
+                } else {
+                    // Close modal - the useEffect will handle submission
+                    setShowAuthModal(false);
+                    // Do NOT call submitAppointment() here - wait for session update
+                }
+            } else {
+                // Signup
+                if (!name || !email || !password) {
+                    setAuthError("Veuillez remplir tous les champs obligatoires");
+                    setAuthLoading(false);
+                    return;
+                }
+                
+                // Validate password format
+                if (password.length < 8) {
+                    setAuthError("Le mot de passe doit contenir au moins 8 caractères");
+                    setAuthLoading(false);
+                    return;
+                }
+                
+                // Create user account
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    // Handle different error cases
+                    if (response.status === 409) {
+                        setAuthError("Cette adresse email est déjà utilisée. Veuillez vous connecter.");
+                    } else if (data.error) {
+                        setAuthError(data.error);
+                    } else {
+                        setAuthError("Erreur lors de la création du compte. Veuillez réessayer.");
+                    }
+                    setPendingSubmission(false); // Clear pending flag on error
+                    setAuthLoading(false);
+                    return;
+                }
+                
+                // Login with new account
+                const loginResult = await signIn("credentials", {
+                    redirect: false,
+                    email,
+                    password,
+                });
+                
+                if (loginResult?.error) {
+                    setAuthError("Compte créé, mais erreur lors de la connexion automatique");
+                    setPendingSubmission(false); // Clear pending flag on error
+                } else {
+                    // Close modal - the useEffect will handle submission
+                    setShowAuthModal(false);
+                    // Do NOT call submitAppointment() here - wait for session update
+                }
+            }
+        } catch (error: unknown) {
+            console.error("Erreur d'authentification:", error);
+            if (error instanceof Error) {
+                setAuthError(error.message);
+            } else {
+                setAuthError("Une erreur inattendue est survenue");
+            }
+            setPendingSubmission(false); // Clear pending flag on error
+        } finally {
+            setAuthLoading(false);
+        }
+    }
 
     return (
         <>
@@ -426,182 +639,252 @@ export default function AppointmentPage() {
                         </p>
                     </motion.div>
 
-                    <div className="bg-white p-8 md:p-12 shadow-luxury max-w-4xl mx-auto">
-                        <div className="border-b border-brandGold/20 pb-8 mb-12">
-                            <p className="italic text-platinumGray text-sm mb-3">Une création Diamant Rouge</p>
-                            <h3 className="text-2xl font-serif text-brandGold">Consultation Exclusive</h3>
-                        </div>
-
-
-                        {/* Step 1: Choose Location */}
-                        <div className="mb-16">
-                            <h3 className="text-xl font-serif text-brandGold mb-8">1. Choisissez l'expérience qui vous convient</h3>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* Casablanca Option */}
-                                <button
-                                    onClick={() => setSelectedLocation("casablanca")}
-                                    className={`p-6 border group transition-all duration-300 flex flex-col items-center text-center rounded-sm ${selectedLocation === "casablanca"
-                                        ? "border-brandGold bg-brandGold/5"
-                                        : "border-gray-200 hover:border-brandGold/50"
-                                        }`}
-                                >
-                                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-all duration-300 ${selectedLocation === "casablanca"
-                                        ? "bg-brandGold text-white"
-                                        : "bg-gray-100 text-platinumGray group-hover:bg-brandGold/20"
-                                        }`}>
-                                        <MapPin size={24} />
-                                    </div>
-                                    <h4 className="text-base font-serif text-richEbony mb-2">Showroom Casablanca</h4>
-                                    <p className="text-sm text-platinumGray">
-                                        Vivez l'expérience Diamant Rouge dans notre showroom exclusif, avec service d'accueil personnalisé et rafraîchissements.
-                                    </p>
-                                    <p className="text-xs text-brandGold mt-4 font-medium italic">
-                                        Anfa Place, Boulevard de la Corniche
-                                    </p>
-                                </button>
-
-                                {/* Virtual Option */}
-                                <button
-                                    onClick={() => setSelectedLocation("virtual")}
-                                    className={`p-6 border group transition-all duration-300 flex flex-col items-center text-center rounded-sm ${selectedLocation === "virtual"
-                                        ? "border-brandGold bg-brandGold/5"
-                                        : "border-gray-200 hover:border-brandGold/50"
-                                        }`}
-                                >
-                                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-all duration-300 ${selectedLocation === "virtual"
-                                        ? "bg-brandGold text-white"
-                                        : "bg-gray-100 text-platinumGray group-hover:bg-brandGold/20"
-                                        }`}>
-                                        <Video size={24} />
-                                    </div>
-                                    <h4 className="text-base font-serif text-richEbony mb-2">Consultation Virtuelle</h4>
-                                    <p className="text-sm text-platinumGray">
-                                        Découvrez nos créations depuis le confort de votre domicile. Un coffret de présentation peut vous être envoyé avant la consultation.
-                                    </p>
-                                    <p className="text-xs text-brandGold mt-4 font-medium italic">
-                                        Vidéoconférence privée
-                                    </p>
-                                </button>
+                    {/* Success message */}
+                    {submitSuccess && (
+                        <div className="bg-green-50 border border-green-200 text-green-800 rounded-lg p-6 mb-12 max-w-4xl mx-auto flex flex-col items-center shadow-luxury">
+                            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
                             </div>
+                            <h3 className="text-xl font-serif text-green-900 mb-2">Réservation Confirmée</h3>
+                            <p className="text-center mb-6">
+                                Nous avons bien reçu votre demande de rendez-vous. Un conseiller vous contactera très prochainement pour confirmer les détails.
+                            </p>
+                            <a 
+                                href="#" 
+                                className="px-6 py-3 bg-brandGold text-richEbony rounded-sm font-medium hover:bg-brandGold/90 transition-all duration-300 shadow-sm"
+                                onClick={() => {
+                                    // Reset form
+                                    setSelectedType("");
+                                    setSelectedDate("");
+                                    setSelectedTime("");
+                                    setGuests(1);
+                                    setPreferences("");
+                                    setSpecialRequests("");
+                                    setSubmitSuccess(false);
+                                }}
+                            >
+                                Réserver un autre rendez-vous
+                            </a>
                         </div>
+                    )}
 
-                        {/* Step 2: Appointment Type */}
-                        <div className="mb-16">
-                            <h3 className="text-xl font-serif text-brandGold mb-8">2. Sélectionnez votre type de consultation</h3>
-
-                            <div className="grid gap-4">
-                                {consultationTypes.map((type) => (
-                                    <div
-                                        key={type.id}
-                                        onClick={() => setSelectedType(type.id)}
-                                        className={`flex items-start p-5 border cursor-pointer transition-all duration-300 rounded-sm ${selectedType === type.id
-                                            ? "border-brandGold bg-brandGold/5"
-                                            : "border-gray-200 hover:border-brandGold/30"
-                                            }`}
-                                    >
-                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center mr-5 transition-colors ${selectedType === type.id
-                                            ? "bg-brandGold text-white"
-                                            : "bg-gray-100 text-platinumGray"
-                                            }`}>
-                                            <type.icon size={20} />
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="flex justify-between items-center mb-2">
-                                                <h4 className="font-medium text-base text-richEbony">{type.title}</h4>
-                                                <span className="text-xs bg-brandGold/10 text-brandGold px-2 py-1 rounded">
-                                                    {type.duration}
-                                                </span>
-                                            </div>
-                                            <p className="text-sm text-platinumGray">{type.description}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Step 3: Choose Date and Time */}
-                        <div className="mb-16">
-                            <h3 className="text-xl font-serif text-brandGold mb-8">3. Choisissez une date et une heure</h3>
-
-                            <div className="mb-10">
-                                <label className="flex items-center text-platinumGray mb-4 font-medium">
-                                    <Calendar size={16} className="mr-2 text-brandGold" />
-                                    Date de votre consultation
-                                </label>
-                                <div className="relative group">
-                                    <input
-                                        type="date"
-                                        className="w-full border border-gray-200 p-4 bg-transparent focus:border-brandGold focus:ring-1 focus:ring-brandGold outline-none transition-all rounded-sm text-richEbony"
-                                        value={selectedDate}
-                                        onChange={(e) => setSelectedDate(e.target.value)}
-                                    />
-                                    <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-transparent via-brandGold to-transparent group-hover:w-full transition-all duration-300"></div>
-                                </div>
-                                <p className="mt-2 text-xs text-platinumGray italic">
-                                    Notre showroom est ouvert du Mardi au Samedi
-                                </p>
-                            </div>
-
-                            {selectedDate && (
-                                <div>
-                                    <h4 className="font-medium text-platinumGray mb-4 flex items-center">
-                                        <Clock size={16} className="mr-2 text-brandGold" />
-                                        Disponibilités du {new Date(selectedDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}
-                                    </h4>
-
-                                    <div className="mb-6">
-                                        <h5 className="text-sm font-medium text-platinumGray mb-3">Matinée</h5>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {morningAppointments.map((slot) => (
-                                                <div
-                                                    key={slot.time}
-                                                    onClick={() => setSelectedTime(slot.time)}
-                                                    className={`flex flex-col p-4 border cursor-pointer transition-all duration-300 rounded-sm ${selectedTime === slot.time
-                                                        ? "border-brandGold bg-brandGold/5"
-                                                        : "border-gray-200 hover:border-brandGold/30"
-                                                        }`}
-                                                >
-                                                    <div className="flex justify-between items-center mb-1">
-                                                        <span className="font-medium text-richEbony text-base">{slot.time}</span>
-                                                        <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-                                                            {slot.availability}
-                                                        </span>
-                                                    </div>
-                                                    <p className="text-xs text-platinumGray">{slot.description}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h5 className="text-sm font-medium text-platinumGray mb-3">Après-midi</h5>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {afternoonAppointments.map((slot) => (
-                                                <div
-                                                    key={slot.time}
-                                                    onClick={() => setSelectedTime(slot.time)}
-                                                    className={`flex flex-col p-4 border cursor-pointer transition-all duration-300 rounded-sm ${selectedTime === slot.time
-                                                        ? "border-brandGold bg-brandGold/5"
-                                                        : "border-gray-200 hover:border-brandGold/30"
-                                                        }`}
-                                                >
-                                                    <div className="flex justify-between items-center mb-1">
-                                                        <span className="font-medium text-richEbony text-base">{slot.time}</span>
-                                                        <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-                                                            {slot.availability}
-                                                        </span>
-                                                    </div>
-                                                    <p className="text-xs text-platinumGray">{slot.description}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
+                    {!submitSuccess && (
+                        <form onSubmit={handleSubmitAppointment} className="bg-white p-8 md:p-12 shadow-luxury max-w-4xl mx-auto">
+                            {/* Error message */}
+                            {submitError && (
+                                <div className="bg-burgundy/10 border border-burgundy/20 text-burgundy p-4 mb-8 rounded-md">
+                                    <p>{submitError}</p>
                                 </div>
                             )}
-                        </div>
 
-                    {/* Step 4: Additional Details with Custom Luxury Dropdowns */}
+                            <div className="border-b border-brandGold/20 pb-8 mb-12">
+                                <p className="italic text-platinumGray text-sm mb-3">Une création Diamant Rouge</p>
+                                <h3 className="text-2xl font-serif text-brandGold">Consultation Exclusive</h3>
+                            </div>
+
+                            {/* Authentication Status Banner */}
+                            <div className="mb-16 p-4 bg-brandGold/5 border border-brandGold/20 rounded-sm">
+                                <div className="flex items-center">
+                                    <div className="mr-4">
+                                        <div className="w-10 h-10 rounded-full bg-brandGold/20 flex items-center justify-center">
+                                            <User size={18} className="text-brandGold" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        {isAuthenticated ? (
+                                            <>
+                                                <h4 className="text-base font-serif text-brandGold mb-1">
+                                                    Bonjour, {session.user.name || session.user.email}
+                                                </h4>
+                                                <p className="text-sm text-platinumGray">
+                                                    Votre réservation sera associée à votre compte.
+                                                </p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <h4 className="text-base font-serif text-brandGold mb-1">
+                                                    Connexion Nécessaire
+                                                </h4>
+                                                <p className="text-sm text-platinumGray">
+                                                    Vous serez invité à vous connecter ou à créer un compte lors de la confirmation de votre rendez-vous.
+                                                </p>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Step 1: Choose Location */}
+                            <div className="mb-16">
+                                <h3 className="text-xl font-serif text-brandGold mb-8">1. Choisissez l'expérience qui vous convient</h3>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Casablanca Option */}
+                                    <button
+                                        onClick={() => setSelectedLocation("casablanca")}
+                                        className={`p-6 border group transition-all duration-300 flex flex-col items-center text-center rounded-sm ${selectedLocation === "casablanca"
+                                            ? "border-brandGold bg-brandGold/5"
+                                            : "border-gray-200 hover:border-brandGold/50"
+                                            }`}
+                                    >
+                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-all duration-300 ${selectedLocation === "casablanca"
+                                            ? "bg-brandGold text-white"
+                                            : "bg-gray-100 text-platinumGray group-hover:bg-brandGold/20"
+                                            }`}>
+                                            <MapPin size={24} />
+                                        </div>
+                                        <h4 className="text-base font-serif text-richEbony mb-2">Showroom Casablanca</h4>
+                                        <p className="text-sm text-platinumGray">
+                                            Vivez l'expérience Diamant Rouge dans notre showroom exclusif, avec service d'accueil personnalisé et rafraîchissements.
+                                        </p>
+                                        <p className="text-xs text-brandGold mt-4 font-medium italic">
+                                            Anfa Place, Boulevard de la Corniche
+                                        </p>
+                                    </button>
+
+                                    {/* Virtual Option */}
+                                    <button
+                                        onClick={() => setSelectedLocation("virtual")}
+                                        className={`p-6 border group transition-all duration-300 flex flex-col items-center text-center rounded-sm ${selectedLocation === "virtual"
+                                            ? "border-brandGold bg-brandGold/5"
+                                            : "border-gray-200 hover:border-brandGold/50"
+                                            }`}
+                                    >
+                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-all duration-300 ${selectedLocation === "virtual"
+                                            ? "bg-brandGold text-white"
+                                            : "bg-gray-100 text-platinumGray group-hover:bg-brandGold/20"
+                                            }`}>
+                                            <Video size={24} />
+                                        </div>
+                                        <h4 className="text-base font-serif text-richEbony mb-2">Consultation Virtuelle</h4>
+                                        <p className="text-sm text-platinumGray">
+                                            Découvrez nos créations depuis le confort de votre domicile. Un coffret de présentation peut vous être envoyé avant la consultation.
+                                        </p>
+                                        <p className="text-xs text-brandGold mt-4 font-medium italic">
+                                            Vidéoconférence privée
+                                        </p>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Step 2: Appointment Type */}
+                            <div className="mb-16">
+                                <h3 className="text-xl font-serif text-brandGold mb-8">2. Sélectionnez votre type de consultation</h3>
+
+                                <div className="grid gap-4">
+                                    {consultationTypes.map((type) => (
+                                        <div
+                                            key={type.id}
+                                            onClick={() => setSelectedType(type.id)}
+                                            className={`flex items-start p-5 border cursor-pointer transition-all duration-300 rounded-sm ${selectedType === type.id
+                                                ? "border-brandGold bg-brandGold/5"
+                                                : "border-gray-200 hover:border-brandGold/30"
+                                                }`}
+                                        >
+                                            <div className={`w-12 h-12 rounded-full flex items-center justify-center mr-5 transition-colors ${selectedType === type.id
+                                                ? "bg-brandGold text-white"
+                                                : "bg-gray-100 text-platinumGray"
+                                                }`}>
+                                                <type.icon size={20} />
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <h4 className="font-medium text-base text-richEbony">{type.title}</h4>
+                                                    <span className="text-xs bg-brandGold/10 text-brandGold px-2 py-1 rounded">
+                                                        {type.duration}
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm text-platinumGray">{type.description}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Step 3: Choose Date and Time */}
+                            <div className="mb-16">
+                                <h3 className="text-xl font-serif text-brandGold mb-8">3. Choisissez une date et une heure</h3>
+
+                                <div className="mb-10">
+                                    <label className="flex items-center text-platinumGray mb-4 font-medium">
+                                        <Calendar size={16} className="mr-2 text-brandGold" />
+                                        Date de votre consultation
+                                    </label>
+                                    <div className="relative group">
+                                        <input
+                                            type="date"
+                                            className="w-full border border-gray-200 p-4 bg-transparent focus:border-brandGold focus:ring-1 focus:ring-brandGold outline-none transition-all rounded-sm text-richEbony"
+                                            value={selectedDate}
+                                            onChange={(e) => setSelectedDate(e.target.value)}
+                                        />
+                                        <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-transparent via-brandGold to-transparent group-hover:w-full transition-all duration-300"></div>
+                                    </div>
+                                    <p className="mt-2 text-xs text-platinumGray italic">
+                                        Notre showroom est ouvert du Mardi au Samedi
+                                    </p>
+                                </div>
+
+                                {selectedDate && (
+                                    <div>
+                                        <h4 className="font-medium text-platinumGray mb-4 flex items-center">
+                                            <Clock size={16} className="mr-2 text-brandGold" />
+                                            Disponibilités du {new Date(selectedDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}
+                                        </h4>
+
+                                        <div className="mb-6">
+                                            <h5 className="text-sm font-medium text-platinumGray mb-3">Matinée</h5>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                {morningAppointments.map((slot) => (
+                                                    <div
+                                                        key={slot.time}
+                                                        onClick={() => setSelectedTime(slot.time)}
+                                                        className={`flex flex-col p-4 border cursor-pointer transition-all duration-300 rounded-sm ${selectedTime === slot.time
+                                                            ? "border-brandGold bg-brandGold/5"
+                                                            : "border-gray-200 hover:border-brandGold/30"
+                                                            }`}
+                                                    >
+                                                        <div className="flex justify-between items-center mb-1">
+                                                            <span className="font-medium text-richEbony text-base">{slot.time}</span>
+                                                            <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                                                                {slot.availability}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-xs text-platinumGray">{slot.description}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <h5 className="text-sm font-medium text-platinumGray mb-3">Après-midi</h5>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                {afternoonAppointments.map((slot) => (
+                                                    <div
+                                                        key={slot.time}
+                                                        onClick={() => setSelectedTime(slot.time)}
+                                                        className={`flex flex-col p-4 border cursor-pointer transition-all duration-300 rounded-sm ${selectedTime === slot.time
+                                                            ? "border-brandGold bg-brandGold/5"
+                                                            : "border-gray-200 hover:border-brandGold/30"
+                                                            }`}
+                                                    >
+                                                        <div className="flex justify-between items-center mb-1">
+                                                            <span className="font-medium text-richEbony text-base">{slot.time}</span>
+                                                            <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                                                                {slot.availability}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-xs text-platinumGray">{slot.description}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                        {/* Step 4: Additional Details with Custom Luxury Dropdowns */}
                         <div className="mb-16">
                             <h3 className="text-xl font-serif text-brandGold mb-8">4. Informations complémentaires</h3>
 
@@ -661,23 +944,253 @@ export default function AppointmentPage() {
                         {/* Form Submission */}
                         <div className="flex flex-col items-center">
                             <button
+                                type="submit"
                                 className="px-10 py-4 bg-brandGold text-richEbony rounded-sm font-medium hover:bg-brandGold/90 transition-all duration-300 shadow-luxury flex items-center"
-                                disabled={!selectedType || !selectedDate || !selectedTime}
+                                disabled={isSubmitting || !selectedType || !selectedDate || !selectedTime}
                             >
-                                <span>Confirmer le rendez-vous</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                </svg>
+                                {isSubmitting ? (
+                                    <>
+                                        <span>Traitement en cours...</span>
+                                        <div className="ml-2 w-5 h-5 border-2 border-richEbony border-t-transparent rounded-full animate-spin"></div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>Confirmer le rendez-vous</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        </svg>
+                                    </>
+                                )}
                             </button>
 
                             <p className="text-xs text-platinumGray mt-6 text-center max-w-md">
                                 En confirmant ce rendez-vous, vous acceptez d'être contacté(e) par notre équipe pour finaliser les détails de votre visite.
                             </p>
                         </div>
-                    </div>
+                    </form>
+                    )}
                 </div>
             </section>
 
+            {/* Authentication Modal */}
+            <AnimatePresence>
+                {showAuthModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-richEbony/30 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-white rounded-lg shadow-luxury border border-brandGold/20 p-8 w-full max-w-md relative overflow-hidden"
+                        >
+                            {/* Luxury decorative elements */}
+                            <div className="absolute -top-16 -right-16 w-32 h-32 border border-brandGold/10 rounded-full"></div>
+                            <div className="absolute top-1/2 -left-12 w-24 h-24 border border-brandGold/5 rounded-full"></div>
+                            
+                            <div className="flex justify-between items-center mb-6 relative z-10">
+                                <h3 className="text-xl font-serif text-brandGold">
+                                    {authMode === "login" ? "Connexion" : "Créer un compte"}
+                                </h3>
+                                <button
+                                    onClick={() => setShowAuthModal(false)}
+                                    className="w-8 h-8 flex items-center justify-center hover:bg-brandGold/10 rounded-full transition-colors"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-platinumGray" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <p className="text-platinumGray mb-8 italic text-sm relative z-10">
+                                {authMode === "login" 
+                                    ? "Connectez-vous pour accéder à votre espace personnel et confirmer votre rendez-vous" 
+                                    : "Rejoignez l'univers Diamant Rouge pour bénéficier d'un service personnalisé à la hauteur de vos attentes"}
+                            </p>
+                            
+                            {/* Authentication Form */}
+                            <form onSubmit={handleAuthentication} className="space-y-5 relative z-10">
+                                {/* Enhanced error display */}
+                                <AnimatePresence>
+                                    {authError && (
+                                        <motion.div 
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            className="border-l-4 border-burgundy bg-burgundy/5 p-4 rounded-r-sm"
+                                        >
+                                            <div className="flex items-start">
+                                                <div className="flex-shrink-0">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-burgundy" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                                <div className="ml-3">
+                                                    <p className="text-sm text-burgundy font-medium">{authError}</p>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                                
+                                {/* Name Field (Signup only) */}
+                                {authMode === "signup" && (
+                                    <div className="space-y-1">
+                                        <label className="block text-sm font-medium text-richEbony">Nom complet</label>
+                                        <div className="relative group">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <User size={18} className="text-platinumGray group-hover:text-brandGold transition-colors duration-300" />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
+                                                className="w-full pl-10 py-3 bg-transparent border border-gray-200 rounded-sm focus:border-brandGold focus:ring-1 focus:ring-brandGold/20 hover:border-brandGold/50 transition-all duration-300"
+                                                placeholder="Votre nom complet"
+                                            />
+                                            <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-transparent via-brandGold to-transparent group-hover:w-full transition-all duration-300"></div>
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {/* Email Field */}
+                                <div className="space-y-1">
+                                    <label className="block text-sm font-medium text-richEbony">Email</label>
+                                    <div className="relative group">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <Mail size={18} className="text-platinumGray group-hover:text-brandGold transition-colors duration-300" />
+                                        </div>
+                                        <input
+                                            type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            className="w-full pl-10 py-3 bg-transparent border border-gray-200 rounded-sm focus:border-brandGold focus:ring-1 focus:ring-brandGold/20 hover:border-brandGold/50 transition-all duration-300"
+                                            placeholder="Votre adresse email"
+                                        />
+                                        <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-transparent via-brandGold to-transparent group-hover:w-full transition-all duration-300"></div>
+                                    </div>
+                                </div>
+                                
+                                {/* Password Field */}
+                                <div className="space-y-1">
+                                    <label className="block text-sm font-medium text-richEbony">Mot de passe</label>
+                                    <div className="relative group">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <Lock size={18} className="text-platinumGray group-hover:text-brandGold transition-colors duration-300" />
+                                        </div>
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            className="w-full pl-10 py-3 bg-transparent border border-gray-200 rounded-sm focus:border-brandGold focus:ring-1 focus:ring-brandGold/20 hover:border-brandGold/50 transition-all duration-300"
+                                            placeholder={authMode === "login" ? "Votre mot de passe" : "Créez un mot de passe"}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-platinumGray hover:text-brandGold transition-colors duration-300"
+                                        >
+                                            {showPassword ? (
+                                                <EyeOff size={18} />
+                                            ) : (
+                                                <Eye size={18} />
+                                            )}
+                                        </button>
+                                        <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-transparent via-brandGold to-transparent group-hover:w-full transition-all duration-300"></div>
+                                    </div>
+                                    {/* Password validation prompt for signup */}
+                                    {authMode === "signup" && (
+                                        <p className="text-xs text-platinumGray mt-2">
+                                            Minimum 8 caractères avec au moins un chiffre et une lettre
+                                        </p>
+                                    )}
+                                </div>
+                                
+                                {/* Submit Button with luxury styling */}
+                                <div className="pt-2">
+                                    <button
+                                        type="submit"
+                                        className="w-full relative overflow-hidden bg-brandGold text-richEbony py-3 rounded-sm font-medium hover:bg-brandGold/90 transition-all duration-300 shadow-sm group"
+                                        disabled={authLoading}
+                                    >
+                                        <span className="relative z-10">
+                                            {authLoading ? (
+                                                <div className="flex items-center justify-center">
+                                                    <span>Patientez</span>
+                                                    <div className="ml-3 w-5 h-5 border-2 border-richEbony border-t-transparent rounded-full animate-spin"></div>
+                                                </div>
+                                            ) : (
+                                                <span>{authMode === "login" ? "Se connecter" : "Créer mon compte"}</span>
+                                            )}
+                                        </span>
+                                        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-0 bg-gradient-to-r from-brandGold via-brandGold/80 to-brandGold transition-transform duration-700"></div>
+                                    </button>
+                                </div>
+                                
+                                {/* Mode Switch with luxury styling */}
+                                <div className="text-center pt-2 relative">
+                                    <div className="absolute left-0 right-0 top-1/2 h-px bg-gray-200"></div>
+                                    <span className="bg-white px-3 relative z-10 text-xs text-platinumGray">
+                                        ou
+                                    </span>
+                                </div>
+                                
+                                <div className="text-center">
+                                    {authMode === "login" ? (
+                                        <div className="space-y-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setAuthMode("signup");
+                                                    setAuthError("");
+                                                }}
+                                                className="text-brandGold hover:text-brandGold/80 text-sm font-medium"
+                                            >
+                                                Créer un nouveau compte
+                                            </button>
+                                            <p className="text-xs text-platinumGray">
+                                                Rejoignez l'univers Diamant Rouge
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setAuthMode("login");
+                                                    setAuthError("");
+                                                }}
+                                                className="text-brandGold hover:text-brandGold/80 text-sm font-medium"
+                                            >
+                                                J'ai déjà un compte
+                                            </button>
+                                            <p className="text-xs text-platinumGray">
+                                                Accédez à votre espace personnel
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </form>
+                            
+                            {/* Enhanced security note */}
+                            <div className="mt-8 flex items-center justify-center relative z-10">
+                                <div className="w-8 h-8 rounded-full bg-brandGold/10 flex items-center justify-center mr-3">
+                                    <Lock size={16} className="text-brandGold" />
+                                </div>
+                                <p className="text-xs text-platinumGray max-w-xs">
+                                    Diamant Rouge garantit la <span className="font-medium">confidentialité</span> et la <span className="font-medium">sécurité</span> de vos données personnelles
+                                </p>
+                            </div>
+                            
+                            {/* Decorative element at bottom */}
+                            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-brandGold/30 to-transparent"></div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Reassurance Section */}
             <section className=" py-16 px-6 bg-burgundy">
@@ -723,7 +1236,7 @@ export default function AppointmentPage() {
                                 Comment se déroule un rendez-vous privé ?
                             </h4>
                             <p className="text-platinumGray">
-                                Chaque consultation commence par un accueil personnalisé avec une boisson de bienvenue. Votre conseiller dédié vous guidera ensuite à travers les collections adaptées à vos préférences. Vous aurez tout le temps nécessaire pour essayer les pièces et poser vos questions dans un cadre confidentiel et luxueux.
+                                Chaque consultation commence par un accueil personnalisé avec une boisson de bienvenue (thé marocain, café arabe ou rafraîchissements sans alcool). Votre conseiller dédié vous guidera ensuite à travers les collections adaptées à vos préférences. Vous aurez tout le temps nécessaire pour essayer les pièces et poser vos questions dans un cadre confidentiel et luxueux.
                             </p>
                         </div>
 

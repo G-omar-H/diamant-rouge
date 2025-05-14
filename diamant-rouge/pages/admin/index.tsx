@@ -10,6 +10,7 @@ import { ManageCategories } from "../../components/admin/ManageCategories";
 import { ManageOrders } from "../../components/admin/ManageOrders";
 import { ManageUsers } from "../../components/admin/ManageUsers";
 import { ManageNewsletter } from "../../components/admin/ManageNewsletter";
+import { ManageAppointments } from "../../components/admin/ManageAppointments";
 
 // Dashboard Analytics Component 
 const DashboardOverview = () => {
@@ -18,7 +19,8 @@ const DashboardOverview = () => {
     { label: "Produits", value: "24", icon: "✦" },
     { label: "Commandes en attente", value: "8", icon: "✧" },
     { label: "Nouveaux clients", value: "12", icon: "✦" },
-    { label: "Revenu mensuel", value: "14 500 MAD", icon: "✧" }
+    { label: "Revenu mensuel", value: "14 500 MAD", icon: "✧" },
+    { label: "Rendez-vous à venir", value: "5", icon: "✦" }
   ]);
   
   return (
@@ -44,7 +46,7 @@ const DashboardOverview = () => {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         {stats.map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -72,8 +74,10 @@ const DashboardOverview = () => {
           </h3>
           <div className="space-y-4">
             {[
+              { action: "Nouveau rendez-vous", item: "Meryem Alaoui", time: "Il y a 30 minutes", status: "Confirmé" },
               { action: "Nouvelle commande", item: "Bague Soleil Diamant", time: "Il y a 2 heures", status: "En attente" },
               { action: "Produit ajouté", item: "Collier Étoile Filante", time: "Il y a 5 heures", status: "Publié" },
+              { action: "Rendez-vous fixé", item: "Sofia Zidane", time: "Il y a 1 jour", status: "En attente" },
               { action: "Stock mis à jour", item: "Bracelet Lumière d'Or", time: "Il y a 1 jour", status: "En stock" },
               { action: "Nouveau client", item: "Marie Dupont", time: "Il y a 2 jours", status: "" }
             ].map((activity, i) => (
@@ -115,6 +119,12 @@ const DashboardOverview = () => {
               onClick={() => {}} 
               className="w-full py-3 px-4 bg-transparent border border-brandGold text-brandGold rounded-lg hover:bg-brandGold hover:text-richEbony transition duration-300 text-left"
             >
+              ✦ Gérer les Rendez-vous
+            </button>
+            <button 
+              onClick={() => {}} 
+              className="w-full py-3 px-4 bg-transparent border border-brandGold text-brandGold rounded-lg hover:bg-brandGold hover:text-richEbony transition duration-300 text-left"
+            >
               ✦ Gérer les Produits en Vedette
             </button>
             <button 
@@ -131,7 +141,7 @@ const DashboardOverview = () => {
 };
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<"overview" | "products" | "categories" | "orders" | "users" | "newsletter">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "products" | "categories" | "orders" | "users" | "newsletter" | "appointments">("overview");
 
   return (
     <AdminLayout title="Dashboard Admin">
@@ -184,6 +194,15 @@ export default function AdminDashboard() {
             Utilisateurs
             </button>
             <button
+              onClick={() => setActiveTab("appointments")}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition whitespace-nowrap
+                ${activeTab === "appointments" ? 
+                  "bg-brandGold text-richEbony shadow-luxury" : 
+                  "bg-transparent border border-brandGold/50 text-brandGold hover:bg-brandGold/10"}`}
+            >
+              Rendez-vous
+            </button>
+            <button
               onClick={() => setActiveTab("newsletter")}
               className={`px-6 py-2 rounded-full text-sm font-medium transition whitespace-nowrap
                 ${activeTab === "newsletter" ? 
@@ -202,6 +221,7 @@ export default function AdminDashboard() {
           {activeTab === "categories" && <ManageCategories />}
           {activeTab === "orders" && <ManageOrders />}
           {activeTab === "users" && <ManageUsers />}
+          {activeTab === "appointments" && <ManageAppointments />}
           {activeTab === "newsletter" && <ManageNewsletter />}
     </div>
     </AdminLayout>

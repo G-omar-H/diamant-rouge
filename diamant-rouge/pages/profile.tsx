@@ -1329,7 +1329,7 @@ export async function getServerSideProps(context: any) {
     if (!session || !session.user) {
         return {
             redirect: {
-                destination: '/login',
+                destination: '/auth',
                 permanent: false,
             },
         };
@@ -1341,7 +1341,7 @@ export async function getServerSideProps(context: any) {
             console.error("Session user ID is missing");
             return {
                 redirect: {
-                    destination: '/login',
+                    destination: '/auth',
                     permanent: false,
                 },
             };
@@ -1412,7 +1412,7 @@ export async function getServerSideProps(context: any) {
             console.error("User not found in database with ID:", userId);
             return {
                 redirect: {
-                    destination: '/login',
+                    destination: '/auth',
                     permanent: false,
                 },
             };

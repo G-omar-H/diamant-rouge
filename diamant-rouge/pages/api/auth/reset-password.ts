@@ -7,13 +7,13 @@ const prisma = new PrismaClient();
 
 export default async function resetPasswordHandler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
+        return res.status(405).json({ error: 'Méthode non autorisée' });
     }
 
     const { email } = req.body;
 
     if (!email) {
-        return res.status(400).json({ error: 'Email address is required' });
+        return res.status(400).json({ error: 'Adresse email requise' });
     }
 
     try {
