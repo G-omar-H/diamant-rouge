@@ -21,19 +21,100 @@ type CartContextType = {
   clearCart: () => Promise<void>;
   refreshCart: () => Promise<void>;
   updateQuantity: (productId: number, variationId: number | undefined, quantity: number) => Promise<void>;
+  isCartLoading: boolean;
 };
+
+const LOCAL_STORAGE_CART_KEY = 'diamant_rouge_guest_cart';
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [isCartLoading, setIsCartLoading] = useState(true);
+  const isAuthenticated = !!session?.user?.email;
+  const isSessionLoading = status === 'loading';
+
+  // Load cart from localStorage on initial load
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !isAuthenticated && !isSessionLoading) {
+      try {
+        const storedCart = localStorage.getItem(LOCAL_STORAGE_CART_KEY);
+        if (storedCart) {
+          setCart(JSON.parse(storedCart));
+        }
+        setIsCartLoading(false);
+      } catch (error) {
+        console.error("Error loading cart from localStorage:", error);
+        setIsCartLoading(false);
+      }
+    }
+  }, [isAuthenticated, isSessionLoading]);
+
+  // Save guest cart to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !isAuthenticated && !isSessionLoading && !isCartLoading) {
+      try {
+        localStorage.setItem(LOCAL_STORAGE_CART_KEY, JSON.stringify(cart));
+      } catch (error) {
+        console.error("Error saving cart to localStorage:", error);
+      }
+    }
+  }, [cart, isAuthenticated, isSessionLoading, isCartLoading]);
+
+  // Sync local cart with server when user logs in
+  useEffect(() => {
+    const syncCartToServer = async () => {
+      if (isAuthenticated && !isSessionLoading) {
+        const storedCart = localStorage.getItem(LOCAL_STORAGE_CART_KEY);
+        if (storedCart) {
+          const localCart: CartItem[] = JSON.parse(storedCart);
+          
+          // Only sync if there are items in the local cart
+          if (localCart.length > 0) {
+            setIsCartLoading(true);
+            
+            // Add each local cart item to the server
+            for (const item of localCart) {
+              try {
+                await fetch("/api/cart", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  credentials: "include",
+                  body: JSON.stringify(item),
+                });
+              } catch (error) {
+                console.error("Error syncing cart item to server:", error);
+              }
+            }
+            
+            // Clear local storage cart after sync
+            localStorage.removeItem(LOCAL_STORAGE_CART_KEY);
+            
+            // Fetch the updated cart from server
+            await fetchCartFromServer();
+          } else {
+            // If local cart is empty, just fetch from server
+            await fetchCartFromServer();
+          }
+        } else {
+          // No local cart, just fetch from server
+          await fetchCartFromServer();
+        }
+      }
+    };
+
+    syncCartToServer();
+  }, [isAuthenticated, isSessionLoading]);
 
   async function fetchCartFromServer() {
-    if (!session?.user?.email) {
-      setCart([]);
+    setIsCartLoading(true);
+    
+    if (!isAuthenticated) {
+      setIsCartLoading(false);
       return;
     }
+    
     try {
       const res = await fetch("/api/cart", { credentials: "include" });
       if (res.ok) {
@@ -44,21 +125,41 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
     } catch (err) {
       console.error("Error fetching cart:", err);
+    } finally {
+      setIsCartLoading(false);
     }
   }
 
   useEffect(() => {
-    fetchCartFromServer();
-  }, [session]);
+    if (isAuthenticated && !isSessionLoading) {
+      fetchCartFromServer();
+    }
+  }, [isAuthenticated, isSessionLoading]);
 
   async function addToCart(item: CartItem) {
-    if (!session?.user?.email) {
-      console.error("User not authenticated. Please log in to add items to the cart.");
+    // Handle guest cart (not authenticated)
+    if (!isAuthenticated) {
+      const existingItemIndex = cart.findIndex(
+        (p) => p.productId === item.productId && p.variationId === item.variationId
+      );
+      
+      if (existingItemIndex !== -1) {
+        // Update existing item in local cart
+        const updatedCart = [...cart];
+        updatedCart[existingItemIndex].quantity += item.quantity;
+        setCart(updatedCart);
+      } else {
+        // Add new item to local cart
+        setCart([...cart, item]);
+      }
       return;
     }
+    
+    // Handle authenticated cart (server-side)
     const existingItem = cart.find(
       (p) => p.productId === item.productId && p.variationId === item.variationId
     );
+    
     if (existingItem && existingItem.id) {
       try {
         const res = await fetch(`/api/cart?id=${existingItem.id}`, {
@@ -91,10 +192,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }
 
   async function removeFromCart(productId: number, variationId?: number) {
+    // Handle guest cart (not authenticated)
+    if (!isAuthenticated) {
+      const updatedCart = cart.filter(
+        (p) => !(p.productId === productId && p.variationId === variationId)
+      );
+      setCart(updatedCart);
+      return;
+    }
+    
+    // Handle authenticated cart (server-side)
     const item = cart.find(
       (p) => p.productId === productId && p.variationId === variationId
     );
     if (!item || !item.id) return;
+    
     try {
       const res = await fetch(`/api/cart?id=${item.id}`, {
         method: "DELETE",
@@ -109,6 +221,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }
 
   async function clearCart() {
+    // Handle guest cart (not authenticated)
+    if (!isAuthenticated) {
+      setCart([]);
+      localStorage.removeItem(LOCAL_STORAGE_CART_KEY);
+      return;
+    }
+    
+    // Handle authenticated cart (server-side)
     try {
       const res = await fetch("/api/cart?clear=true", {
         method: "DELETE",
@@ -123,19 +243,38 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }
 
   async function refreshCart() {
-    await fetchCartFromServer();
+    if (isAuthenticated) {
+      await fetchCartFromServer();
+    } else {
+      // For guest cart, we might refresh from localStorage
+      try {
+        const storedCart = localStorage.getItem(LOCAL_STORAGE_CART_KEY);
+        if (storedCart) {
+          setCart(JSON.parse(storedCart));
+        }
+      } catch (error) {
+        console.error("Error refreshing cart from localStorage:", error);
+      }
+    }
   }
 
-  // Add the new updateQuantity function
+  // Update quantity function with guest cart support
   async function updateQuantity(productId: number, variationId: number | undefined, quantity: number) {
     if (quantity < 1) return; // Prevent negative quantities
     
-    if (!session?.user?.email) {
-      console.error("User not authenticated. Please log in to update cart items.");
+    // Handle guest cart (not authenticated)
+    if (!isAuthenticated) {
+      const updatedCart = cart.map(item => {
+        if (item.productId === productId && item.variationId === variationId) {
+          return { ...item, quantity };
+        }
+        return item;
+      });
+      setCart(updatedCart);
       return;
     }
-
-    // Find the cart item to update
+    
+    // Handle authenticated cart (server-side)
     const item = cart.find(
       (p) => p.productId === productId && p.variationId === variationId
     );
@@ -172,7 +311,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeFromCart, 
       clearCart, 
       refreshCart,
-      updateQuantity 
+      updateQuantity,
+      isCartLoading
     }}>
       {children}
     </CartContext.Provider>

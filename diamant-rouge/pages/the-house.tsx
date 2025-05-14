@@ -209,14 +209,14 @@ export default function LaMaisonPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="relative h-[500px]">
-              <Image 
+                <Image 
                 src="/images/home/founder.jpg" 
                 alt="Leila Miyara" 
-                layout="fill"
-                objectFit="cover"
+                  layout="fill"
+                  objectFit="cover"
                 className="rounded-sm"
-              />
-            </div>
+                />
+              </div>
             <div>
               <h4 className="text-2xl font-serif text-brandGold mb-3">Leila Miyara</h4>
               <p className="text-sm text-brandGold mb-6">Directrice Artistique & Héritière</p>
@@ -247,10 +247,10 @@ export default function LaMaisonPage() {
               <div className="h-[1px] w-40 bg-gradient-to-r from-transparent via-brandGold to-transparent"></div>
               <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                 <Diamond size={8} className="text-brandGold fill-brandGold" />
+                </div>
               </div>
             </div>
-          </div>
-          
+            
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
               <p className="text-platinumGray leading-relaxed mb-4">
@@ -269,11 +269,11 @@ export default function LaMaisonPage() {
               </p>
             </div>
             <div className="relative h-[500px]">
-              <Image 
+                    <Image 
                 src="/images/home/atelier.jpg" 
                 alt="Atelier Diamant Rouge" 
-                layout="fill"
-                objectFit="cover"
+                      layout="fill"
+                      objectFit="cover"
                 className="rounded-sm"
               />
             </div>

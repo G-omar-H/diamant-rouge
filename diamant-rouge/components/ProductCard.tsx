@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { useWishlist } from "../contexts/WishlistContext";
+import { useToast } from "../contexts/ToastContext";
 
 type ProductTranslation = {
     language: string;
@@ -27,6 +28,7 @@ type ProductCardProps = {
 
 export default function ProductCard({ product, locale, isWishlisted = false }: ProductCardProps) {
     const { addToWishlist, removeFromWishlist } = useWishlist();
+    const { showToast } = useToast();
     const [hovered, setHovered] = useState(false);
     const [isInWishlist, setIsInWishlist] = useState(isWishlisted);
 
@@ -54,9 +56,11 @@ export default function ProductCard({ product, locale, isWishlisted = false }: P
         if (isInWishlist) {
             removeFromWishlist(product.id);
             setIsInWishlist(false);
+            showToast("Bijou retiré des favoris", "wishlist");
         } else {
             addToWishlist(product.id);
             setIsInWishlist(true);
+            showToast("Bijou ajouté aux favoris", "wishlist");
         }
     };
     

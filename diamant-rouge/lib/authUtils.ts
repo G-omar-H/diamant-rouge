@@ -9,15 +9,17 @@ import { useEffect } from 'react';
  * @param returnUrl URL to return to after authentication (defaults to current URL)
  */
 export const redirectToAuth = (action: string, productId?: string | number, returnUrl?: string) => {
-  const router = useRouter();
-  const currentUrl = typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/';
+  if (typeof window === 'undefined') return; // Safety check for SSR
+  
+  const currentUrl = window.location.pathname + window.location.search;
   
   const params = new URLSearchParams();
   params.append('action', action);
   if (productId) params.append('productId', productId.toString());
   params.append('returnUrl', returnUrl || currentUrl);
   
-  router.push(`/auth?${params.toString()}`);
+  // Use direct navigation instead of router
+  window.location.href = `/auth?${params.toString()}`;
 };
 
 /**

@@ -7,14 +7,18 @@ import {
   Shield, GiftIcon, Phone, Package, ArrowRight, HelpCircle, 
   Lock, CreditCard, Info, X, Truck, Calendar, Award
 } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { redirectToAuth } from "../lib/authUtils";
 
 export default function CartPage() {
   const { cart, removeFromCart, clearCart, updateQuantity } = useCart();
+  const { data: session } = useSession();
+  const isAuthenticated = !!session?.user;
   const [showInsuranceInfo, setShowInsuranceInfo] = useState(false);
   const [showPackagingInfo, setShowPackagingInfo] = useState(false);
   const [showPackagingModal, setShowPackagingModal] = useState(false);
-const [showSecurityModal, setShowSecurityModal] = useState(false);
+  const [showSecurityModal, setShowSecurityModal] = useState(false);
 
   // Calculate total using either the cart item price or fallback to product.basePrice
   const subtotal = cart.reduce((sum, item) => {
@@ -44,6 +48,17 @@ const [showSecurityModal, setShowSecurityModal] = useState(false);
       maximumFractionDigits: 0,
       minimumFractionDigits: 0
     }).format(price);
+  };
+
+  // Handle checkout button click
+  const handleCheckout = () => {
+    if (!isAuthenticated) {
+      // Redirect to authentication if not logged in
+      redirectToAuth('checkout');
+    } else {
+      // User is authenticated, proceed to checkout
+      window.location.href = '/checkout';
+    }
   };
 
   if (cart.length === 0) {
@@ -425,14 +440,15 @@ const [showSecurityModal, setShowSecurityModal] = useState(false);
 
                 {/* Action buttons */}
                 <div className="space-y-4">
-<Link href="/checkout" className="w-full">
-  <button className="w-full button-primary py-4 rounded-full flex items-center justify-center shadow-xl hover:shadow-lg transition-all">
-    <span className="mr-2">Finaliser ma Commande</span>
-    <div className="bg-white/20 rounded-full p-1">
-      <ArrowRight size={16} className="text-white" />
-    </div>
-  </button>
-</Link>
+                  <button 
+                    onClick={handleCheckout}
+                    className="w-full button-primary py-4 rounded-full flex items-center justify-center shadow-xl hover:shadow-lg transition-all"
+                  >
+                    <span className="mr-2">Finaliser ma Commande</span>
+                    <div className="bg-white/20 rounded-full p-1">
+                      <ArrowRight size={16} className="text-white" />
+                    </div>
+                  </button>
                   
                   <Link href="/collections" className="w-full">
                     <button className="w-full button-secondary py-3 rounded-full">

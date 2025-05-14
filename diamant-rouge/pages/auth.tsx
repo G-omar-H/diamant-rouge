@@ -123,7 +123,7 @@ export default function Authentication() {
     if (action === 'favorite' && productId) {
       // Add product to favorites
       try {
-        await fetch('/api/user/favorites', {
+        await fetch('/api/wishlist', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ productId })
@@ -137,20 +137,9 @@ export default function Authentication() {
       }
     } 
     else if (action === 'cart' && productId) {
-      // Add to cart if product ID is provided
-      try {
-        await fetch('/api/cart', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ productId, quantity: 1 })
-        });
-        
-        // Redirect to cart page
-        router.push('/cart');
-      } catch (err) {
-        console.error('Error adding to cart:', err);
-        router.push('/');
-      }
+      // We don't need to add to cart here anymore since cart works with localStorage
+      // Just redirect to cart page
+      router.push('/cart');
     }
     else if (action === 'cart' && !productId) {
       // Just view cart if no product ID

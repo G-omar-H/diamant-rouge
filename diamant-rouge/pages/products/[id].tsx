@@ -1,8 +1,9 @@
 import { GetServerSideProps } from "next";
 import { prisma } from "../../lib/prisma";
 import Image from "next/image";
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useCart } from "../../contexts/CartContext";
+import { useToast } from "../../contexts/ToastContext";
 import { NextSeo } from "next-seo";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -49,7 +50,57 @@ export default function ProductPage({
     locale,
   }: ProductPageProps) {
     const { addToCart } = useCart();
+    const { showToast } = useToast();
     const mainImageRef = useRef<HTMLDivElement>(null);
+    const breadcrumbRef = useRef<HTMLDivElement>(null);
+    
+    // Measure and apply exact header height
+    useEffect(() => {
+      const applyHeaderHeight = () => {
+        // Get the current header element
+        const header = document.querySelector('header');
+        if (header && breadcrumbRef.current) {
+          // Set the top padding to exactly the header height plus a small buffer
+          const headerHeight = header.getBoundingClientRect().height;
+          breadcrumbRef.current.style.paddingTop = `${headerHeight}px`;
+        }
+      };
+      
+      // Apply immediately and on scroll/resize
+      applyHeaderHeight();
+      
+      // Also apply after a short delay to ensure measurements are accurate after complete render
+      const timeoutId = setTimeout(applyHeaderHeight, 100);
+      
+      // Set up mutation observer to detect DOM changes in the header
+      if (typeof MutationObserver !== 'undefined') {
+        const header = document.querySelector('header');
+        if (header) {
+          const observer = new MutationObserver(applyHeaderHeight);
+          observer.observe(header, { 
+            attributes: true, 
+            childList: true, 
+            subtree: true 
+          });
+          
+          return () => {
+            observer.disconnect();
+            clearTimeout(timeoutId);
+            window.removeEventListener('resize', applyHeaderHeight);
+            window.removeEventListener('scroll', applyHeaderHeight);
+          };
+        }
+      }
+      
+      window.addEventListener('resize', applyHeaderHeight);
+      window.addEventListener('scroll', applyHeaderHeight);
+      
+      return () => {
+        clearTimeout(timeoutId);
+        window.removeEventListener('resize', applyHeaderHeight);
+        window.removeEventListener('scroll', applyHeaderHeight);
+      };
+    }, []);
     
     // Error state handling
     if (!productData) {
@@ -164,6 +215,12 @@ export default function ProductPage({
       price: totalPrice,
       quantity: 1,
     });
+    
+    // Show success toast notification
+    showToast(
+      `${productTranslation?.name || "Bijou"} ajouté au panier`,
+      "cart"
+    );
   };
 
   // Request appointment
@@ -191,10 +248,10 @@ export default function ProductPage({
         }}
       />
 
-      {/* Breadcrumb navigation */}
-      <div className="bg-brandIvory hero-section pt-6 pb-2 px-6 text-sm">
+      {/* Breadcrumb navigation with ref for dynamic height adjustment */}
+      <div ref={breadcrumbRef} className="bg-brandIvory px-6 text-sm product-breadcrumb">
         <div className="max-w-7xl mx-auto">
-          <nav className="text-platinumGray flex items-center space-x-2">
+          <nav className="text-platinumGray flex items-center space-x-2 py-4">
             <Link href="/" className="hover:text-brandGold transition-colors">Accueil</Link>
             <span>/</span>
             <Link href="/collections" className="hover:text-brandGold transition-colors">Collections</Link>
@@ -206,7 +263,7 @@ export default function ProductPage({
 
       {/* Main product display */}
       <motion.section 
-        className="bg-brandIvory pt-8 pb-20 px-6"
+        className="bg-brandIvory pt-0 pb-20 px-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -612,7 +669,7 @@ export default function ProductPage({
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {similarProducts.slice(0, 4).map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product.id} product={product} locale={locale} />
               ))}
             </div>
             

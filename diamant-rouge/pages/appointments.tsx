@@ -679,10 +679,10 @@ export default function AppointmentPage() {
                                 </div>
                             )}
 
-                            <div className="border-b border-brandGold/20 pb-8 mb-12">
-                                <p className="italic text-platinumGray text-sm mb-3">Une création Diamant Rouge</p>
-                                <h3 className="text-2xl font-serif text-brandGold">Consultation Exclusive</h3>
-                            </div>
+                        <div className="border-b border-brandGold/20 pb-8 mb-12">
+                            <p className="italic text-platinumGray text-sm mb-3">Une création Diamant Rouge</p>
+                            <h3 className="text-2xl font-serif text-brandGold">Consultation Exclusive</h3>
+                        </div>
 
                             {/* Authentication Status Banner */}
                             <div className="mb-16 p-4 bg-brandGold/5 border border-brandGold/20 rounded-sm">
@@ -716,175 +716,175 @@ export default function AppointmentPage() {
                                 </div>
                             </div>
 
-                            {/* Step 1: Choose Location */}
-                            <div className="mb-16">
-                                <h3 className="text-xl font-serif text-brandGold mb-8">1. Choisissez l'expérience qui vous convient</h3>
+                        {/* Step 1: Choose Location */}
+                        <div className="mb-16">
+                            <h3 className="text-xl font-serif text-brandGold mb-8">1. Choisissez l'expérience qui vous convient</h3>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* Casablanca Option */}
-                                    <button
-                                        onClick={() => setSelectedLocation("casablanca")}
-                                        className={`p-6 border group transition-all duration-300 flex flex-col items-center text-center rounded-sm ${selectedLocation === "casablanca"
-                                            ? "border-brandGold bg-brandGold/5"
-                                            : "border-gray-200 hover:border-brandGold/50"
-                                            }`}
-                                    >
-                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-all duration-300 ${selectedLocation === "casablanca"
-                                            ? "bg-brandGold text-white"
-                                            : "bg-gray-100 text-platinumGray group-hover:bg-brandGold/20"
-                                            }`}>
-                                            <MapPin size={24} />
-                                        </div>
-                                        <h4 className="text-base font-serif text-richEbony mb-2">Showroom Casablanca</h4>
-                                        <p className="text-sm text-platinumGray">
-                                            Vivez l'expérience Diamant Rouge dans notre showroom exclusif, avec service d'accueil personnalisé et rafraîchissements.
-                                        </p>
-                                        <p className="text-xs text-brandGold mt-4 font-medium italic">
-                                            Anfa Place, Boulevard de la Corniche
-                                        </p>
-                                    </button>
-
-                                    {/* Virtual Option */}
-                                    <button
-                                        onClick={() => setSelectedLocation("virtual")}
-                                        className={`p-6 border group transition-all duration-300 flex flex-col items-center text-center rounded-sm ${selectedLocation === "virtual"
-                                            ? "border-brandGold bg-brandGold/5"
-                                            : "border-gray-200 hover:border-brandGold/50"
-                                            }`}
-                                    >
-                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-all duration-300 ${selectedLocation === "virtual"
-                                            ? "bg-brandGold text-white"
-                                            : "bg-gray-100 text-platinumGray group-hover:bg-brandGold/20"
-                                            }`}>
-                                            <Video size={24} />
-                                        </div>
-                                        <h4 className="text-base font-serif text-richEbony mb-2">Consultation Virtuelle</h4>
-                                        <p className="text-sm text-platinumGray">
-                                            Découvrez nos créations depuis le confort de votre domicile. Un coffret de présentation peut vous être envoyé avant la consultation.
-                                        </p>
-                                        <p className="text-xs text-brandGold mt-4 font-medium italic">
-                                            Vidéoconférence privée
-                                        </p>
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Step 2: Appointment Type */}
-                            <div className="mb-16">
-                                <h3 className="text-xl font-serif text-brandGold mb-8">2. Sélectionnez votre type de consultation</h3>
-
-                                <div className="grid gap-4">
-                                    {consultationTypes.map((type) => (
-                                        <div
-                                            key={type.id}
-                                            onClick={() => setSelectedType(type.id)}
-                                            className={`flex items-start p-5 border cursor-pointer transition-all duration-300 rounded-sm ${selectedType === type.id
-                                                ? "border-brandGold bg-brandGold/5"
-                                                : "border-gray-200 hover:border-brandGold/30"
-                                                }`}
-                                        >
-                                            <div className={`w-12 h-12 rounded-full flex items-center justify-center mr-5 transition-colors ${selectedType === type.id
-                                                ? "bg-brandGold text-white"
-                                                : "bg-gray-100 text-platinumGray"
-                                                }`}>
-                                                <type.icon size={20} />
-                                            </div>
-                                            <div className="flex-1">
-                                                <div className="flex justify-between items-center mb-2">
-                                                    <h4 className="font-medium text-base text-richEbony">{type.title}</h4>
-                                                    <span className="text-xs bg-brandGold/10 text-brandGold px-2 py-1 rounded">
-                                                        {type.duration}
-                                                    </span>
-                                                </div>
-                                                <p className="text-sm text-platinumGray">{type.description}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Step 3: Choose Date and Time */}
-                            <div className="mb-16">
-                                <h3 className="text-xl font-serif text-brandGold mb-8">3. Choisissez une date et une heure</h3>
-
-                                <div className="mb-10">
-                                    <label className="flex items-center text-platinumGray mb-4 font-medium">
-                                        <Calendar size={16} className="mr-2 text-brandGold" />
-                                        Date de votre consultation
-                                    </label>
-                                    <div className="relative group">
-                                        <input
-                                            type="date"
-                                            className="w-full border border-gray-200 p-4 bg-transparent focus:border-brandGold focus:ring-1 focus:ring-brandGold outline-none transition-all rounded-sm text-richEbony"
-                                            value={selectedDate}
-                                            onChange={(e) => setSelectedDate(e.target.value)}
-                                        />
-                                        <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-transparent via-brandGold to-transparent group-hover:w-full transition-all duration-300"></div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Casablanca Option */}
+                                <button
+                                    onClick={() => setSelectedLocation("casablanca")}
+                                    className={`p-6 border group transition-all duration-300 flex flex-col items-center text-center rounded-sm ${selectedLocation === "casablanca"
+                                        ? "border-brandGold bg-brandGold/5"
+                                        : "border-gray-200 hover:border-brandGold/50"
+                                        }`}
+                                >
+                                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-all duration-300 ${selectedLocation === "casablanca"
+                                        ? "bg-brandGold text-white"
+                                        : "bg-gray-100 text-platinumGray group-hover:bg-brandGold/20"
+                                        }`}>
+                                        <MapPin size={24} />
                                     </div>
-                                    <p className="mt-2 text-xs text-platinumGray italic">
-                                        Notre showroom est ouvert du Mardi au Samedi
+                                    <h4 className="text-base font-serif text-richEbony mb-2">Showroom Casablanca</h4>
+                                    <p className="text-sm text-platinumGray">
+                                        Vivez l'expérience Diamant Rouge dans notre showroom exclusif, avec service d'accueil personnalisé et rafraîchissements.
                                     </p>
-                                </div>
+                                    <p className="text-xs text-brandGold mt-4 font-medium italic">
+                                        Anfa Place, Boulevard de la Corniche
+                                    </p>
+                                </button>
 
-                                {selectedDate && (
-                                    <div>
-                                        <h4 className="font-medium text-platinumGray mb-4 flex items-center">
-                                            <Clock size={16} className="mr-2 text-brandGold" />
-                                            Disponibilités du {new Date(selectedDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}
-                                        </h4>
+                                {/* Virtual Option */}
+                                <button
+                                    onClick={() => setSelectedLocation("virtual")}
+                                    className={`p-6 border group transition-all duration-300 flex flex-col items-center text-center rounded-sm ${selectedLocation === "virtual"
+                                        ? "border-brandGold bg-brandGold/5"
+                                        : "border-gray-200 hover:border-brandGold/50"
+                                        }`}
+                                >
+                                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-all duration-300 ${selectedLocation === "virtual"
+                                        ? "bg-brandGold text-white"
+                                        : "bg-gray-100 text-platinumGray group-hover:bg-brandGold/20"
+                                        }`}>
+                                        <Video size={24} />
+                                    </div>
+                                    <h4 className="text-base font-serif text-richEbony mb-2">Consultation Virtuelle</h4>
+                                    <p className="text-sm text-platinumGray">
+                                        Découvrez nos créations depuis le confort de votre domicile. Un coffret de présentation peut vous être envoyé avant la consultation.
+                                    </p>
+                                    <p className="text-xs text-brandGold mt-4 font-medium italic">
+                                        Vidéoconférence privée
+                                    </p>
+                                </button>
+                            </div>
+                        </div>
 
-                                        <div className="mb-6">
-                                            <h5 className="text-sm font-medium text-platinumGray mb-3">Matinée</h5>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                {morningAppointments.map((slot) => (
-                                                    <div
-                                                        key={slot.time}
-                                                        onClick={() => setSelectedTime(slot.time)}
-                                                        className={`flex flex-col p-4 border cursor-pointer transition-all duration-300 rounded-sm ${selectedTime === slot.time
-                                                            ? "border-brandGold bg-brandGold/5"
-                                                            : "border-gray-200 hover:border-brandGold/30"
-                                                            }`}
-                                                    >
-                                                        <div className="flex justify-between items-center mb-1">
-                                                            <span className="font-medium text-richEbony text-base">{slot.time}</span>
-                                                            <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-                                                                {slot.availability}
-                                                            </span>
-                                                        </div>
-                                                        <p className="text-xs text-platinumGray">{slot.description}</p>
-                                                    </div>
-                                                ))}
-                                            </div>
+                        {/* Step 2: Appointment Type */}
+                        <div className="mb-16">
+                            <h3 className="text-xl font-serif text-brandGold mb-8">2. Sélectionnez votre type de consultation</h3>
+
+                            <div className="grid gap-4">
+                                {consultationTypes.map((type) => (
+                                    <div
+                                        key={type.id}
+                                        onClick={() => setSelectedType(type.id)}
+                                        className={`flex items-start p-5 border cursor-pointer transition-all duration-300 rounded-sm ${selectedType === type.id
+                                            ? "border-brandGold bg-brandGold/5"
+                                            : "border-gray-200 hover:border-brandGold/30"
+                                            }`}
+                                    >
+                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center mr-5 transition-colors ${selectedType === type.id
+                                            ? "bg-brandGold text-white"
+                                            : "bg-gray-100 text-platinumGray"
+                                            }`}>
+                                            <type.icon size={20} />
                                         </div>
-
-                                        <div>
-                                            <h5 className="text-sm font-medium text-platinumGray mb-3">Après-midi</h5>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                {afternoonAppointments.map((slot) => (
-                                                    <div
-                                                        key={slot.time}
-                                                        onClick={() => setSelectedTime(slot.time)}
-                                                        className={`flex flex-col p-4 border cursor-pointer transition-all duration-300 rounded-sm ${selectedTime === slot.time
-                                                            ? "border-brandGold bg-brandGold/5"
-                                                            : "border-gray-200 hover:border-brandGold/30"
-                                                            }`}
-                                                    >
-                                                        <div className="flex justify-between items-center mb-1">
-                                                            <span className="font-medium text-richEbony text-base">{slot.time}</span>
-                                                            <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-                                                                {slot.availability}
-                                                            </span>
-                                                        </div>
-                                                        <p className="text-xs text-platinumGray">{slot.description}</p>
-                                                    </div>
-                                                ))}
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h4 className="font-medium text-base text-richEbony">{type.title}</h4>
+                                                <span className="text-xs bg-brandGold/10 text-brandGold px-2 py-1 rounded">
+                                                    {type.duration}
+                                                </span>
                                             </div>
+                                            <p className="text-sm text-platinumGray">{type.description}</p>
                                         </div>
                                     </div>
-                                )}
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Step 3: Choose Date and Time */}
+                        <div className="mb-16">
+                            <h3 className="text-xl font-serif text-brandGold mb-8">3. Choisissez une date et une heure</h3>
+
+                            <div className="mb-10">
+                                <label className="flex items-center text-platinumGray mb-4 font-medium">
+                                    <Calendar size={16} className="mr-2 text-brandGold" />
+                                    Date de votre consultation
+                                </label>
+                                <div className="relative group">
+                                    <input
+                                        type="date"
+                                        className="w-full border border-gray-200 p-4 bg-transparent focus:border-brandGold focus:ring-1 focus:ring-brandGold outline-none transition-all rounded-sm text-richEbony"
+                                        value={selectedDate}
+                                        onChange={(e) => setSelectedDate(e.target.value)}
+                                    />
+                                    <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-transparent via-brandGold to-transparent group-hover:w-full transition-all duration-300"></div>
+                                </div>
+                                <p className="mt-2 text-xs text-platinumGray italic">
+                                    Notre showroom est ouvert du Mardi au Samedi
+                                </p>
                             </div>
 
-                        {/* Step 4: Additional Details with Custom Luxury Dropdowns */}
+                            {selectedDate && (
+                                <div>
+                                    <h4 className="font-medium text-platinumGray mb-4 flex items-center">
+                                        <Clock size={16} className="mr-2 text-brandGold" />
+                                        Disponibilités du {new Date(selectedDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}
+                                    </h4>
+
+                                    <div className="mb-6">
+                                        <h5 className="text-sm font-medium text-platinumGray mb-3">Matinée</h5>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {morningAppointments.map((slot) => (
+                                                <div
+                                                    key={slot.time}
+                                                    onClick={() => setSelectedTime(slot.time)}
+                                                    className={`flex flex-col p-4 border cursor-pointer transition-all duration-300 rounded-sm ${selectedTime === slot.time
+                                                        ? "border-brandGold bg-brandGold/5"
+                                                        : "border-gray-200 hover:border-brandGold/30"
+                                                        }`}
+                                                >
+                                                    <div className="flex justify-between items-center mb-1">
+                                                        <span className="font-medium text-richEbony text-base">{slot.time}</span>
+                                                        <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                                                            {slot.availability}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-xs text-platinumGray">{slot.description}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h5 className="text-sm font-medium text-platinumGray mb-3">Après-midi</h5>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {afternoonAppointments.map((slot) => (
+                                                <div
+                                                    key={slot.time}
+                                                    onClick={() => setSelectedTime(slot.time)}
+                                                    className={`flex flex-col p-4 border cursor-pointer transition-all duration-300 rounded-sm ${selectedTime === slot.time
+                                                        ? "border-brandGold bg-brandGold/5"
+                                                        : "border-gray-200 hover:border-brandGold/30"
+                                                        }`}
+                                                >
+                                                    <div className="flex justify-between items-center mb-1">
+                                                        <span className="font-medium text-richEbony text-base">{slot.time}</span>
+                                                        <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                                                            {slot.availability}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-xs text-platinumGray">{slot.description}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                    {/* Step 4: Additional Details with Custom Luxury Dropdowns */}
                         <div className="mb-16">
                             <h3 className="text-xl font-serif text-brandGold mb-8">4. Informations complémentaires</h3>
 
@@ -955,10 +955,10 @@ export default function AppointmentPage() {
                                     </>
                                 ) : (
                                     <>
-                                        <span>Confirmer le rendez-vous</span>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                        </svg>
+                                <span>Confirmer le rendez-vous</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
                                     </>
                                 )}
                             </button>

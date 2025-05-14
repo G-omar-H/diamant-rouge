@@ -6,8 +6,8 @@
    🎩 Root Theme Variables for Luxury Experience
    ========================================================== */
 :root {
-    --header-height: 200px; /* Default taller height when not scrolled */
-    --header-height-scrolled: 100px; /* Shorter height when scrolled */
+    --header-height: 150px; /* Default taller height when not scrolled - significantly reduced */
+    --header-height-scrolled: 70px; /* Shorter height when scrolled - significantly reduced */
     --brand-gold: #D4AF37;
     --brand-burgundy: #6A0F23;
     --brand-ivory: #FAF3E3;
@@ -18,8 +18,8 @@
 
 @media (max-width: 768px) {
     :root {
-        --header-height: 170px; /* Mobile taller height when not scrolled */
-        --header-height-scrolled: 90px; /* Mobile shorter height when scrolled */
+        --header-height: 130px; /* Mobile taller height when not scrolled - significantly reduced */
+        --header-height-scrolled: 60px; /* Mobile shorter height when scrolled - significantly reduced */
     }
 }
 
@@ -66,11 +66,22 @@ p {
         transition: padding-top 0.4s ease;
     }
     
+    /* Special container for product pages - NO PADDING */
+    .product-page-container {
+        padding-top: 0;
+    }
+    
     /* Hero section that accounts for fixed header */
     .hero-section {
         margin-top: calc(-1 * var(--current-header-height));
         padding-top: var(--current-header-height);
         transition: margin-top 0.4s ease, padding-top 0.4s ease;
+    }
+    
+    /* Special class for product page breadcrumbs to avoid header overlap */
+    .product-breadcrumb {
+        padding-top: 150px !important; /* Initial fallback - will be overridden by JS */
+        transition: padding-top 0.2s ease-out !important;
     }
 
     /* Home page hero - no additional padding needed as it has its own layout */

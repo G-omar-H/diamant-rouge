@@ -18,6 +18,9 @@ export default function Layout({ children, title, description }: LayoutProps) {
     const { isWishlistOpen, closeWishlist } = useWishlist();
     const router = useRouter();
     
+    // Check if we're on a product page
+    const isProductPage = router.pathname.includes('/products/');
+    
     // Close wishlist panel on route change
     useEffect(() => {
         const handleRouteChange = () => {
@@ -35,20 +38,57 @@ export default function Layout({ children, title, description }: LayoutProps) {
     useEffect(() => {
         const adjustMainPadding = () => {
             const scrolled = window.scrollY > 50;
-            document.documentElement.style.setProperty(
-                '--current-header-height', 
-                scrolled ? 'var(--header-height-scrolled)' : 'var(--header-height)'
-            );
+            // Get actual height instead of using variables for more precision
+            const header = document.querySelector('header');
+            if (header) {
+                const headerHeight = header.getBoundingClientRect().height;
+                document.documentElement.style.setProperty(
+                    '--current-header-height', 
+                    `${headerHeight}px`
+                );
+            } else {
+                // Fallback to the variable if header isn't found
+                document.documentElement.style.setProperty(
+                    '--current-header-height', 
+                    scrolled ? 'var(--header-height-scrolled)' : 'var(--header-height)'
+                );
+            }
         };
         
         // Initial setting
         adjustMainPadding();
         
-        // Listen for scroll
+        // Set again after a small delay to ensure accurate measurements
+        const timeoutId = setTimeout(adjustMainPadding, 100);
+        
+        // Listen for DOM mutations in the header
+        if (typeof MutationObserver !== 'undefined') {
+            const header = document.querySelector('header');
+            if (header) {
+                const observer = new MutationObserver(adjustMainPadding);
+                observer.observe(header, { 
+                    attributes: true, 
+                    childList: true, 
+                    subtree: true 
+                });
+                
+                return () => {
+                    observer.disconnect();
+                    clearTimeout(timeoutId);
+                    window.removeEventListener('scroll', adjustMainPadding);
+                    window.removeEventListener('resize', adjustMainPadding);
+                };
+            }
+        }
+        
+        // Listen for scroll and resize
         window.addEventListener('scroll', adjustMainPadding);
+        window.addEventListener('resize', adjustMainPadding);
         
         return () => {
+            clearTimeout(timeoutId);
             window.removeEventListener('scroll', adjustMainPadding);
+            window.removeEventListener('resize', adjustMainPadding);
         };
     }, []);
 
@@ -67,7 +107,7 @@ export default function Layout({ children, title, description }: LayoutProps) {
             <div className="w-full">
                 <Header />
 
-                <main className="content-container min-h-screen transition-opacity duration-500 ease-in-out">
+                <main className={`min-h-screen transition-opacity duration-500 ease-in-out ${isProductPage ? 'product-page-container' : 'content-container'}`}>
                     {children}
                 </main>
 

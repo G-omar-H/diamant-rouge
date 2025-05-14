@@ -65,12 +65,14 @@ export default function Header() {
     initial: {
       height: "auto",
       backgroundColor: "rgba(250, 243, 227, 0.98)", // Keep solid background
-      boxShadow: "none"
+      boxShadow: "none",
+      transition: { duration: 0.4, ease: "easeInOut" }
     },
     scrolled: {
-      height: "90px",
+      height: "70px",
       backgroundColor: "rgba(250, 243, 227, 0.98)",
-      boxShadow: "0 4px 20px rgba(212, 175, 55, 0.1)"
+      boxShadow: "0 4px 20px rgba(212, 175, 55, 0.1)",
+      transition: { duration: 0.4, ease: "easeInOut" }
     }
   };
 
@@ -91,6 +93,7 @@ export default function Header() {
       initial="initial"
       animate={scrolled ? "scrolled" : "initial"}
       transition={{ duration: 0.4, ease: "easeInOut" }}
+      layout
     >
       {/* Container with conditional styling based on scroll position */}
       <div className={`w-full bg-brandIvory ${scrolled ? 'border-b border-brandGold/20 shadow-sm' : ''}`}>
@@ -169,7 +172,7 @@ export default function Header() {
           )}
 
           {/* Main Row: Perfect symmetrical positioning */}
-          <div className={`grid grid-cols-3 items-center w-full ${scrolled ? 'h-[90px] px-8' : 'py-3 px-4 md:px-8'}`}>
+          <div className={`grid grid-cols-3 items-center w-full ${scrolled ? 'h-[70px] px-8' : 'py-1 px-4 md:px-8'}`}>
             {/* Left side: Navigation or mobile menu button */}
             <div className="flex items-center">
               {scrolled ? (
