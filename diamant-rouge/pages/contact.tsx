@@ -100,7 +100,7 @@ export default function ContactPage() {
                     {/* Contact Information */}
                     <div className="lg:col-span-2 order-2 lg:order-1">
                         <div className="bg-gradient-to-b from-brandIvory/50 to-white p-8 border border-brandGold/10 rounded-sm shadow-subtle hover:shadow-luxury transition-shadow duration-500">
-                            <h3 className="text-2xl font-serif text-brandGold mb-6">Nos Coordonnées</h3>
+                            <h3 className="heading-section">Nos Coordonnées</h3>
                             
                             <div className="space-y-8">
                                 {/* Address */}
@@ -111,7 +111,7 @@ export default function ContactPage() {
                                         </div>
                                     </div>
                                     <div>
-                                        <h4 className="text-richEbony font-medium mb-1">Notre Atelier</h4>
+                                        <h4 className="heading-bullet">Notre Atelier</h4>
                                         <p className="text-platinumGray mb-1">45 Avenue Hassan II</p>
                                         <p className="text-platinumGray">Casablanca 20250, Maroc</p>
                                     </div>
@@ -125,7 +125,7 @@ export default function ContactPage() {
                                         </div>
                                     </div>
                                     <div>
-                                        <h4 className="text-richEbony font-medium mb-1">Téléphone</h4>
+                                        <h4 className="heading-bullet">Téléphone</h4>
                                         <p className="text-platinumGray">+212 5 22 43 XX XX</p>
                                         <p className="text-platinumGray">+212 6 61 XX XX XX</p>
                                     </div>
@@ -139,7 +139,7 @@ export default function ContactPage() {
                                         </div>
                                     </div>
                                     <div>
-                                        <h4 className="text-richEbony font-medium mb-1">Email</h4>
+                                        <h4 className="heading-bullet">Email</h4>
                                         <p className="text-platinumGray">contact@diamant-rouge.ma</p>
                                         <p className="text-platinumGray">info@diamant-rouge.ma</p>
                                     </div>
@@ -152,8 +152,8 @@ export default function ContactPage() {
                                             <Clock size={18} className="text-brandGold" />
                                         </div>
                                     </div>
-                    <div>
-                                        <h4 className="text-richEbony font-medium mb-1">Heures d'Ouverture</h4>
+                                    <div>
+                                        <h4 className="heading-bullet">Heures d'Ouverture</h4>
                                         <p className="text-platinumGray">Lundi - Vendredi: 10h - 19h</p>
                                         <p className="text-platinumGray">Samedi: 10h - 18h (Sur rendez-vous)</p>
                                         <p className="text-platinumGray">Dimanche: Fermé</p>
@@ -186,14 +186,14 @@ export default function ContactPage() {
                     {/* Contact Form */}
                     <div className="lg:col-span-3 order-1 lg:order-2">
                         <div className="bg-white p-8 border border-brandGold/10 rounded-sm shadow-subtle transition-shadow duration-500">
-                            <h3 className="text-2xl font-serif text-brandGold mb-6">Envoyez-Nous un Message</h3>
+                            <h3 className="heading-section">Envoyez-Nous un Message</h3>
                             
                             {formSubmitted ? (
                                 <div className="text-center py-10">
                                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brandGold/10 mb-6">
                                         <CheckCircle size={32} className="text-brandGold" />
                                     </div>
-                                    <h4 className="text-xl font-serif text-richEbony mb-3">Message Envoyé avec Succès</h4>
+                                    <h4 className="heading-feature">Message Envoyé avec Succès</h4>
                                     <p className="text-platinumGray mb-6">
                                         Merci de nous avoir contactés. Notre équipe vous répondra dans les plus brefs délais.
                                     </p>
@@ -225,14 +225,14 @@ export default function ContactPage() {
                                         </div>
                                         
                                         {/* Email Field */}
-                    <div>
+                                        <div>
                                             <label htmlFor="email" className="block text-sm text-richEbony mb-2 font-medium">
                                                 Email <span className="text-brandGold">*</span>
                                             </label>
-                        <input
+                                            <input
                                                 id="email"
                                                 name="email"
-                            type="email"
+                                                type="email"
                                                 value={formData.email}
                                                 onChange={handleChange}
                                                 required
@@ -254,8 +254,8 @@ export default function ContactPage() {
                                                 onChange={handleChange}
                                                 className="w-full px-4 py-3 border border-brandGold/20 focus:border-brandGold/40 focus:ring-1 focus:ring-brandGold/30 outline-none transition-all rounded-sm bg-white hover:border-brandGold/30"
                                                 placeholder="Votre numéro de téléphone"
-                        />
-                    </div>
+                                            />
+                                        </div>
                                         
                                         {/* Subject Field */}
                                         <div>
@@ -281,11 +281,11 @@ export default function ContactPage() {
                                     </div>
                                     
                                     {/* Message Field */}
-                    <div>
+                                    <div>
                                         <label htmlFor="message" className="block text-sm text-richEbony mb-2 font-medium">
                                             Message <span className="text-brandGold">*</span>
                                         </label>
-                        <textarea
+                                        <textarea
                                             id="message"
                                             name="message"
                                             value={formData.message}
@@ -293,7 +293,7 @@ export default function ContactPage() {
                                             required
                                             className="w-full px-4 py-3 border border-brandGold/20 focus:border-brandGold/40 focus:ring-1 focus:ring-brandGold/30 outline-none transition-all rounded-sm bg-white hover:border-brandGold/30 h-40"
                                             placeholder="Détaillez votre demande ici..."
-                        ></textarea>
+                                        ></textarea>
                                     </div>
                                     
                                     {/* Privacy Policy */}

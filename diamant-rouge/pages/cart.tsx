@@ -65,13 +65,7 @@ export default function CartPage() {
     return (
       <main className="bg-brandIvory py-16 px-6 min-h-screen">
         <div className="max-w-4xl mx-auto text-center">
-          <Image 
-            src="/images/icons/empty-cart.svg" 
-            width={120} 
-            height={120} 
-            alt="Panier Vide" 
-            className="mx-auto mb-6"
-          />
+
           <h1 className="text-3xl md:text-4xl font-serif text-brandGold mb-4">Votre Panier est Vide</h1>
           <p className="text-platinumGray mb-8 max-w-md mx-auto">
             Découvrez notre collection exceptionnelle de bijoux de luxe et créations sur mesure.

@@ -74,12 +74,12 @@ export default function LaMaisonPage() {
             
             {/* Timeline Events */}
             <div className="space-y-16 relative">
-              {/* 1957 */}
+              {/* 1950 */}
               <div className="flex flex-col md:flex-row items-center">
                 <div className="md:w-1/2 md:pr-12 md:text-right">
-                  <h4 className="text-xl font-serif text-brandGold mb-2">1957</h4>
-                  <h5 className="text-lg font-medium text-richEbony mb-2">Fondation à Fès</h5>
-                  <p className="text-platinumGray">Monsieur Miyara ouvre son premier atelier de joaillerie dans la médina historique de Fès, berceau de l'artisanat marocain.</p>
+                  <h4 className="heading-feature text-brandGold">1950</h4>
+                  <h5 className="heading-bullet mb-2">Fondation</h5>
+                  <p className="text-platinumGray">Fondation de la première bijouterie par Hassan Miyara à Fès, perpétuant une tradition familiale de joaillerie remontant à plusieurs générations.</p>
                 </div>
                 <div className="flex items-center justify-center my-4 md:my-0">
                   <div className="w-4 h-4 rounded-full bg-brandGold z-10"></div>
@@ -94,8 +94,8 @@ export default function LaMaisonPage() {
                   <div className="w-4 h-4 rounded-full bg-brandGold z-10"></div>
                 </div>
                 <div className="md:w-1/2 md:pl-12">
-                  <h4 className="text-xl font-serif text-brandGold mb-2">1968</h4>
-                  <h5 className="text-lg font-medium text-richEbony mb-2">Première collection iconique</h5>
+                  <h4 className="heading-feature text-brandGold">1968</h4>
+                  <h5 className="heading-bullet mb-2">Première collection iconique</h5>
                   <p className="text-platinumGray">Création de la collection "Héritage de Fès", inspirée des motifs géométriques des zellige marocains, qui devient rapidement emblématique de la Maison.</p>
                 </div>
               </div>
@@ -103,8 +103,8 @@ export default function LaMaisonPage() {
               {/* 1985 */}
               <div className="flex flex-col md:flex-row items-center">
                 <div className="md:w-1/2 md:pr-12 md:text-right">
-                  <h4 className="text-xl font-serif text-brandGold mb-2">1985</h4>
-                  <h5 className="text-lg font-medium text-richEbony mb-2">Formation de Leila Miyara</h5>
+                  <h4 className="heading-feature text-brandGold">1985</h4>
+                  <h5 className="heading-bullet mb-2">Formation de Leila Miyara</h5>
                   <p className="text-platinumGray">Leila Miyara commence son apprentissage auprès de son père, s'imprégnant des techniques ancestrales tout en apportant un regard nouveau sur la joaillerie marocaine.</p>
                 </div>
                 <div className="flex items-center justify-center my-4 md:my-0">
@@ -120,8 +120,8 @@ export default function LaMaisonPage() {
                   <div className="w-4 h-4 rounded-full bg-brandGold z-10"></div>
                 </div>
                 <div className="md:w-1/2 md:pl-12">
-                  <h4 className="text-xl font-serif text-brandGold mb-2">2003</h4>
-                  <h5 className="text-lg font-medium text-richEbony mb-2">Nouvelle direction artistique</h5>
+                  <h4 className="heading-feature text-brandGold">2003</h4>
+                  <h5 className="heading-bullet mb-2">Nouvelle direction artistique</h5>
                   <p className="text-platinumGray">Leila Miyara prend officiellement la direction artistique de la Maison, insufflant une vision contemporaine tout en préservant l'héritage familial.</p>
                 </div>
               </div>
@@ -129,8 +129,8 @@ export default function LaMaisonPage() {
               {/* 2023 */}
               <div className="flex flex-col md:flex-row items-center">
                 <div className="md:w-1/2 md:pr-12 md:text-right">
-                  <h4 className="text-xl font-serif text-brandGold mb-2">2023</h4>
-                  <h5 className="text-lg font-medium text-richEbony mb-2">Innovation et tradition</h5>
+                  <h4 className="heading-feature text-brandGold">2023</h4>
+                  <h5 className="heading-bullet mb-2">Innovation et tradition</h5>
                   <p className="text-platinumGray">Lancement de l'expérience numérique de Diamant Rouge, permettant de faire découvrir au monde entier le patrimoine joaillier unique de la famille Miyara.</p>
                 </div>
                 <div className="flex items-center justify-center my-4 md:my-0">

@@ -9,7 +9,8 @@ import { useRouter } from "next/router";
 import Layout from "../components/Layout";
 
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
-    const { locale } = useRouter();
+    const router = useRouter();
+    const { locale } = router;
 
     return (
         <SessionProvider session={session}> {/* ✅ Ensures session context is available */}
@@ -18,7 +19,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
                     <CartProvider> {/* ✅ Cart is now session-aware */}
                         <WishlistProvider>
                             <Layout title="Home" description="Welcome to Diamant-Rouge, the epitome of luxury jewelry.">
-                                <Component {...pageProps} />
+                                <Component {...pageProps} key={router.asPath} />
                             </Layout>
                         </WishlistProvider>
                     </CartProvider>

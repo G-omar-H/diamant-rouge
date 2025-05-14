@@ -24,6 +24,13 @@ module.exports = {
     'text-ivory',
     'bg-ivory',
     'text-royalGold',
+    'heading-feature',
+    'heading-section',
+    'heading-bullet',
+    'text-shadow-sm',
+    'text-shadow-md',
+    'text-shadow-dark',
+    'text-shadow-strong',
   ],
 
   theme: {

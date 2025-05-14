@@ -54,6 +54,21 @@ export default function ProductPage({
     const mainImageRef = useRef<HTMLDivElement>(null);
     const breadcrumbRef = useRef<HTMLDivElement>(null);
     
+    // Reset selected image when product changes
+    useEffect(() => {
+      if (productData && productData.images && productData.images.length > 0) {
+        setSelectedImage(productData.images[0]);
+      }
+      
+      // Reset all state when product changes
+      setSelectedVariations({});
+      setIsZoomed(false);
+      setShowCertificateModal(false);
+      setShowExpertAuthenticationModal(false);
+      setActiveTab("description");
+      
+    }, [productData?.id]); // Depend on product ID to reset when product changes
+    
     // Measure and apply exact header height
     useEffect(() => {
       const applyHeaderHeight = () => {

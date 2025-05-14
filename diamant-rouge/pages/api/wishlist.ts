@@ -32,7 +32,8 @@ async function getUserId(req: NextApiRequest, res: NextApiResponse): Promise<num
         if (typeof decoded !== 'object' || !decoded.id || !decoded.email) {
             throw new Error('Invalid token payload structure.');
         }
-        const payload = decoded as DecodedPayload;
+        // Fix type conversion by casting to unknown first
+        const payload = decoded as unknown as DecodedPayload;
         return Number(payload.id);
     } catch (err) {
         return null;
@@ -53,20 +54,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Use a leaner GET method with minimal logging and optimized queries
     if (req.method === "GET") {
         try {
-            // Minimize data returned by selecting only what's needed
+            // Include product details with the wishlist query
             const wishlist = await prisma.wishlist.findMany({
                 where: { userId },
-                select: {
-                    id: true,
-                    productId: true
+                include: {
+                    product: {
+                        include: {
+                            translations: true
+                        }
+                    }
                 }
+            });
+            
+            // Transform the response to include images in the expected format
+            const formattedWishlist = wishlist.map(item => {
+                return {
+                    id: item.id,
+                    productId: item.productId,
+                    userId: item.userId,
+                    product: {
+                        ...item.product,
+                        images: item.product?.images || [] // Use existing images field
+                    }
+                };
             });
             
             // Add cache headers to response
             res.setHeader('Cache-Control', 'private, max-age=10');
-            return res.status(200).json(wishlist);
+            return res.status(200).json(formattedWishlist);
             
         } catch (error) {
+            console.error("Error fetching wishlist:", error);
             return res.status(500).json({ error: "Failed to fetch wishlist" });
         }
     }

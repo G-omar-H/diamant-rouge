@@ -372,7 +372,7 @@ const WishlistPanel = ({ isOpen, onClose, locale = 'fr' }: WishlistPanelProps) =
                                             >
                                                 <div className="flex gap-6">
                                                     {/* Image prominently positioned left */}
-                                                    <Link href={`/product/${item.productId}`} className="block flex-shrink-0">
+                                                    <Link href={`/products/${item.productId}`} onClick={onClose} className="block flex-shrink-0">
                                                         <div className="w-32 h-40 bg-brandIvory/30 overflow-hidden relative shadow-sm">
                                                             <motion.div 
                                                                 className="h-full w-full"
@@ -394,7 +394,7 @@ const WishlistPanel = ({ isOpen, onClose, locale = 'fr' }: WishlistPanelProps) =
                                                     {/* Content elegantly positioned right */}
                                                     <div className="flex flex-col flex-1 justify-between">
                                                         <div>
-                                                            <Link href={`/product/${item.productId}`}>
+                                                            <Link href={`/products/${item.productId}`} onClick={onClose}>
                                                                 <h4 className="font-serif text-richEbony hover:text-brandGold transition-colors duration-300 text-lg leading-tight">
                                                                     {getProductName(item)}
                                                                 </h4>
@@ -406,7 +406,7 @@ const WishlistPanel = ({ isOpen, onClose, locale = 'fr' }: WishlistPanelProps) =
                                                         </div>
                                                         
                                                         <div className="flex justify-between items-center mt-4">
-                                                            <Link href={`/product/${item.productId}`}>
+                                                            <Link href={`/products/${item.productId}`} onClick={onClose}>
                                                                 <button className="flex items-center justify-center text-xs px-6 py-2.5 bg-white text-richEbony border border-brandGold/30 hover:border-brandGold hover:bg-brandGold/5 transition-all duration-300 tracking-wide">
                                                                     <Eye size={14} className="mr-2 text-brandGold" />
                                                                     Voir la création

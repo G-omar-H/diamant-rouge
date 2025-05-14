@@ -319,7 +319,7 @@ export default function CollectionsPage({ products, categories }: CollectionPage
             <div className="hero-section">
             <div className="min-h-screen bg-white">
                 {/* HERO SECTION */}
-                <div className="relative h-72 md:h-96 bg-gradient-to-r from-brandGold/20 to-burgundy/20 overflow-hidden">
+                <div className="relative h-72 md:h-96 overflow-hidden">
                     <div className="absolute inset-0">
                         <Image 
                             src="/images/home/about-sourcing-01.jpg" 
@@ -328,9 +328,9 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                             objectFit="cover"
                             objectPosition="center"
                             priority
-                            className="opacity-80"
+                            className="opacity-100"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-brandIvory to-transparent"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
                     </div>
                     
                     <div className="container mx-auto relative h-full flex flex-col justify-end items-center pb-12 text-center px-6">
@@ -338,11 +338,12 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8 }}
+                            className="backdrop-blur-[2px] backdrop-brightness-110 px-8 py-4 rounded-lg bg-white/5"
                         >
-                            <h1 className="text-5xl md:text-6xl font-serif text-brandGold drop-shadow-sm mb-4">
+                            <h1 className="text-5xl md:text-6xl font-serif text-white drop-shadow-lg mb-4 text-shadow-strong">
                                 Nos Collections
                             </h1>
-                            <p className="text-platinumGray text-lg md:text-xl max-w-2xl mx-auto">
+                            <p className="text-white text-lg md:text-xl max-w-2xl mx-auto font-medium drop-shadow-lg text-shadow-md">
                                 Découvrez nos pièces intemporelles, façonnées dans l'excellence et le raffinement.
                             </p>
                         </motion.div>
