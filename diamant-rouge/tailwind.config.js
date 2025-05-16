@@ -17,6 +17,8 @@ module.exports = {
     'card',
     'alert',
     'hover-scale',
+    'hover:scale-102',
+    'hover:scale-103',
     'image-luxury',
     'input-field',
     'dropdown-menu',
@@ -31,6 +33,9 @@ module.exports = {
     'text-shadow-md',
     'text-shadow-dark',
     'text-shadow-strong',
+    'mobile-nav-link',
+    'product-card-mobile',
+    'mobile-optimized-form',
   ],
 
   theme: {
@@ -62,6 +67,9 @@ module.exports = {
         subtle: '0 2px 8px rgba(255, 255, 255, 0.1)',
         deepGlow: '0px 8px 30px rgba(212, 175, 55, 0.6)',
         regal: '0 0 30px rgba(212, 175, 55, 0.8)',
+        'mobile': '0 2px 10px rgba(0, 0, 0, 0.08)',
+        'mobile-subtle': '0 1px 5px rgba(212, 175, 55, 0.15)',
+        'mobile-elevation': '0 3px 6px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)',
       },
 
       spacing: {
@@ -72,6 +80,7 @@ module.exports = {
       },
 
       screens: {
+        'xs': '480px',
         '2xl': '1440px',
         '3xl': '1600px',
         '4xl': '1920px',
@@ -79,13 +88,14 @@ module.exports = {
 
       backgroundImage: {
         'gold-gradient': 'linear-gradient(145deg, #D4AF37 0%, #6A0F23 100%)',
-        
+        'gold-mobile-gradient': 'linear-gradient(135deg, #D4AF37 0%, #6A0F23 100%)',
       },
 
       animation: {
         fadeIn: 'fadeIn 0.6s ease-in-out forwards',
         slideIn: 'slideIn 0.5s ease-in-out forwards',
         drift: 'drift 8s ease-in-out infinite',
+        'mobile-pulse': 'mobilePulse 3s ease-in-out infinite',
       },
 
       keyframes: {
@@ -101,6 +111,31 @@ module.exports = {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(10px)' },
         },
+        mobilePulse: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.05)' },
+        },
+      },
+
+      scale: {
+        '102': '1.02',
+        '103': '1.03',
+      },
+
+      transitionDuration: {
+        '400': '400ms',
+      },
+
+      minHeight: {
+        '8': '2rem',
+        '10': '2.5rem',
+        '12': '3rem',
+      },
+      
+      borderRadius: {
+        'xl': '0.75rem',
+        '2xl': '1rem',
+        '3xl': '1.5rem',
       },
     },
   },

@@ -422,26 +422,36 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                                     <h3 className="font-serif text-center text-lg text-brandGold mb-5 relative after:content-[''] after:absolute after:w-12 after:h-px after:bg-brandGold/30 after:bottom-[-8px] after:left-1/2 after:-translate-x-1/2">
                                         Catégorie
                                     </h3>
-                                    <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
-                                        <button
-                                            onClick={() => setSelectedCategory("")}
-                                            className={`text-xs px-5 py-2.5 rounded-full transition-all duration-300 ${selectedCategory === "" 
-                                                ? "bg-gradient-to-r from-brandGold to-brandGold/90 text-white shadow-md" 
-                                                : "bg-brandIvory/80 text-platinumGray hover:bg-brandGold/10 hover:text-brandGold hover:border-brandGold/40 border border-brandGold/20"}`}
-                                        >
-                                            Toutes
-                                        </button>
-                                        {categories.map((cat) => (
+                                    <div className="overflow-x-auto py-1 -mx-1 px-1 scrollbar-hide">
+                                        <div className="flex flex-nowrap sm:flex-wrap justify-start sm:justify-center gap-3 min-w-max sm:min-w-0 sm:max-w-3xl mx-auto">
                                             <button
-                                                key={cat.slug}
-                                                onClick={() => setSelectedCategory(cat.slug)}
-                                                className={`text-xs px-5 py-2.5 rounded-full transition-all duration-300 ${selectedCategory === cat.slug 
+                                                onClick={() => setSelectedCategory("")}
+                                                className={`text-xs px-5 py-2.5 rounded-full transition-all duration-300 whitespace-nowrap ${selectedCategory === "" 
                                                     ? "bg-gradient-to-r from-brandGold to-brandGold/90 text-white shadow-md" 
                                                     : "bg-brandIvory/80 text-platinumGray hover:bg-brandGold/10 hover:text-brandGold hover:border-brandGold/40 border border-brandGold/20"}`}
                                             >
-                                                {getCategoryName(cat.slug)}
+                                                Toutes
                                             </button>
-                                        ))}
+                                            {categories.map((cat) => (
+                                                <button
+                                                    key={cat.slug}
+                                                    onClick={() => setSelectedCategory(cat.slug)}
+                                                    className={`text-xs px-5 py-2.5 rounded-full transition-all duration-300 whitespace-nowrap ${selectedCategory === cat.slug 
+                                                        ? "bg-gradient-to-r from-brandGold to-brandGold/90 text-white shadow-md" 
+                                                        : "bg-brandIvory/80 text-platinumGray hover:bg-brandGold/10 hover:text-brandGold hover:border-brandGold/40 border border-brandGold/20"}`}
+                                                >
+                                                    {getCategoryName(cat.slug)}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    {/* Mobile indicator for scroll */}
+                                    <div className="flex justify-center mt-2 sm:hidden">
+                                        <div className="flex items-center space-x-1">
+                                            <div className="w-1 h-1 bg-brandGold/40 rounded-full"></div>
+                                            <div className="w-1 h-1 bg-brandGold/40 rounded-full"></div>
+                                            <div className="w-1 h-1 bg-brandGold/40 rounded-full"></div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -632,8 +642,11 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ duration: 0.4 }}
                                         whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                                        className="mx-auto w-full max-w-xs sm:max-w-none"
                                     >
-                                        <ProductCard product={product} locale={locale} />
+                                        <div className="mx-auto w-64 sm:w-auto">
+                                            <ProductCard product={product} locale={locale} />
+                                        </div>
                                     </motion.div>
                                 ))}
                             </div>

@@ -100,7 +100,13 @@ export default function Layout({ children, title, description }: LayoutProps) {
                     {title ? `${title} | Diamant-Rouge` : "Diamant-Rouge - Luxury Jewelry House"}
                 </title>
                 {description && <meta name="description" content={description} />}
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <meta 
+                    name="viewport" 
+                    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" 
+                />
+                <meta name="theme-color" content="#FAF3E3" />
+                <meta name="apple-mobile-web-app-capable" content="yes" />
+                <meta name="apple-mobile-web-app-status-bar-style" content="default" />
             </Head>
 
             {/* Full width layout */}

@@ -103,7 +103,9 @@ export default function CollectionPage({ categoryData, locale }: CollectionProps
                         ? [...Array(6)].map((_, i) => <ProductSkeleton key={i} />)
                         : sortedProducts.length > 0
                             ? sortedProducts.map((product) => (
-                                <ProductCard key={product.id} product={product} locale={locale} />
+                                <div key={product.id} className="mx-auto w-64 sm:w-auto">
+                                    <ProductCard product={product} locale={locale} />
+                                </div>
                             ))
                             : (
                                 <p className="text-center text-platinumGray col-span-3">

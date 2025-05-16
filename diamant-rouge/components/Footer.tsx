@@ -31,7 +31,7 @@ export default function Footer() {
       {/* Full-width Burgundy Newsletter Section */}
       
       <div className="w-full bg-burgundy py-12 md:py-16">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-4 md:px-6">
           <div className="relative text-center">
             {/* Diamond accent */}
             <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
@@ -42,12 +42,12 @@ export default function Footer() {
               <h4 className="text-2xl md:text-4xl font-serif text-brandIvory mb-2">
                 Rejoignez Le Cercle Rouge
               </h4>
-              <div className="h-px w-56 mx-auto bg-brandGold/50 mb-6"></div>
-              <p className="text-brandIvory/80 max-w-xl mx-auto mb-8 md:text-lg">
+              <div className="h-px w-40 md:w-56 mx-auto bg-brandGold/50 mb-4 md:mb-6"></div>
+              <p className="text-brandIvory/80 max-w-xl mx-auto mb-6 md:mb-8 text-base md:text-lg px-2">
                 Recevez en exclusivité nos invitations privées aux événements, nos nouvelles collections
                 et l'inspiration de notre maison.
               </p>
-              <form className="max-w-lg mx-auto" onSubmit={handleNewsletterSubmit}>
+              <form className="max-w-lg mx-auto px-2" onSubmit={handleNewsletterSubmit}>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <div className="relative flex-grow">
                     <input
@@ -61,7 +61,7 @@ export default function Footer() {
                   </div>
                   <button
                     type="submit"
-                    className="bg-brandGold text-burgundy px-6 py-3 rounded-md hover:bg-brandIvory hover:text-burgundy transition duration-300 flex items-center justify-center group shadow-sm font-medium tracking-wide"
+                    className="bg-brandGold text-burgundy px-6 py-3 rounded-md hover:bg-brandIvory hover:text-burgundy transition duration-300 flex items-center justify-center group shadow-sm font-medium tracking-wide min-h-[48px]"
                   >
                     <span className="mr-2">S'inscrire</span>
                     <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
@@ -81,23 +81,23 @@ export default function Footer() {
       {/* Decorative top border - mirrors header style */}
       <div className="flex justify-center">
         <div className="relative">
-          <div className="h-[1px] w-60 bg-gradient-to-r from-transparent via-brandGold to-transparent my-1.5 mt-16"></div>
+          <div className="h-[1px] w-40 md:w-60 bg-gradient-to-r from-transparent via-brandGold to-transparent my-1.5 mt-12 md:mt-16"></div>
           <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <Diamond size={7} className="text-brandGold fill-brandGold" />
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 md:gap-8">
           {/* Logo & About */}
           <div className="col-span-1 md:col-span-1">
-            <Link href="/" className="inline-block mb-6">
+            <Link href="/" className="inline-block mb-4 md:mb-6">
               <Image
                 src="/images/1/diamant-rouge-logo-full.svg" 
                 alt="Diamant Rouge - Joaillerie de Luxe"
-                width={180}
-                height={45}
+                width={160}
+                height={40}
                 className="object-contain"
                 priority
               />
@@ -105,7 +105,7 @@ export default function Footer() {
             <p className="text-platinumGray text-sm leading-relaxed mb-6">
               Depuis 1967, Diamant Rouge façonne des pièces d'exception. Notre maison perpétue l'art de la haute joaillerie en alliant tradition et innovation.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-5">
               <SocialLink href="https://instagram.com" icon={<Instagram size={18} />} label="Instagram" />
               <SocialLink href="https://facebook.com" icon={<Facebook size={18} />} label="Facebook" />
               <SocialLink href="https://twitter.com" icon={<Twitter size={18} />} label="Twitter" />
@@ -115,8 +115,8 @@ export default function Footer() {
 
           {/* Collections */}
           <div className="col-span-1">
-            <h5 className="font-serif text-brandGold mb-6 text-lg">Collections</h5>
-            <ul className="space-y-3">
+            <h5 className="font-serif text-brandGold mb-4 md:mb-6 text-lg">Collections</h5>
+            <ul className="space-y-2 md:space-y-3">
               <FooterLink href="/collections/bagues">Bagues</FooterLink>
               <FooterLink href="/collections/colliers">Colliers</FooterLink>
               <FooterLink href="/collections/bracelets">Bracelets</FooterLink>
@@ -128,8 +128,8 @@ export default function Footer() {
 
           {/* Maison & Services */}
           <div className="col-span-1">
-            <h5 className="font-serif text-brandGold mb-6 text-lg">La Maison</h5>
-            <ul className="space-y-3">
+            <h5 className="font-serif text-brandGold mb-4 md:mb-6 text-lg">La Maison</h5>
+            <ul className="space-y-2 md:space-y-3">
               <FooterLink href="/the-house">Notre Histoire</FooterLink>
               <FooterLink href="/jewelry">Joaillerie</FooterLink>
               <FooterLink href="/appointments">Rendez-vous Privé</FooterLink>
@@ -141,8 +141,8 @@ export default function Footer() {
 
           {/* Contact Info */}
           <div className="col-span-1">
-            <h5 className="font-serif text-brandGold mb-6 text-lg">Contactez-nous</h5>
-            <ul className="space-y-5">
+            <h5 className="font-serif text-brandGold mb-4 md:mb-6 text-lg">Contactez-nous</h5>
+            <ul className="space-y-4 md:space-y-5">
               <li className="flex items-start">
                 <MapPin size={18} className="text-brandGold mr-3 mt-1 flex-shrink-0" />
                 <span className="text-platinumGray text-sm">
@@ -171,19 +171,19 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-16 pt-8 border-t border-brandGold/20 flex flex-col md:flex-row justify-between items-center">
-          <p className="mb-6 md:mb-0 font-serif text-sm tracking-wide text-platinumGray">
+        <div className="mt-10 md:mt-16 pt-6 md:pt-8 border-t border-brandGold/20 flex flex-col md:flex-row justify-between items-center">
+          <p className="mb-6 md:mb-0 font-serif text-sm tracking-wide text-platinumGray text-center md:text-left">
             © {new Date().getFullYear()} Diamant Rouge Joaillerie. Tous droits réservés.
           </p>
 
-          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs">
-            <Link href="/terms" className="text-platinumGray hover:text-brandGold transition-colors">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-xs">
+            <Link href="/terms" className="text-platinumGray hover:text-brandGold transition-colors py-1 px-2">
               Conditions Générales
             </Link>
-            <Link href="/privacy" className="text-platinumGray hover:text-brandGold transition-colors">
+            <Link href="/privacy" className="text-platinumGray hover:text-brandGold transition-colors py-1 px-2">
               Politique de Confidentialité
             </Link>
-            <Link href="/mentions-legales" className="text-platinumGray hover:text-brandGold transition-colors">
+            <Link href="/mentions-legales" className="text-platinumGray hover:text-brandGold transition-colors py-1 px-2">
               Mentions Légales
             </Link>
           </div>
@@ -193,7 +193,7 @@ export default function Footer() {
       {/* Decorative bottom accent - mirrors header style */}
       <div className="flex justify-center pb-4">
         <div className="relative">
-          <div className="h-[1px] w-32 bg-gradient-to-r from-transparent via-brandGold/40 to-transparent my-1"></div>
+          <div className="h-[1px] w-24 md:w-32 bg-gradient-to-r from-transparent via-brandGold/40 to-transparent my-1"></div>
         </div>
       </div>
     </footer>
@@ -205,10 +205,9 @@ function FooterLink({ href, children }: { href: string, children: React.ReactNod
   return (
     <li>
       <Link 
-        href={href} 
-        className="text-richEbony/80 hover:text-brandGold transition-colors duration-300 group flex items-center"
+        href={href}
+        className="text-platinumGray text-sm hover:text-brandGold transition-colors duration-200 py-1 block"
       >
-        <span className="w-0 h-[1px] bg-brandGold opacity-0 group-hover:w-2 group-hover:opacity-100 mr-0 group-hover:mr-2 transition-all duration-300"></span>
         {children}
       </Link>
     </li>
@@ -219,10 +218,10 @@ function SocialLink({ href, icon, label }: { href: string, icon: React.ReactNode
   return (
     <a 
       href={href}
+      aria-label={label}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-burgundy hover:text-brandGold hover:scale-110 transition-all duration-300"
-      aria-label={label}
+      className="text-platinumGray hover:text-brandGold transition-colors duration-200 p-1.5 -m-1.5"
     >
       {icon}
     </a>

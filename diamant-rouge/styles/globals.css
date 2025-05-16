@@ -18,7 +18,7 @@
 
 @media (max-width: 768px) {
     :root {
-        --header-height: 130px; /* Mobile taller height when not scrolled - significantly reduced */
+        --header-height: 100px; /* Further reduced height for mobile */
         --header-height-scrolled: 60px; /* Mobile shorter height when scrolled - significantly reduced */
     }
 }
@@ -33,6 +33,8 @@ body {
         It's okay as a color in the config, just not used as the entire background.)
     */
     @apply bg-brandIvory text-richEbony font-serif tracking-wide leading-relaxed;
+    /* Enhanced touch experience for mobile */
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Headings - Gold to mirror the logo lines */
@@ -40,15 +42,15 @@ h1, h2, h3, h4, h5 {
     @apply text-brandGold font-bold tracking-wide;
 }
 
-h1 { @apply text-5xl md:text-7xl leading-tight; }
-h2 { @apply text-4xl md:text-6xl leading-snug; }
-h3 { @apply text-3xl md:text-5xl leading-snug; }
-h4 { @apply text-2xl md:text-4xl leading-snug; }
-h5 { @apply text-xl md:text-2xl leading-normal; }
+h1 { @apply text-4xl md:text-7xl leading-tight; }
+h2 { @apply text-3xl md:text-6xl leading-snug; }
+h3 { @apply text-2xl md:text-5xl leading-snug; }
+h4 { @apply text-xl md:text-4xl leading-snug; }
+h5 { @apply text-lg md:text-2xl leading-normal; }
 
 /* Paragraphs - typically platinumGray for subtle contrast */
 p {
-    @apply text-platinumGray text-lg leading-relaxed;
+    @apply text-platinumGray text-base md:text-lg leading-relaxed;
 }
 
 /* ==========================================================
@@ -82,6 +84,13 @@ p {
     .product-breadcrumb {
         padding-top: 150px !important; /* Initial fallback - will be overridden by JS */
         transition: padding-top 0.2s ease-out !important;
+    }
+    
+    /* Mobile-specific reduction for product breadcrumb initial padding */
+    @media (max-width: 767px) {
+        .product-breadcrumb {
+            padding-top: 90px !important; /* Smaller initial padding for mobile */
+        }
     }
 
     /* Home page hero - no additional padding needed as it has its own layout */
@@ -124,11 +133,25 @@ p {
         shadow-luxury focus:ring-2 focus:ring-brandGold;
     }
 
+    /* Enhanced mobile touch target for buttons */
+    @media (max-width: 768px) {
+        .button-primary {
+            @apply px-5 py-2.5 text-sm;
+        }
+    }
+
     /* 🏛️ Secondary Action Button */
     .button-secondary {
         @apply bg-transparent border border-brandGold text-brandGold px-6 py-3
         rounded-full font-medium hover:bg-brandGold hover:text-richEbony
         transition duration-300;
+    }
+
+    /* Enhanced mobile touch target for buttons */
+    @media (max-width: 768px) {
+        .button-secondary {
+            @apply px-5 py-2.5 text-sm;
+        }
     }
 
     /* Disabled Buttons */
@@ -141,6 +164,13 @@ p {
     .card {
         @apply bg-brandIvory border border-brandGold text-richEbony rounded-lg
         shadow-luxury p-6 transition-transform hover:scale-105 duration-300;
+    }
+
+    /* Mobile optimized cards */
+    @media (max-width: 768px) {
+        .card {
+            @apply p-4 hover:scale-102;
+        }
     }
 
     /* 📌 Section Backgrounds (No Ebony in light mode) */
@@ -157,10 +187,24 @@ p {
         @apply shadow-luxury rounded-2xl;
     }
 
+    /* Mobile optimized luxury images */
+    @media (max-width: 768px) {
+        .image-luxury {
+            @apply rounded-xl;
+        }
+    }
+
     /* 🔘 Input Fields */
     .input-field {
         @apply bg-transparent border border-brandGold text-richEbony px-4 py-2 rounded-lg
         focus:border-brandGold focus:ring focus:ring-brandGold transition duration-300;
+    }
+
+    /* Mobile optimized input fields with larger tap targets */
+    @media (max-width: 768px) {
+        .input-field {
+            @apply py-3;
+        }
     }
 
     /* 🛎️ Alert & Notification */
@@ -171,6 +215,13 @@ p {
     /* 🖥️ Hover Animations */
     .hover-scale {
         @apply transition-transform duration-300 hover:scale-105;
+    }
+
+    /* Refined hover for mobile */
+    @media (max-width: 768px) {
+        .hover-scale {
+            @apply hover:scale-102;
+        }
     }
 
     /* 🔲 Dropdown */
@@ -198,6 +249,53 @@ p {
     
     .text-shadow-strong {
         text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8), 0 0 2px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Mobile Navigation Improvements */
+    .mobile-nav-link {
+        @apply relative block w-full text-left py-3 px-1 font-medium text-richEbony 
+        hover:text-brandGold transition-colors duration-200 border-b border-brandGold/10;
+    }
+    
+    .mobile-nav-link::after {
+        content: '';
+        @apply absolute bottom-0 left-0 w-0 h-px bg-brandGold transition-all duration-300;
+    }
+    
+    .mobile-nav-link:hover::after {
+        @apply w-1/2;
+    }
+
+    /* Mobile menu slide animation */
+    .mobile-menu-enter {
+        transform: translateX(100%);
+    }
+    
+    .mobile-menu-enter-active {
+        transform: translateX(0);
+        transition: transform 300ms ease-out;
+    }
+    
+    .mobile-menu-exit {
+        transform: translateX(0);
+    }
+    
+    .mobile-menu-exit-active {
+        transform: translateX(100%);
+        transition: transform 300ms ease-in;
+    }
+
+    /* Form elements refined for mobile */
+    .mobile-optimized-form input,
+    .mobile-optimized-form select,
+    .mobile-optimized-form textarea {
+        @apply py-3 px-4 text-base;
+        min-height: 48px; /* Minimum touch target size */
+    }
+
+    /* Product cards refined for mobile */
+    .product-card-mobile {
+        @apply rounded-lg overflow-hidden shadow-subtle transition-all duration-300;
     }
 }
 
@@ -248,10 +346,5 @@ p {
     position: fixed;
     top: 0;
     left: 0;
-    width: 30px;
-    height: var(--current-header-height);
-    background-color: rgba(255, 0, 0, 0.3);
-    z-index: 9999;
-    pointer-events: none;
 }
 */

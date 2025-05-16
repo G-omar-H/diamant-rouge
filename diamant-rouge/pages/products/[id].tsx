@@ -221,15 +221,19 @@ export default function ProductPage({
   // Add to Cart
   const handleAddToCart = () => {
     const primaryVariation = selectedVariations["diamondShape"] || undefined;
-    addToCart({
-      image: selectedImage,
+    const cartItem = {
       productId: productData.id,
       variationId: primaryVariation ? primaryVariation.id : undefined,
+      quantity: 1,
+      // These fields are used for the local cart display but not sent to the server
       sku: productData.sku,
       name: productTranslation?.name || "Bijou personnalisé",
       price: totalPrice,
-      quantity: 1,
-    });
+      image: selectedImage,
+    };
+    
+    console.log("Adding item to cart:", cartItem);
+    addToCart(cartItem);
     
     // Show success toast notification
     showToast(
@@ -264,13 +268,13 @@ export default function ProductPage({
       />
 
       {/* Breadcrumb navigation with ref for dynamic height adjustment */}
-      <div ref={breadcrumbRef} className="bg-brandIvory px-6 text-sm product-breadcrumb">
+      <div ref={breadcrumbRef} className="bg-brandIvory px-4 md:px-6 text-xs md:text-sm product-breadcrumb">
         <div className="max-w-7xl mx-auto">
-          <nav className="text-platinumGray flex items-center space-x-2 py-4">
+          <nav className="text-platinumGray flex items-center space-x-2 py-3 md:py-4">
             <Link href="/" className="hover:text-brandGold transition-colors">Accueil</Link>
-            <span>/</span>
+            <span className="text-platinumGray/50">/</span>
             <Link href="/collections" className="hover:text-brandGold transition-colors">Collections</Link>
-            <span>/</span>
+            <span className="text-platinumGray/50">/</span>
             <span className="text-brandGold">{productTranslation?.name}</span>
           </nav>
         </div>
@@ -278,160 +282,180 @@ export default function ProductPage({
 
       {/* Main product display */}
       <motion.section 
-        className="bg-brandIvory pt-0 pb-20 px-6"
+        className="bg-brandIvory pt-0 pb-12 md:pb-20 px-4 md:px-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
+        transition={{ duration: 0.6 }}
       >
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+          {/* Mobile-only product title - refined elegant typography */}
+          <div className="block lg:hidden mb-5 mt-1">
+            <h1 className="text-2xl md:text-3xl font-serif text-richEbony leading-snug">
+              {productTranslation?.name}
+            </h1>
+            <div className="h-[1px] w-24 bg-gradient-to-r from-brandGold to-transparent mt-2.5"></div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-20">
             
-            {/* LEFT COLUMN: Product Gallery */}
-            <div className="space-y-6">
-              {/* Main Image with Zoom */}
+            {/* LEFT COLUMN: Product Gallery - refined for all devices */}
+            <div className="space-y-4 md:space-y-5">
+              {/* Main Image with Zoom - refined aspect ratio and smoother transitions */}
               <div 
-                className="relative overflow-hidden rounded-lg shadow-luxury cursor-zoom-in"
+                className="relative overflow-hidden rounded-md md:rounded-lg shadow-luxury cursor-zoom-in aspect-square md:aspect-[4/3]"
                 ref={mainImageRef}
                 onClick={handleImageZoom}
                 onMouseLeave={handleZoomEnd}
                 style={{
-                  transition: 'transform 0.3s ease-out',
+                  transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)', // Elegant easing
                   transform: isZoomed ? 'scale(1.75)' : 'scale(1)'
                 }}
               >
                 <Image
                   src={selectedImage}
-                  width={800}
-                  height={800}
+                  width={1200}
+                  height={900}
                   alt={productTranslation?.name || "Bijou Diamant Rouge"}
-                  className="w-full h-auto"
+                  className="w-full h-full object-cover"
                   priority
                 />
                 {!isZoomed && (
-                  <button className="absolute bottom-4 right-4 bg-richEbony/80 text-brandIvory p-2 rounded-full">
+                  <motion.button 
+                    initial={{ opacity: 0.8 }}
+                    whileHover={{ opacity: 1 }}
+                    className="absolute bottom-3 right-3 bg-richEbony/70 text-brandIvory p-1.5 rounded-full backdrop-blur-sm"
+                  >
                     <ZoomIn size={18} />
-                  </button>
+                  </motion.button>
                 )}
               </div>
 
-              {/* Thumbnails */}
-              <div className="flex gap-3 overflow-x-auto pb-1">
+              {/* Thumbnails - refined for touch with better visual feedback */}
+              <div className="flex gap-2.5 md:gap-3 overflow-x-auto pb-1 snap-x snap-mandatory scrollbar-hide">
                 {productData.images.map((img, index) => {
                   const isSelected = selectedImage === img;
                   return (
-                    <button
+                    <motion.button
                       key={index}
                       onClick={() => setSelectedImage(img)}
-                      className={`border-2 rounded-md overflow-hidden transition-all ${
-                        isSelected ? "border-brandGold ring-2 ring-brandGold/20" : "border-transparent"
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`relative border-2 rounded-md overflow-hidden flex-none snap-center transition-all ${
+                        isSelected ? "border-brandGold ring-2 ring-brandGold/30" : "border-transparent hover:border-brandGold/40"
                       }`}
                     >
+                      <div className="relative h-18 w-18 md:h-20 md:w-20">
                       <Image
                         src={img}
-                        width={100}
-                        height={100}
+                          fill
                         alt={`${productTranslation?.name} - Vue ${index + 1}`}
-                        className="object-cover w-20 h-20"
-                      />
-                    </button>
+                          className="object-cover"
+                        />
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-brandGold/10"></div>
+                        )}
+                      </div>
+                    </motion.button>
                   );
                 })}
               </div>
 
-              {/* Product badges */}
-              <div className="flex flex-wrap items-center gap-4 pt-4">
-                <div className="flex items-center space-x-2 text-xs text-platinumGray bg-richEbony/5 px-3 py-1.5 rounded-full">
+              {/* Product badges - elegant scrolling with refined design */}
+              <div className="flex overflow-x-auto gap-3 py-1.5 scrollbar-hide">
+                <div className="flex-none flex items-center space-x-2 text-xs text-platinumGray bg-gradient-to-br from-richEbony/5 to-richEbony/10 px-3.5 py-2 rounded-full whitespace-nowrap border border-richEbony/5">
                   <BadgeCheck size={14} className="text-brandGold" />
                   <span>Certifié GIA</span>
                 </div>
-                <div className="flex items-center space-x-2 text-xs text-platinumGray bg-richEbony/5 px-3 py-1.5 rounded-full">
+                <div className="flex-none flex items-center space-x-2 text-xs text-platinumGray bg-gradient-to-br from-richEbony/5 to-richEbony/10 px-3.5 py-2 rounded-full whitespace-nowrap border border-richEbony/5">
                   <Shield size={14} className="text-brandGold" />
                   <span>Authentique</span>
                 </div>
-                <div className="flex items-center space-x-2 text-xs text-platinumGray bg-richEbony/5 px-3 py-1.5 rounded-full">
+                <div className="flex-none flex items-center space-x-2 text-xs text-platinumGray bg-gradient-to-br from-richEbony/5 to-richEbony/10 px-3.5 py-2 rounded-full whitespace-nowrap border border-richEbony/5">
                   <Award size={14} className="text-brandGold" />
                   <span>Fait main</span>
                 </div>
               </div>
 
-              {/* Expert consultation banner */}
-              <div className="bg-burgundy/10 border border-burgundy/20 rounded-lg p-5 mt-8">
+              {/* Expert consultation banner - refined for elegance */}
+              <div className="hidden md:block bg-gradient-to-br from-burgundy/5 to-burgundy/10 border border-burgundy/20 rounded-lg p-5 mt-6">
                 <h3 className="text-burgundy font-serif text-lg mb-2">Consultation experte privée</h3>
-                <p className="text-sm text-richEbony mb-3">
+                <p className="text-sm text-richEbony/80 mb-3 leading-relaxed">
                   Pour une expérience personnalisée, nos experts diamantaires sont à votre disposition pour vous guider dans votre choix.
                 </p>
-                <button 
+                <motion.button 
                   onClick={handleRequestAppointment}
-                  className="flex items-center text-sm text-burgundy hover:text-brandGold transition-colors"
+                  className="flex items-center text-sm text-burgundy hover:text-brandGold transition-all"
+                  whileHover={{ x: 3 }}
                 >
                   <Phone size={14} className="mr-1" /> 
                   <span>Prendre rendez-vous</span>
-                </button>
+                </motion.button>
               </div>
             </div>
             
-            {/* RIGHT COLUMN: Product Details */}
-            <div className="space-y-8">
-              {/* Product title and price */}
-              <div>
-                <h1 className="text-3xl md:text-4xl font-serif text-richEbony mb-3">
+            {/* RIGHT COLUMN: Product Details - refined and polished */}
+            <div className="space-y-5 md:space-y-7">
+              {/* Product title and price - elegant desktop presentation */}
+              <div className="hidden lg:block">
+                <h1 className="text-3xl md:text-4xl font-serif text-richEbony mb-4 leading-snug">
                   {productTranslation?.name}
                 </h1>
-                <p className="text-3xl font-serif text-brandGold mb-4">
+                <p className="text-3xl font-serif text-brandGold mb-3">
                   {formattedPrice}
                 </p>
-                <div className="h-px w-32 bg-gradient-to-r from-brandGold via-brandGold to-transparent mb-6"></div>
+                <div className="h-px w-28 bg-gradient-to-r from-brandGold to-transparent mb-6"></div>
               </div>
 
-              {/* Tabs for different content sections */}
+              {/* Tabs for different content sections - refined scrolling and indicators */}
               <div>
-                <div className="flex border-b border-platinumGray/20">
+                <div className="flex border-b border-platinumGray/20 overflow-x-auto pb-0.5 scrollbar-hide">
+                  {["description", "details", "certificate"].map((tab) => (
                   <button 
-                    onClick={() => setActiveTab('description')}
-                    className={`pb-2 mr-6 text-sm font-medium transition-colors ${
-                      activeTab === 'description' 
-                        ? 'text-brandGold border-b-2 border-brandGold' 
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={`pb-2 mr-6 text-sm font-medium whitespace-nowrap transition-colors relative ${
+                        activeTab === tab 
+                          ? 'text-brandGold' 
                         : 'text-platinumGray hover:text-richEbony'
                     }`}
                   >
-                    Description
+                      {tab === "description" && "Description"}
+                      {tab === "details" && "Détails & Matériaux"}
+                      {tab === "certificate" && "Certification"}
+                      {activeTab === tab && (
+                        <motion.div 
+                          className="absolute bottom-0 left-0 right-0 h-[2px] bg-brandGold"
+                          layoutId="activeTabIndicator"
+                        />
+                      )}
                   </button>
-                  <button 
-                    onClick={() => setActiveTab('details')}
-                    className={`pb-2 mr-6 text-sm font-medium transition-colors ${
-                      activeTab === 'details' 
-                        ? 'text-brandGold border-b-2 border-brandGold' 
-                        : 'text-platinumGray hover:text-richEbony'
-                    }`}
-                  >
-                    Détails & Matériaux
-                  </button>
-                  <button 
-                    onClick={() => setActiveTab('certificate')}
-                    className={`pb-2 text-sm font-medium transition-colors ${
-                      activeTab === 'certificate' 
-                        ? 'text-brandGold border-b-2 border-brandGold' 
-                        : 'text-platinumGray hover:text-richEbony'
-                    }`}
-                  >
-                    Certification
-                  </button>
+                  ))}
                 </div>
                 
-                <div className="pt-6">
+                <div className="pt-4">
                   {activeTab === 'description' && (
-                    <div className="prose prose-sm max-w-none text-platinumGray">
-                      <p className="leading-relaxed mb-4">{productTranslation?.description}</p>
-                      <p className="leading-relaxed">
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="prose prose-sm max-w-none text-platinumGray"
+                    >
+                      <p className="leading-relaxed mb-4 text-sm md:text-base">{productTranslation?.description}</p>
+                      <p className="leading-relaxed text-sm md:text-base">
                         Cette pièce d'exception incarne l'excellence et le savoir-faire de la maison Diamant Rouge. 
                         Façonnée dans nos ateliers parisiens par nos maîtres joailliers, chaque détail a été pensé 
                         pour créer une œuvre intemporelle qui traversera les générations.
                       </p>
-                    </div>
+                    </motion.div>
                   )}
                   
                   {activeTab === 'details' && (
-                    <div className="space-y-4">
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="space-y-4"
+                    >
                       <div>
                         <h3 className="text-sm font-medium text-richEbony mb-2">Matériaux précieux</h3>
                         <p className="text-sm text-platinumGray mb-1">
@@ -447,7 +471,7 @@ export default function ProductPage({
                       
                       <div>
                         <h3 className="text-sm font-medium text-richEbony mb-2">Fabrication</h3>
-                        <p className="text-sm text-platinumGray">
+                        <p className="text-sm text-platinumGray leading-relaxed">
                           Entièrement réalisée à la main dans nos ateliers selon des techniques traditionnelles 
                           de haute joaillerie, perpétuant un savoir-faire ancestral combiné aux technologies 
                           de pointe pour une finition parfaite.
@@ -456,30 +480,35 @@ export default function ProductPage({
                       
                       <div>
                         <h3 className="text-sm font-medium text-richEbony mb-2">Entretien</h3>
-                        <p className="text-sm text-platinumGray">
+                        <p className="text-sm text-platinumGray leading-relaxed">
                           Nous recommandons un nettoyage professionnel annuel pour maintenir l'éclat de votre bijou. 
                           Entre-temps, un nettoyage doux avec un chiffon en microfibre suffit pour préserver sa beauté.
                         </p>
                       </div>
-                    </div>
+                    </motion.div>
                   )}
                   
                   {activeTab === 'certificate' && (
-                    <div>
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
                       <div className="flex items-start space-x-4 mb-4">
-                        <BadgeCheck size={32} className="text-brandGold flex-shrink-0" />
+                        <BadgeCheck size={24} className="text-brandGold flex-shrink-0 mt-1" />
                         <div>
                           <h3 className="text-sm font-medium text-richEbony mb-1">Certification internationale</h3>
-                          <p className="text-sm text-platinumGray mb-3">
+                          <p className="text-sm text-platinumGray mb-3 leading-relaxed">
                             Chaque diamant est accompagné d'un certificat GIA (Gemological Institute of America) 
                             garantissant son authenticité et ses caractéristiques précises.
                           </p>
-                          <button
+                          <motion.button
                             onClick={() => setShowCertificateModal(true)}
                             className="text-sm text-brandGold hover:underline flex items-center"
+                            whileHover={{ x: 3 }}
                           >
                             Voir le certificat <ArrowRight size={14} className="ml-1" />
-                          </button>
+                          </motion.button>
                         </div>
                       </div>
                       
@@ -488,35 +517,36 @@ export default function ProductPage({
                         <ul className="space-y-2">
                           <li className="flex items-start">
                             <Check size={16} className="text-brandGold mr-2 mt-0.5 flex-shrink-0" />
-                            <p className="text-sm text-platinumGray">
+                            <p className="text-sm text-platinumGray leading-relaxed">
                               Garantie à vie contre tout défaut de fabrication
                             </p>
                           </li>
                           <li className="flex items-start">
                             <Check size={16} className="text-brandGold mr-2 mt-0.5 flex-shrink-0" />
-                            <p className="text-sm text-platinumGray">
+                            <p className="text-sm text-platinumGray leading-relaxed">
                               Service de nettoyage et polissage gratuit à vie
                             </p>
                           </li>
                           <li className="flex items-start">
                             <Check size={16} className="text-brandGold mr-2 mt-0.5 flex-shrink-0" />
-                            <p className="text-sm text-platinumGray">
+                            <p className="text-sm text-platinumGray leading-relaxed">
                               Assurance joaillerie offerte la première année
                             </p>
                           </li>
                         </ul>
                       </div>
-                    </div>
+                    </motion.div>
                   )}
                 </div>
               </div>
 
-              {/* Personalization Options */}
-              <div>
-                <h3 className="text-lg font-serif text-richEbony mb-4">
+              {/* Personalization Options - elegant cards with improved selection visual feedback */}
+              <div className="mt-7">
+                <h3 className="text-base md:text-lg font-serif text-richEbony mb-4">
                   Votre Création Personnalisée
                 </h3>
                 
+                <div className="space-y-4">
                 {[
                   "diamondShape",
                   "carat",
@@ -531,8 +561,8 @@ export default function ProductPage({
                   if (variationGroup.length === 0) return null;
 
                   return (
-                    <div key={type} className="mb-6">
-                      <p className="font-medium text-richEbony mb-2">
+                      <div key={type} className="mb-4">
+                        <p className="font-medium text-sm text-richEbony mb-2">
                         {getVariationLabel(type)}
                       </p>
                       <div className="flex flex-wrap gap-2">
@@ -540,162 +570,239 @@ export default function ProductPage({
                           const isSelected =
                             selectedVariations[type]?.id === variation.id;
                           return (
-                            <button
+                              <motion.button
                               key={variation.id}
                               onClick={() => updateVariation(variation)}
-                              className={`px-4 py-2 rounded-md border transition-all ${
+                                whileHover={{ y: -2 }}
+                                whileTap={{ scale: 0.97 }}
+                                className={`px-3.5 py-2 md:px-4 md:py-2 rounded-md border transition-all text-sm ${
                                 isSelected
                                   ? "bg-burgundy text-brandIvory border-burgundy shadow-md"
                                   : "bg-brandIvory text-richEbony border-platinumGray/30 hover:border-burgundy/50"
                               }`}
                             >
                               {variation.variationValue}
-                            </button>
+                              </motion.button>
                           );
                         })}
                       </div>
                     </div>
                   );
                 })}
+                </div>
               </div>
 
-              {/* Selection Summary */}
+              {/* Selection Summary - refined styling */}
               {selectionSummary && (
-                <div className="bg-richEbony/5 p-4 rounded-lg">
-                  <h4 className="text-sm font-medium text-richEbony mb-2">Votre configuration personnalisée</h4>
-                  <p className="text-sm text-platinumGray">{selectionSummary}</p>
+                <div className="bg-gradient-to-br from-richEbony/5 to-richEbony/8 p-3.5 md:p-4 rounded-md">
+                  <h4 className="text-sm font-medium text-richEbony mb-1.5 md:mb-2">Votre configuration personnalisée</h4>
+                  <p className="text-xs md:text-sm text-platinumGray">{selectionSummary}</p>
                 </div>
               )}
 
-              {/* Shipping and Services */}
-              <div className="space-y-3 border-t border-b border-platinumGray/10 py-4">
+              {/* Shipping and Services - elegant icons with more touch-friendly spacing */}
+              <div className="space-y-3 md:space-y-3 border-t border-b border-platinumGray/10 py-4 md:py-4">
                 <div className="flex items-center">
-                  <Package size={18} className="text-brandGold mr-3" />
-                  <p className="text-sm text-platinumGray">
+                  <div className="w-7 h-7 rounded-full bg-brandGold/10 flex items-center justify-center mr-3">
+                    <Package size={14} className="text-brandGold" />
+                  </div>
+                  <p className="text-xs md:text-sm text-platinumGray">
                     Livraison sécurisée offerte avec remise en main propre
                   </p>
                 </div>
                 <div className="flex items-center">
-                  <Calendar size={18} className="text-brandGold mr-3" />
-                  <p className="text-sm text-platinumGray">
+                  <div className="w-7 h-7 rounded-full bg-brandGold/10 flex items-center justify-center mr-3">
+                    <Calendar size={14} className="text-brandGold" />
+                  </div>
+                  <p className="text-xs md:text-sm text-platinumGray">
                     Livraison estimée le {shippingDateStr}
                   </p>
                 </div>
                 <div className="flex items-center">
-                  <RefreshCw size={18} className="text-brandGold mr-3" />
-                  <p className="text-sm text-platinumGray">
+                  <div className="w-7 h-7 rounded-full bg-brandGold/10 flex items-center justify-center mr-3">
+                    <RefreshCw size={14} className="text-brandGold" />
+                  </div>
+                  <p className="text-xs md:text-sm text-platinumGray">
                     Retours acceptés sous 30 jours
                   </p>
                 </div>
               </div>
 
-              {/* Payment Security */}
-              <div>
-                <div className="flex justify-between items-center mb-6">
-                  <div className="flex items-center space-x-4">
-                    <Shield size={18} className="text-brandGold" />
+              {/* Desktop Payment Security - now only visible on desktop */}
+              <div className="hidden md:block">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-3">
+                    <Shield size={16} className="text-brandGold" />
                     <p className="text-sm font-medium text-richEbony">Paiement Sécurisé</p>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <Image src="/images/icons/visa.png" width={40} height={24} alt="Visa" />
-                    <Image src="/images/icons/mastercard.svg" width={40} height={24} alt="Mastercard" />
+                    <Image src="/images/icons/visa.png" width={36} height={22} alt="Visa" className="opacity-80 hover:opacity-100 transition-opacity" />
+                    <Image src="/images/icons/mastercard.svg" width={36} height={22} alt="Mastercard" className="opacity-80 hover:opacity-100 transition-opacity" />
                   </div>
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button
+              {/* Action Buttons - elegant desktop buttons */}
+              <div className="hidden lg:flex flex-col sm:flex-row gap-4 pt-2">
+                <motion.button
                   onClick={handleAddToCart}
-                  className="button-primary py-3 px-8 rounded-full flex-1"
+                  className="button-primary py-3 px-8 rounded-full flex-1 transition-all"
+                  whileHover={{ y: -2, boxShadow: "0 4px 12px rgba(169, 138, 95, 0.3)" }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   Ajouter au Panier
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   onClick={handleRequestAppointment}
-                  className="button-secondary py-3 px-8 rounded-full flex-1"
+                  className="button-secondary py-3 px-8 rounded-full flex-1 transition-all"
+                  whileHover={{ y: -2, boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)" }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   Réserver un Essayage
-                </button>
+                </motion.button>
               </div>
             </div>
           </div>
         </div>
       </motion.section>
 
-      {/* Craftsmanship Section */}
-      <section className="bg-richEbony text-brandIvory py-16 px-6">
+      {/* Mobile: Inline action section - between product details and craftsmanship */}
+      <div className="block lg:hidden bg-gradient-to-b from-brandIvory to-richEbony/5 py-8 px-4">
+        <div className="max-w-md mx-auto">
+          {/* Price with subtle divider */}
+          <div className="mb-5 text-center">
+            <p className="font-serif text-xl text-brandGold mb-2">{formattedPrice}</p>
+            <div className="h-px w-16 bg-gradient-to-r from-transparent via-brandGold/30 to-transparent mx-auto"></div>
+          </div>
+          
+          {/* Payment methods for trust and authority */}
+          <div className="flex justify-center items-center mb-5">
+            <div className="flex items-center space-x-3 bg-richEbony/5 px-4 py-2 rounded-full">
+              <Shield size={14} className="text-brandGold" />
+              <span className="text-xs text-platinumGray">Paiement sécurisé</span>
+              <div className="flex items-center space-x-2 ml-1">
+                <Image src="/images/icons/visa.png" width={28} height={18} alt="Visa" className="opacity-80" />
+                <Image src="/images/icons/mastercard.svg" width={28} height={18} alt="Mastercard" className="opacity-80" />
+              </div>
+            </div>
+          </div>
+          
+          {/* Action buttons */}
+          <div className="flex flex-col gap-3.5">
+            <motion.button
+              onClick={handleAddToCart}
+              whileTap={{ scale: 0.98 }}
+              className="button-primary py-3.5 w-full rounded-sm text-sm shadow-luxury"
+            >
+              Ajouter au Panier
+            </motion.button>
+            <motion.button
+              onClick={handleRequestAppointment}
+              whileTap={{ scale: 0.98 }}
+              className="button-secondary py-3.5 w-full rounded-sm text-sm flex items-center justify-center"
+            >
+              <Phone size={16} className="mr-2" />
+              Réserver un Essayage
+            </motion.button>
+          </div>
+        </div>
+      </div>
+
+      {/* Craftsmanship Section - refined visual elements */}
+      <section className="bg-gradient-to-b from-richEbony to-richEbony/95 text-brandIvory py-14 md:py-20 px-4 md:px-6">
         <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-3xl font-serif text-brandGold mb-6">L'Art de la Haute Joaillerie</h2>
-          <p className="text-brandIvory/80 mb-8 max-w-2xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-serif text-brandGold mb-4 md:mb-6">L'Art de la Haute Joaillerie</h2>
+          <div className="h-px w-20 md:w-24 bg-gradient-to-r from-transparent via-brandGold/40 to-transparent mx-auto mb-5 md:mb-6"></div>
+          <p className="text-brandIvory/80 mb-8 md:mb-10 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
             Chaque création Diamant Rouge est le fruit d'un savoir-faire d'exception, 
             perpétué par nos maîtres artisans qui consacrent des centaines d'heures 
             à la réalisation de pièces uniques.
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-            <div className="text-center">
-              <div className="bg-brandGold/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Diamond size={24} className="text-brandGold" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 mt-6 md:mt-12">
+            <motion.div 
+              className="text-center"
+              whileHover={{ y: -4 }}
+            >
+              <div className="bg-gradient-to-br from-brandGold/15 to-brandGold/5 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-brandGold/20">
+                <Diamond size={22} className="text-brandGold" />
               </div>
               <h3 className="font-serif text-brandGold text-lg mb-2">Gemmes d'exception</h3>
-              <p className="text-brandIvory/70 text-sm">
+              <p className="text-brandIvory/70 text-sm leading-relaxed px-1">
                 Sélectionnées à la main par nos experts gemmologues pour leur pureté et leur éclat extraordinaire.
               </p>
-            </div>
+            </motion.div>
             
-            <div className="text-center">
-              <div className="bg-brandGold/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Star size={24} className="text-brandGold" />
+            <motion.div 
+              className="text-center"
+              whileHover={{ y: -4 }}
+            >
+              <div className="bg-gradient-to-br from-brandGold/15 to-brandGold/5 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-brandGold/20">
+                <Star size={22} className="text-brandGold" />
               </div>
               <h3 className="font-serif text-brandGold text-lg mb-2">Excellence artisanale</h3>
-              <p className="text-brandIvory/70 text-sm">
+              <p className="text-brandIvory/70 text-sm leading-relaxed px-1">
                 Façonnées par les mains expertes de nos maîtres joailliers selon des techniques traditionnelles.
               </p>
-            </div>
+            </motion.div>
             
-            <div className="text-center">
-              <div className="bg-brandGold/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award size={24} className="text-brandGold" />
+            <motion.div 
+              className="text-center"
+              whileHover={{ y: -4 }}
+            >
+              <div className="bg-gradient-to-br from-brandGold/15 to-brandGold/5 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-brandGold/20">
+                <Award size={22} className="text-brandGold" />
               </div>
               <h3 className="font-serif text-brandGold text-lg mb-2">Création intemporelle</h3>
-              <p className="text-brandIvory/70 text-sm">
+              <p className="text-brandIvory/70 text-sm leading-relaxed px-1">
                 Des pièces d'exception conçues pour traverser les générations et devenir des héritages familiaux.
               </p>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Similar Products */}
+      {/* Créations Associées - Matching Home Page Implementation */}
       {similarProducts.length > 0 && (
-        <motion.section
-          className="py-16 px-6 bg-brandIvory text-center"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true, margin: "-100px" }}
-        >
+        <section className="py-12 md:py-20 px-4 md:px-6 bg-brandIvory">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl font-serif text-brandGold mb-2">
-              Vous Pourriez Aussi Aimer
-            </h2>
-            <div className="h-px w-32 bg-gradient-to-r from-transparent via-brandGold to-transparent mx-auto mb-12"></div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {similarProducts.slice(0, 4).map((product) => (
-                <ProductCard key={product.id} product={product} locale={locale} />
-              ))}
+            {/* Simple heading */}
+            <div className="text-center mb-8 md:mb-10">
+              <h2 className="text-2xl md:text-3xl font-serif text-brandGold mb-3">
+                Créations Associées
+              </h2>
+              <div className="h-px w-24 md:w-32 bg-gradient-to-r from-transparent via-brandGold/50 to-transparent mx-auto"></div>
             </div>
             
-            <div className="mt-12">
-              <Link href="/collections" className="button-secondary inline-flex items-center px-8 py-3 rounded-full">
-                Voir toutes nos collections
-                <ArrowRight size={18} className="ml-2" />
+            {/* Using exact same structure as homepage featured products */}
+            <div>
+              <div 
+                className="flex overflow-x-auto custom-scrollbar snap-x scroll-smooth gap-4 md:gap-6 lg:gap-8 pb-6 md:pb-8"
+              >
+                {similarProducts.slice(0, 4).map((product) => (
+                  <div 
+                    key={product.id} 
+                    className="product-item flex-none w-64 sm:w-72 md:w-80 snap-start"
+                  >
+                    <ProductCard 
+                      product={product} 
+                      locale={locale} 
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Simple button */}
+            <div className="text-center mt-6">
+              <Link href="/collections">
+                <button className="px-6 py-2.5 border border-brandGold text-brandGold hover:bg-brandGold hover:text-richEbony transition-all duration-300 rounded-sm text-sm">
+                  Explorer toutes nos collections
+                </button>
               </Link>
             </div>
           </div>
-        </motion.section>
+        </section>
       )}
 
       {/* Certificate Modal */}
@@ -1008,3 +1115,77 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
     }
   };
+
+{/* Add scrollbar hiding styles at the bottom of the page */}
+<style jsx global>{`
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .shadow-up-xl {
+    box-shadow: 0 -4px 25px -5px rgba(0, 0, 0, 0.1), 0 -10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+  
+  /* Elegant tap highlight for mobile */
+  @media (max-width: 768px) {
+    button, a {
+      -webkit-tap-highlight-color: transparent;
+    }
+  }
+  
+  /* Smooth focus transitions */
+  button:focus, a:focus {
+    outline: none;
+    transition: all 0.3s ease;
+  }
+  
+  /* Enhanced loading transitions */
+  img {
+    transition: opacity 0.3s ease;
+  }
+
+  /* Custom scrollbar styling */
+  .custom-scrollbar::-webkit-scrollbar {
+    height: 4px;
+    width: 4px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(209, 213, 219, 0.1);
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(169, 138, 95, 0.5);
+    border-radius: 2px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(169, 138, 95, 0.8);
+  }
+  
+  /* For Firefox */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(169, 138, 95, 0.5) rgba(209, 213, 219, 0.1);
+  }
+  
+  /* Subtle product hover effect */
+  .product-item {
+    transition: transform 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .product-item:hover {
+    transform: translateY(-3px);
+  }
+  
+  /* Snap alignment */
+  .snap-start {
+    scroll-snap-align: start;
+  }
+`}</style>

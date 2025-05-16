@@ -20,7 +20,11 @@ import {
   PhoneCall,
   Diamond,
   Clock,
-  ChevronDown
+  ChevronDown,
+  Instagram,
+  Facebook,
+  Twitter,
+  Phone
 } from "lucide-react";
 import { useRouter } from "next/router";
 
@@ -252,9 +256,9 @@ export default function Header() {
                     <button
                       onClick={() => setNavOpen(true)}
                       title="Ouvrir le menu"
-                      className="text-brandGold hover:scale-110 transition-transform duration-300"
+                      className="text-brandGold hover:scale-110 transition-transform duration-300 p-1.5 -ml-1"
                     >
-                      <Menu size={24} />
+                      <Menu size={22} strokeWidth={1.75} />
                     </button>
                   </div>
                 </>
@@ -265,9 +269,9 @@ export default function Header() {
                     <button
                       onClick={() => setNavOpen(true)}
                       title="Ouvrir le menu"
-                      className="text-brandGold hover:scale-110 transition-transform duration-300"
+                      className="text-brandGold hover:scale-110 transition-transform duration-300 p-1.5 -ml-1"
                     >
-                      <Menu size={24} />
+                      <Menu size={22} strokeWidth={1.75} />
                     </button>
                   </div>
                   {/* This div ensures proper spacing in the grid layout when not showing navigation */}
@@ -287,8 +291,8 @@ export default function Header() {
                 <Image
                   src="/images/1/diamant-rouge-logo.svg"
                   alt="Diamant Rouge - Joaillerie de Luxe"
-                  width={scrolled ? 180 : 240}
-                  height={scrolled ? 45 : 60}
+                  width={scrolled ? 180 : 200}
+                  height={scrolled ? 45 : 50}
                   className="object-contain transition-all duration-500"
                   priority
                 />
@@ -297,7 +301,7 @@ export default function Header() {
             </div>
 
             {/* Right side: Navigation when scrolled and icons */}
-            <div className="flex items-center justify-end gap-3">
+            <div className="flex items-center justify-end gap-3 md:gap-6">
               {/* When scrolled, show the right navigation */}
               {scrolled ? (
                 <div className="hidden md:flex items-center justify-end mr-5">
@@ -333,7 +337,7 @@ export default function Header() {
               <div className="flex items-center gap-6">
                 <button
                   onClick={() => setSearchOpen(true)}
-                  className="text-brandGold hover:scale-110 transition-transform duration-300"
+                  className="text-brandGold hover:scale-110 transition-transform duration-300 hidden md:block"
                   title="Rechercher"
                 >
                   <Search size={scrolled ? 18 : 20} strokeWidth={1.5} />
@@ -536,22 +540,23 @@ export default function Header() {
             animate={{ opacity: 1, backdropFilter: "blur(5px)" }}
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
-            className="fixed inset-0 bg-richEbony/80 z-50 flex items-start justify-center pt-28"
+            className="fixed inset-0 bg-richEbony/80 z-50 flex items-start justify-center pt-28 md:pt-28 px-4 md:px-0"
           >
             <motion.div
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}
               transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
-              className="w-full max-w-2xl px-6"
+              className="w-full max-w-2xl"
             >
-              <div className="flex justify-between items-center mb-10">
-                <h2 className="text-brandGold font-serif text-3xl">Recherche</h2>
+              <div className="flex justify-between items-center mb-6 md:mb-10">
+                <h2 className="text-brandGold font-serif text-2xl md:text-3xl">Recherche</h2>
                 <button
                   onClick={() => setSearchOpen(false)}
-                  className="text-brandIvory hover:text-brandGold transition-colors duration-300"
+                  className="text-brandIvory hover:text-brandGold transition-colors duration-300 p-1"
+                  aria-label="Fermer la recherche"
                 >
-                  <X size={28} />
+                  <X size={24} />
                 </button>
               </div>
 
@@ -562,29 +567,30 @@ export default function Header() {
                   placeholder="Rechercher des créations, des collections..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-transparent border-none text-brandIvory text-xl py-3 px-2 pr-12 outline-none focus:ring-0 placeholder-brandIvory/50"
+                  className="w-full bg-transparent border-none text-brandIvory text-lg md:text-xl py-3 px-2 pr-12 outline-none focus:ring-0 placeholder-brandIvory/50"
                   autoFocus
                 />
                 <button
                   type="submit"
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-brandGold hover:scale-110 transition-transform duration-300"
+                  aria-label="Rechercher"
                 >
-                  <Search size={24} />
+                  <Search size={22} />
                 </button>
                 <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-brandGold/40 to-transparent mt-4"></div>
               </form>
 
-              <div className="mt-14">
-                <h3 className="text-brandIvory/70 text-sm uppercase tracking-widest mb-6 text-center">Explorez nos collections</h3>
+              <div className="mt-10 md:mt-14">
+                <h3 className="text-brandIvory/70 text-xs md:text-sm uppercase tracking-widest mb-6 text-center">Explorez nos collections</h3>
 
-<div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
   <CategoryLink href="/collections?category=bagues" label="Bagues" count={22} onClick={() => setSearchOpen(false)} locale={router.locale} />
   <CategoryLink href="/collections?category=colliers" label="Colliers" count={18} onClick={() => setSearchOpen(false)} locale={router.locale} />
   <CategoryLink href="/collections?category=bracelets" label="Bracelets" count={14} onClick={() => setSearchOpen(false)} locale={router.locale} />
   <CategoryLink href="/collections?category=boucles" label="Boucles d'oreilles" count={16} onClick={() => setSearchOpen(false)} locale={router.locale} />
 </div>
 
-                <div className="text-center mt-10">
+                <div className="text-center mt-8 md:mt-10">
                   <Link
                     href="/collections"
                     onClick={() => setSearchOpen(false)}
@@ -617,28 +623,51 @@ export default function Header() {
               transition={{ type: 'tween', ease: 'easeInOut', duration: 0.4 }}
               className="bg-brandIvory w-4/5 max-w-xs h-full ml-auto flex flex-col"
             >
-              <div className="p-6 border-b border-brandGold/10">
-                <div className="flex justify-between items-center">
+              <div className="p-4 md:p-6 border-b border-brandGold/10 flex justify-between items-center">
                   <Link href="/" onClick={() => setNavOpen(false)}>
                     <Image
                       src="/images/1/diamant-rouge-logo-full.svg"
                       alt="Diamant Rouge"
-                      width={140}
-                      height={36}
+                    width={130}
+                    height={32}
                       className="object-contain"
                     />
                   </Link>
                   <button
                     onClick={() => setNavOpen(false)}
-                    className="text-richEbony hover:text-brandGold transition-colors duration-300"
+                  className="text-richEbony hover:text-brandGold transition-colors duration-300 p-1.5 rounded-full hover:bg-brandGold/5"
+                  aria-label="Close menu"
                   >
-                    <X size={24} />
+                  <X size={22} />
                   </button>
-                </div>
               </div>
 
               <div className="flex-grow overflow-y-auto py-6 px-6">
-                <nav className="space-y-5">
+                {/* Elegant gold accent line */}
+                <div className="flex justify-center mb-6">
+                  <div className="relative">
+                    <div className="h-[1px] w-32 bg-gradient-to-r from-transparent via-brandGold to-transparent"></div>
+                    <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                      <Diamond size={6} className="text-brandGold fill-brandGold" />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Search bar in mobile menu */}
+                <div className="mb-6">
+                  <div 
+                    className="flex items-center p-3 bg-richEbony/5 rounded-md border border-brandGold/10 text-richEbony/80"
+                    onClick={() => {
+                      setNavOpen(false);
+                      setTimeout(() => setSearchOpen(true), 300);
+                    }}
+                  >
+                    <Search size={18} className="text-brandGold mr-3" />
+                    <span className="text-sm">Rechercher nos créations</span>
+                  </div>
+                </div>
+                
+                <nav className="space-y-1 mb-8">
                   <MobileLink href="/" locale={router.locale} onClick={() => setNavOpen(false)}>Accueil</MobileLink>
                   <MobileLink href="/collections" locale={router.locale} onClick={() => setNavOpen(false)}>Collections</MobileLink>
                   <MobileLink href="/jewelry" locale={router.locale} onClick={() => setNavOpen(false)}>Joaillerie</MobileLink>
@@ -649,7 +678,7 @@ export default function Header() {
 
                 <div className="h-px w-full bg-gradient-to-r from-transparent via-brandGold/30 to-transparent my-6"></div>
 
-                <div className="space-y-3">
+                <div className="space-y-1">
                   {session ? (
                     <>
                       <MobileLink href="/profile" locale={router.locale} onClick={() => setNavOpen(false)}>Mon Compte</MobileLink>
@@ -660,7 +689,7 @@ export default function Header() {
                           signOut();
                           setNavOpen(false);
                         }}
-                        className="w-full flex items-center justify-between text-left py-2 text-burgundy hover:text-brandGold transition-colors duration-200"
+                        className="w-full flex items-center justify-between text-left py-3 px-1 text-burgundy hover:text-brandGold transition-colors duration-200 border-b border-brandGold/10"
                       >
                         <span className="font-medium">Se déconnecter</span>
                         <LogOut size={18} />
@@ -670,9 +699,36 @@ export default function Header() {
                     <MobileLink href="/auth" locale={router.locale} onClick={() => setNavOpen(false)}>Connexion / Inscription</MobileLink>
                   )}
                 </div>
+                
+                {/* Contact info in mobile menu */}
+                <div className="mt-8 pt-6 border-t border-brandGold/10">
+                  <h5 className="text-sm text-brandGold mb-4 font-medium">Contactez-nous</h5>
+                  <div className="space-y-3">
+                    <a href="tel:+212555000111" className="flex items-center gap-2 text-sm text-platinumGray hover:text-brandGold transition-colors duration-200">
+                      <Phone size={14} className="text-brandGold" />
+                      <span>+212 555 000 111</span>
+                    </a>
+                    <div className="flex items-center gap-2 text-sm text-platinumGray">
+                      <Clock size={14} className="text-brandGold" />
+                      <span>Lun-Sam: 9h-19h</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="p-6 border-t border-brandGol" />
+              <div className="p-4 border-t border-brandGold/10 flex justify-center">
+                <div className="flex space-x-5">
+                  <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-platinumGray hover:text-brandGold transition-colors p-2" aria-label="Instagram">
+                    <Instagram size={18} />
+                  </a>
+                  <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-platinumGray hover:text-brandGold transition-colors p-2" aria-label="Facebook">
+                    <Facebook size={18} />
+                  </a>
+                  <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-platinumGray hover:text-brandGold transition-colors p-2" aria-label="Twitter">
+                    <Twitter size={18} />
+                  </a>
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         )}
@@ -697,10 +753,10 @@ function CategoryLink({ href, label, count, onClick, locale }: CategoryLinkProps
       href={href}
       onClick={onClick}
       locale={locale}
-      className="group flex flex-col items-center"
+      className="group flex flex-col items-center p-2"
     >
       <span className="text-brandGold text-xs mb-1">{count}</span>
-      <span className="text-brandIvory group-hover:text-brandGold transition-colors duration-300 mb-1">
+      <span className="text-brandIvory group-hover:text-brandGold transition-colors duration-300 mb-1 text-sm md:text-base">
         {label}
       </span>
       <span className="block h-[1px] w-0 bg-brandGold transition-all duration-300 group-hover:w-12"></span>
@@ -722,7 +778,7 @@ function MobileLink({ href, children, onClick, locale }: MobileLinkProps) {
       href={href}
       locale={locale}
       onClick={onClick}
-      className="block py-2 font-medium hover:text-brandGold transition-colors duration-200"
+      className="mobile-nav-link"
     >
       {children}
     </Link>

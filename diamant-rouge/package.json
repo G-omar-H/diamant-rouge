@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "npx ts-node --transpile-only prisma/seed.ts",
-    "postbuild": "next-sitemap"
+    "postbuild": "next-sitemap",
+    "dev_mobile": "next dev -H 0.0.0.0 -p 3000"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

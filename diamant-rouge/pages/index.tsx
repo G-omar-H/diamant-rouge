@@ -11,6 +11,28 @@ import { jwtVerify } from "jose";
 import HeroCarousel from "../components/HeroCarousel";
 import ProductCard from "../components/ProductCard";
 
+// Types for categories and translations for improved type safety
+interface CategoryTranslation {
+    id: number;
+    language: string;
+    name: string;
+    categoryId: number;
+}
+
+interface Category {
+    id: number;
+    translations: CategoryTranslation[];
+}
+
+// Define a type for the slide that matches the HeroCarousel component's Slide interface
+interface Slide {
+    imageSrc: string;
+    heading: string;
+    subheading: string;
+    actionLink?: string;
+    actionText?: string;
+    position?: "left" | "right" | "center";
+}
 
 /* ----------------------------------------------------------
    1. Server-Side Data Fetching
@@ -98,7 +120,7 @@ export async function getServerSideProps(context: any) {
 /* ----------------------------------------------------------
    2. Hero Carousel Slides
    ---------------------------------------------------------- */
-const slides = [
+const slides: Slide[] = [
     {
         imageSrc: "/images/amantys_showroom_vitrine_exterieur_bordeaux_3.jpg",
         heading: "Diamant Rouge",
@@ -128,7 +150,7 @@ const slides = [
         heading: "Créations Sur-Mesure",
         subheading: "Des pièces uniques pour des moments inoubliables",
         actionLink: "/appointments",
-        actionText: "Prendre Rendez"
+        actionText: "Prendre Rendez-vous"
     }
 ];
 
@@ -139,7 +161,7 @@ export default function HomePage({
     locale,
 }: {
     products: any[];
-    categories: any[];
+    categories: Category[];
     wishlist: number[];
     locale: string;
 }) {
@@ -157,8 +179,8 @@ export default function HomePage({
         if (categories && categories.length) {
             categories.forEach(category => {
                 // Prioritize French translation, fall back to any available translation
-                const translation = category.translations.find(t => t.language === "fr") || 
-                                   category.translations.find(t => t.language === currentLocale) ||
+                const translation = category.translations.find((t: CategoryTranslation) => t.language === "fr") || 
+                                   category.translations.find((t: CategoryTranslation) => t.language === currentLocale) ||
                                    category.translations[0];
                                    
                 if (translation) {
@@ -179,8 +201,8 @@ export default function HomePage({
             if (!product.category) return false;
             
             // Prioritize French translation
-            const categoryTranslation = product.category.translations.find(t => t.language === "fr") || 
-                                       product.category.translations.find(t => t.language === currentLocale) ||
+            const categoryTranslation = product.category.translations.find((t: CategoryTranslation) => t.language === "fr") || 
+                                       product.category.translations.find((t: CategoryTranslation) => t.language === currentLocale) ||
                                        product.category.translations[0];
             
             return categoryTranslation.name === activeFilter;
@@ -251,57 +273,78 @@ export default function HomePage({
             ----------------------------------------------------
             */}
             <motion.section
-                className="py-20 bg-white w-full overflow-hidden"
+                className="py-14 md:py-20 bg-white w-full overflow-hidden"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
             >
                 {/* Section title */}
-                <div className="text-center mb-12 px-4">
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-brandGold mb-4">
+                <div className="text-center mb-10 md:mb-12 px-4">
+                    <h2 className="text-2xl md:text-4xl lg:text-5xl font-serif text-brandGold mb-3 md:mb-4">
                         Collections Prestigieuses
                     </h2>
-                    <div className="h-0.5 w-24 bg-brandGold/40 mx-auto mb-6"></div>
-                    <p className="text-platinumGray max-w-2xl mx-auto">
+                    <div className="h-0.5 w-16 md:w-24 bg-brandGold/40 mx-auto mb-4 md:mb-6"></div>
+                    <p className="text-platinumGray max-w-2xl mx-auto text-sm md:text-base px-2">
                         Des créations d'exception qui révèlent votre élégance naturelle. 
                         Chaque pièce est une déclaration d'art et de raffinement.
                     </p>
                 </div>
 
-                {/* Filter tabs */}
-                <div className="flex justify-center mb-10 overflow-x-auto pb-3 custom-scrollbar px-4">
-                    <div className="flex space-x-1 md:space-x-2">
-                        {productCategories.map((category) => (
-                            <button
-                                key={category}
-                                onClick={() => {
-                                    setActiveFilter(category);
-                                    setInitialLoad(true);
-                                }}
-                                className={`px-6 py-2 text-sm whitespace-nowrap transition-all duration-300 border ${
-                                    activeFilter === category
-                                        ? "border-brandGold bg-brandGold text-richEbony"
-                                        : "border-brandGold/40 text-platinumGray hover:border-brandGold"
-                                }`}
-                            >
-                                {category}
-                            </button>
-                        ))}
+                {/* Filter tabs - Enhanced for mobile with horizontal scroll */}
+                <div className="relative mb-8 md:mb-10 px-4 md:px-6">
+                    <div className="flex justify-center">
+                        <div className="w-full overflow-x-auto scrollbar-hide py-2 md:py-0 -mx-1 px-1">
+                            <div className="flex space-x-2 md:space-x-3 min-w-max mx-auto">
+                                {productCategories.map((category) => (
+                                    <button
+                                        key={category}
+                                        onClick={() => {
+                                            setActiveFilter(category);
+                                            setInitialLoad(true);
+                                        }}
+                                        className={`px-4 py-2 md:px-5 md:py-2.5 text-xs md:text-sm whitespace-nowrap transition-all duration-300 border rounded-full ${
+                                            activeFilter === category
+                                                ? "border-brandGold bg-brandGold text-richEbony shadow-sm"
+                                                : "border-brandGold/40 text-platinumGray hover:border-brandGold hover:bg-brandGold/5"
+                                        }`}
+                                    >
+                                        {category}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                    {/* Mobile indicator for horizontal scrolling */}
+                    <div className="flex justify-center mt-2 md:hidden">
+                        <div className="flex items-center space-x-1">
+                            <div className="w-1 h-1 bg-brandGold/40 rounded-full"></div>
+                            <div className="w-1 h-1 bg-brandGold/40 rounded-full"></div>
+                            <div className="w-1 h-1 bg-brandGold/40 rounded-full"></div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Products carousel */}
-                <div className="relative w-full px-4 md:px-10 lg:px-16">
+                {/* Products carousel with refined mobile experience */}
+                <div className="relative w-full px-3 md:px-10 lg:px-16">
+                    {/* Mobile carousel scrolling instructions (visible only on mobile) */}
+                    <div className="flex items-center justify-center mb-4 md:hidden">
+                        <span className="text-xs text-platinumGray flex items-center">
+                            <span className="inline-block animate-pulse mr-2">←</span>
+                            <span>Glissez pour voir plus</span>
+                            <span className="inline-block animate-pulse ml-2">→</span>
+                        </span>
+                    </div>
+
                     <div 
                         ref={carouselRef}
-                        className="flex overflow-x-auto custom-scrollbar snap-x scroll-smooth gap-6 md:gap-8 pb-8"
+                        className="flex overflow-x-auto custom-scrollbar snap-x scroll-smooth gap-4 md:gap-6 lg:gap-8 pb-6 md:pb-8"
                     >
                         {filteredProducts.length > 0 ? (
                             filteredProducts.map((product) => (
                                 <div 
                                     key={product.id} 
-                                    className="product-item flex-none w-72 md:w-80 snap-start"
+                                    className="product-item flex-none w-64 sm:w-72 md:w-80 snap-start"
                                 >
                                     <ProductCard
                                         product={product}
@@ -311,20 +354,41 @@ export default function HomePage({
                                 </div>
                             ))
                         ) : (
-                            <div className="w-full text-center py-10 text-platinumGray">
+                            <div className="w-full text-center py-8 md:py-10 text-platinumGray">
                                 <p>Aucun produit trouvé dans cette catégorie.</p>
                             </div>
                         )}
                     </div>
+                    </div>
                     
-                    
-                    
+                {/* Position indicators for desktop - hidden on mobile */}
+                <div className="hidden md:flex justify-center mt-8 space-x-6">
+                    <button 
+                        onClick={() => scrollCarousel('left')}
+                        className="text-sm text-platinumGray hover:text-brandGold transition-colors flex items-center gap-2"
+                    >
+                        <span className="w-6 h-[1px] bg-current"></span>
+                        <span>Début</span>
+                    </button>
+                    <button 
+                        onClick={() => scrollCarousel('center')}
+                        className="text-sm text-platinumGray hover:text-brandGold transition-colors flex items-center gap-2"
+                    >
+                        <span>Milieu</span>
+                    </button>
+                    <button 
+                        onClick={() => scrollCarousel('right')}
+                        className="text-sm text-platinumGray hover:text-brandGold transition-colors flex items-center gap-2"
+                    >
+                        <span>Fin</span>
+                        <span className="w-6 h-[1px] bg-current"></span>
+                    </button>
                 </div>
 
                 {/* View all collections button */}
-                <div className="text-center mt-12 px-4">
+                <div className="text-center mt-10 md:mt-12 px-4">
                     <Link href="/collections">
-                        <button className="px-10 py-3 border-2 border-brandGold text-brandGold hover:bg-brandGold hover:text-richEbony transition-all duration-300 tracking-wider">
+                        <button className="px-8 py-2.5 md:py-3 border-2 border-brandGold text-brandGold hover:bg-brandGold hover:text-richEbony transition-all duration-300 tracking-wider text-sm md:text-base rounded-sm md:rounded-none">
                             Découvrir Toutes Nos Collections
                         </button>
                     </Link>
@@ -381,7 +445,7 @@ export default function HomePage({
             ----------------------------------------------------
             */}
             <motion.section
-                className="py-24 relative overflow-hidden"
+                className="py-16 md:py-24 relative overflow-hidden"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
@@ -391,58 +455,67 @@ export default function HomePage({
                 <div className="absolute inset-0 bg-gradient-to-b from-richEbony to-burgundy opacity-95 z-0"></div>
                 <div className="absolute inset-0 bg-[url('/images/subtle-pattern.png')] opacity-10 z-0"></div>
                 
-                <div className="container mx-auto px-6 md:px-10 relative z-10">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-16">
+                <div className="container mx-auto px-4 md:px-10 relative z-10">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-16">
                         {/* Left: Brand story */}
-                        <div className="md:w-1/2">
+                        <div className="md:w-1/2 order-2 md:order-1">
                             <div className="relative">
-                                {/* Decorative frame */}
-                                <div className="absolute -top-8 -left-8 w-24 h-24 border border-brandGold/40"></div>
+                                {/* Decorative frame - visible only on desktop */}
+                                <div className="absolute -top-8 -left-8 w-24 h-24 border border-brandGold/40 hidden md:block"></div>
                                 
-                                <h2 className="text-5xl md:text-6xl font-serif text-brandGold mb-8">La Maison</h2>
+                                {/* Mobile decorative element */}
+                                <div className="flex justify-center mb-4 md:hidden">
+                                    <div className="h-[1px] w-20 bg-gradient-to-r from-transparent via-brandGold/60 to-transparent"></div>
+                                </div>
                                 
-                                <p className="text-xl text-brandIvory/90 mb-8 leading-relaxed">
+                                <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif text-brandGold mb-6 md:mb-8 text-center md:text-left">La Maison</h2>
+                                
+                                <p className="text-lg md:text-xl text-brandIvory/90 mb-6 md:mb-8 leading-relaxed text-center md:text-left">
                                     Fondée sur l'excellence et la passion des métiers d'art, Diamant Rouge perpétue 
                                     depuis des générations une quête de beauté absolue. Notre maison de joaillerie 
                                     marie tradition marocaine et vision contemporaine.
                                 </p>
                                 
-                                <p className="text-lg text-brandIvory/80 mb-10">
+                                <p className="text-base md:text-lg text-brandIvory/80 mb-8 md:mb-10 text-center md:text-left">
                                     Chaque création est le fruit d'un savoir-faire exigeant, où la 
                                     précision du geste et la noblesse des matériaux donnent vie à des pièces uniques.
                                 </p>
                                 
+                                <div className="flex justify-center md:justify-start">
                                 <Link href="/the-house">
-                                    <button className="px-10 py-3 border border-brandGold text-brandGold hover:bg-brandGold hover:text-richEbony transition-colors duration-300">
+                                        <button className="px-8 py-2.5 md:px-10 md:py-3 border border-brandGold text-brandGold hover:bg-brandGold hover:text-richEbony transition-colors duration-300 text-sm md:text-base">
                                         Notre Histoire
                                     </button>
                                 </Link>
+                                </div>
                             </div>
                         </div>
                         
                         {/* Right: Image collage with overlapping effect */}
-                        <div className="md:w-1/2 relative h-[600px]">
-                            <div className="absolute right-0 bottom-0 w-3/4 h-4/5">
+                        <div className="md:w-1/2 relative h-[400px] md:h-[600px] w-full mb-10 md:mb-0 order-1 md:order-2">
+                            {/* Mobile-optimized image layout */}
+                            <div className="absolute right-0 bottom-0 w-[75%] h-[80%]">
                                 <Image 
                                                                     src="/images/home/Aurate_Early_Black_Friday-18kira_long_2_v333_1200x.jpg"
-
                                     alt="Artisan joaillier"
                                     fill
-                                    className="object-cover object-center border-8 border-richEbony"
+                                    sizes="(max-width: 768px) 75vw, 50vw"
+                                    className="object-cover object-center border-4 md:border-8 border-richEbony"
                                 />
                             </div>
-                            <div className="absolute left-0 top-0 w-3/5 h-3/5 shadow-luxury">
+                            <div className="absolute left-0 top-0 w-[60%] h-[60%] shadow-luxury">
                                 <Image 
                                     src="/images/gemologist.jpg"
                                     alt="Boutique Diamant Rouge"
                                     fill
-                                    className="object-cover object-center border-8 border-richEbony"
+                                    sizes="(max-width: 768px) 60vw, 40vw"
+                                    className="object-cover object-center border-4 md:border-8 border-richEbony"
                                 />
                             </div>
                             
-                            {/* Decorative elements */}
-                            <div className="absolute -bottom-4 -left-4 w-20 h-20 border border-brandGold/40"></div>
-                            <div className="absolute -top-4 -right-4 w-16 h-16 border border-brandGold/40"></div>
+                            {/* Decorative elements - simplified for mobile */}
+                            <div className="absolute -bottom-2 -left-2 md:-bottom-4 md:-left-4 w-12 h-12 md:w-20 md:h-20 border border-brandGold/40"></div>
+                            <div className="absolute -top-2 -right-2 md:-top-4 md:-right-4 w-10 h-10 md:w-16 md:h-16 border border-brandGold/40"></div>
                         </div>
                     </div>
                 </div>
@@ -454,60 +527,109 @@ export default function HomePage({
             ----------------------------------------------------
             */}
             <motion.section
-                className="py-20 px-6 md:px-10 lg:px-20 bg-brandIvory"
+                className="py-14 md:py-20 px-4 md:px-10 lg:px-20 bg-brandIvory"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
             >
-                <div className="flex flex-col md:flex-row items-center gap-16">
+                <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16">
                     {/* Left: Image */}
                     <div className="w-full md:w-1/2 relative overflow-hidden">
-                        <div className="pb-[56.25%] relative"> {/* 16:9 aspect ratio */}
+                        <div className="pb-[75%] md:pb-[56.25%] relative"> {/* 4:3 on mobile, 16:9 on desktop */}
                             <Image
                                 src="/images/showroom.jpg"
                                 alt="Atelier Diamant Rouge"
                                 fill
-                                className="object-cover absolute inset-0 hover-scale"
+                                sizes="(max-width: 768px) 100vw, 50vw"
+                                className="object-cover absolute inset-0 hover-scale rounded-md md:rounded-none"
                             />
+                            
+                            {/* Architectural quote structure overlay */}
+                            <div className="absolute inset-0 pointer-events-none">
+                                {/* Bottom right architectural frame - desktop only */}
+                                <div className="hidden md:block absolute bottom-0 right-0 w-[40%] h-[40%]">
+                                    {/* Thin gold lines creating an open corner frame */}
+                                    <div className="absolute bottom-0 right-0 w-full h-[1px] bg-gradient-to-l from-brandGold to-transparent"></div>
+                                    <div className="absolute bottom-0 right-0 w-[1px] h-full bg-gradient-to-t from-brandGold to-transparent"></div>
+                                    
+                                    {/* Small decorative corner element */}
+                                    <div className="absolute bottom-0 right-0 w-8 h-8">
+                                        <div className="absolute bottom-0 right-0 w-full h-[2px] bg-brandGold"></div>
+                                        <div className="absolute bottom-0 right-0 w-[2px] h-full bg-brandGold"></div>
                         </div>
                         
-                        {/* Floating quote */}
-                        <div className="absolute -bottom-6 -right-6 md:bottom-6 md:right-6 bg-brandGold/90 p-6 max-w-xs shadow-luxury">
-                            <p className="text-richEbony italic font-serif">
+                                    {/* Quote text with asymmetrical placement - desktop */}
+                                    <div className="absolute bottom-8 right-8 max-w-[95%] transform -translate-y-2 translate-x-[-15%]">
+                                        <div className="relative">
+                                            {/* Minimal text container */}
+                                            <div className="bg-richEbony/70 backdrop-blur-[1px] p-4 border-l border-t border-brandGold/60">
+                                                <p className="text-brandGold italic font-serif text-sm leading-relaxed">
                                 "L'art de la joaillerie réside dans la capacité à transformer 
                                 un rêve en une œuvre éternelle"
                             </p>
-                            <p className="text-right mt-2 text-richEbony/80 font-medium">- Myara</p>
+                                                
+                                                {/* Subtle signature */}
+                                                <div className="mt-2 flex items-center justify-end">
+                                                    <div className="h-px w-5 bg-brandGold/50 mr-2"></div>
+                                                    <p className="text-brandGold/90 font-serif text-sm">- Myara</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {/* Mobile-optimized quote - minimalist design that preserves image visibility */}
+                                <div className="md:hidden absolute bottom-0 left-0 right-0">
+                                    {/* Elegant minimalist banner at bottom */}
+                                    <div className="relative">
+                                        {/* Semi-transparent bottom gradient overlay */}
+                                        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-richEbony/80 to-transparent pointer-events-none"></div>
+                                        
+                                        {/* Small quote indicator */}
+                                        <div className="absolute bottom-10 left-4 w-1 h-8 bg-brandGold/70"></div>
+                                        
+                                        {/* Simple bottom-aligned quote */}
+                                        <div className="absolute bottom-3 left-8 right-4">
+                                            <p className="text-brandGold/90 italic font-serif text-2xs leading-tight">
+                                                "L'art de la joaillerie réside dans la capacité à transformer un rêve en une œuvre éternelle" <span className="text-brandGold/80 ml-1 font-serif">- Myara</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
                     {/* Right: Text content */}
                     <div className="w-full md:w-1/2">
-                        <h2 className="text-4xl md:text-5xl font-serif text-brandGold mb-6">
+                        {/* Mobile centered title */}
+                        <div className="text-center md:text-left">
+                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-brandGold mb-4 md:mb-6">
                             Créations Sur-Mesure
                         </h2>
-                        <div className="h-0.5 w-16 bg-brandGold mb-8"></div>
+                            <div className="h-0.5 w-16 bg-brandGold mx-auto md:mx-0 mb-6 md:mb-8"></div>
+                        </div>
                         
-                        <p className="text-lg text-platinumGray mb-6">
+                        <p className="text-base md:text-lg text-platinumGray mb-5 md:mb-6 text-center md:text-left">
                             Au cœur de notre atelier, nos maîtres joailliers donnent vie à vos 
                             désirs les plus précieux. Une bague de fiançailles unique, 
                             un bijou commémoratif ou une pièce d'exception — nous créons l'extraordinaire.
                         </p>
                         
-                        <p className="text-lg text-platinumGray mb-10">
+                        <p className="text-base md:text-lg text-platinumGray mb-8 md:mb-10 text-center md:text-left">
                             Chaque création sur-mesure est une invitation à participer au processus créatif, 
                             depuis l'esquisse jusqu'à l'écrin final.
                         </p>
                         
+                        <div className="flex justify-center md:justify-start">
                         <Link href="/appointments">
-                            <button className="button-primary">Prendre Rendez-vous</button>
+                                <button className="button-primary text-sm md:text-base px-8 py-2.5 md:py-3">Prendre Rendez-vous</button>
                         </Link>
+                        </div>
                     </div>
                 </div>
             </motion.section>
-
- 
 
             {/* 
 ----------------------------------------------------
@@ -517,12 +639,49 @@ export default function HomePage({
 <section className="relative">
   <div className="lg:flex">
     {/* Sticky heading column - narrower width */}
-    <div className="lg:w-2/5 lg:sticky lg:top-[90px] lg:h-[calc(100vh-90px)] bg-richEbony relative aspect-square">
+    <div className="lg:w-2/5 lg:sticky lg:top-[var(--header-height-scrolled)] lg:h-[calc(100vh-var(--header-height-scrolled))] bg-richEbony relative">
+      <div className="block lg:hidden">
+        {/* Mobile: Beautiful full-width header */}
+        <div className="relative h-[50vh] w-full overflow-hidden">
+          <Image
+            src="/images/home/Holiday-03crop_1_1200x.jpg"
+            alt="Nos valeurs"
+            fill
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+          <div className="absolute inset-0 flex items-center justify-center">
+            {/* Geometric art with proportional spacing - matching desktop */}
+            <div className="absolute inset-[10%] flex items-center justify-center">
+              {/* Rectangle with fine lines */}
+              <div className="absolute inset-0">
+                <div className="absolute top-0 left-0 right-0 h-[1px] md:h-[2px] bg-white/50"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-[1px] md:h-[2px] bg-white/50"></div>
+                <div className="absolute left-0 top-0 bottom-0 w-[1px] md:w-[2px] bg-white/50"></div>
+                <div className="absolute right-0 top-0 bottom-0 w-[1px] md:w-[2px] bg-white/50"></div>
+                
+                {/* Ellipse touching the midpoints */}
+                <div className="absolute inset-0 rounded-full border-[1px] md:border-[2px] border-white/40"></div>
+              </div>
+              
+              {/* Heading text - matched with desktop */}
+              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-thin text-white tracking-wide text-center relative z-10 px-4 max-w-[90%]">
+                Joaillerie d'exception <br/>digne de celles <br/>et ceux qui la portent
+              </h2>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Desktop: Full-height sticky header */}
+      <div className="hidden lg:block h-full w-full relative">
       <Image
         src="/images/home/Holiday-03crop_1_1200x.jpg"
         alt="Nos valeurs"
         fill
+          sizes="40vw"
         className="object-cover"
+          style={{ objectPosition: "center center" }}
       />
       <div className="absolute inset-0">
         {/* Geometric art with proportional spacing from image borders */}
@@ -539,27 +698,156 @@ export default function HomePage({
           </div>
           
           {/* Heading text */}
-          <h2 className="text-xl md:text-2xl lg:text-3xl font-thin text-white tracking-wide text-center relative z-10 px-4 max-w-[90%]">
+            <h2 className="text-2xl lg:text-3xl font-thin text-white tracking-wide text-center relative z-10 px-4 max-w-[90%]">
             Joaillerie d'exception <br/>digne de celles <br/>et ceux qui la portent
           </h2>
+          </div>
         </div>
       </div>
     </div>
 
     {/* Scrollable content column - wider width */}
     <div className="lg:w-3/5 bg-brandIvory text-richEbony">
+      {/* Mobile sliding cards approach */}
+      <div className="block lg:hidden">
+        <div className="bg-brandIvory pt-4 pb-12">
+          {/* Value cards - elegant sliding cards */}
+          <div className="px-4 py-6">
+            <div className="overflow-x-auto pb-4 flex snap-x snap-mandatory gap-4 scrollbar-hide">
+              {/* Value card 1 */}
+              <div className="flex-none w-[85%] snap-center bg-white rounded-sm shadow-mobile-subtle overflow-hidden border border-brandGold/10 transform transition-all duration-300 hover:shadow-luxury">
+                <div className="relative w-full aspect-[5/3]">
+                  <Image
+                    src="/images/home/Aurate_Early_Black_Friday-15kira_3_v3_1200x.jpg"
+                    alt="Qualité Exceptionnelle"
+                    fill
+                    sizes="85vw"
+                    className="object-cover object-center"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/5 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 right-0 text-center px-3 pb-1">
+                    <h3 className="text-xl font-serif text-brandGold inline-block">
+                      <span className="relative">
+                        Qualité Exceptionnelle
+                        <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-brandGold/50 to-transparent"></span>
+                      </span>
+                    </h3>
+                  </div>
+                </div>
+                <div className="p-5">
+                  <p className="text-sm text-platinumGray leading-relaxed">
+                    L'or est notre passion, et nous mettons un point d'honneur à rester fidèles à nos racines. Notre or est durable, coulé, poli et perfectionné par des artisans de génération en génération.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Value card 2 */}
+              <div className="flex-none w-[85%] snap-center bg-white rounded-sm shadow-mobile-subtle overflow-hidden border border-brandGold/10 transform transition-all duration-300 hover:shadow-luxury">
+                <div className="relative w-full aspect-[5/3]">
+                  <Image
+                    src="/images/home/AurateWinter-29_1_v2_1200x.jpg"
+                    alt="Prix Juste"
+                    fill
+                    sizes="85vw"
+                    className="object-cover object-center"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/5 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 right-0 text-center px-3 pb-1">
+                    <h3 className="text-xl font-serif text-brandGold inline-block">
+                      <span className="relative">
+                        Prix Juste
+                        <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-brandGold/50 to-transparent"></span>
+                      </span>
+                    </h3>
+                  </div>
+                </div>
+                <div className="p-5">
+                  <p className="text-sm text-platinumGray leading-relaxed">
+                    Nous aimons l'or, mais pas les prix excessifs. Notre production locale, le recyclage des excédents et la fabrication sur commande vous garantissent le luxe sans la majoration.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Value card 3 */}
+              <div className="flex-none w-[85%] snap-center bg-white rounded-sm shadow-mobile-subtle overflow-hidden border border-brandGold/10 transform transition-all duration-300 hover:shadow-luxury">
+                <div className="relative w-full aspect-[5/3]">
+                  <Image
+                    src="/images/home/Aurate_Early_Black_Friday-18kira_long_2_v333_1200x.jpg"
+                    alt="Éthique Irréprochable"
+                    fill
+                    sizes="85vw"
+                    className="object-cover object-center"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/5 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 right-0 text-center px-3 pb-1">
+                    <h3 className="text-xl font-serif text-brandGold inline-block">
+                      <span className="relative">
+                        Éthique Irréprochable
+                        <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-brandGold/50 to-transparent"></span>
+                      </span>
+                    </h3>
+                  </div>
+                </div>
+                <div className="p-5">
+                  <p className="text-sm text-platinumGray leading-relaxed">
+                    L'approvisionnement éthique et la fabrication durable sont notre méthode. Tout ce que vous voyez est fabriqué à partir d'or recyclé et nos diamants sont soigneusement sélectionnés pour être sans conflit.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Value card 4 */}
+              <div className="flex-none w-[85%] snap-center bg-white rounded-sm shadow-mobile-subtle overflow-hidden border border-brandGold/10 transform transition-all duration-300 hover:shadow-luxury">
+                <div className="relative w-full aspect-[5/3]">
+                  <Image
+                    src="/images/home/Aurate_Early_Black_Friday-16_2_v3_1200x.jpg"
+                    alt="Durabilité Inégalée"
+                    fill
+                    sizes="85vw"
+                    className="object-cover object-center"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/5 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 right-0 text-center px-3 pb-1">
+                    <h3 className="text-xl font-serif text-brandGold inline-block">
+                      <span className="relative">
+                        Durabilité Inégalée
+                        <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-brandGold/50 to-transparent"></span>
+                      </span>
+                    </h3>
+                  </div>
+                </div>
+                <div className="p-5">
+                  <p className="text-sm text-platinumGray leading-relaxed">
+                    Des bijoux authentiques pour une vie authentique. Toutes nos créations sont conçues pour résister et briller au fil du temps. Et nous tenons parole : elles sont garanties à vie.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Scroll indicator */}
+          <div className="flex justify-center items-center mt-2">
+            <div className="h-[1px] w-16 bg-gradient-to-r from-transparent via-brandGold/40 to-transparent"></div>
+            <span className="mx-3 text-xs text-platinumGray">Glissez pour découvrir nos valeurs</span>
+            <div className="h-[1px] w-16 bg-gradient-to-r from-transparent via-brandGold/40 to-transparent"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop version - original */}
+      <div className="hidden lg:block">
       {/* Value prop 1 */}
-      <div className="md:flex flex-col items-center">
+        <div className="flex flex-col items-center">
         <div className="relative w-full aspect-[16/6]">
           <Image
             src="/images/home/Aurate_Early_Black_Friday-15kira_3_v3_1200x.jpg"
             alt="Qualité Exceptionnelle"
             fill
+              sizes="60vw"
             className="object-cover object-center"
           />
         </div>
-        <div className="py-16 px-10 sm:max-w-4xl md:text-center lg:flex flex-col justify-center">
-          <h3 className="text-3xl md:text-4xl font-serif text-brandGold">Qualité Exceptionnelle</h3>
+          <div className="py-16 px-10 sm:max-w-4xl text-center flex flex-col justify-center">
+            <h3 className="text-3xl lg:text-4xl font-serif text-brandGold">Qualité Exceptionnelle</h3>
           <p className="mt-6 text-lg text-platinumGray">
             L'or est notre passion, et nous mettons un point d'honneur à rester fidèles à nos racines. Notre or est durable, coulé, poli et perfectionné par des artisans de génération en génération. Chaque création passe par un processus rigoureux de tests en 5 étapes pour que vous puissiez briller de mille feux et porter nos pièces en toute sérénité.
           </p>
@@ -567,17 +855,18 @@ export default function HomePage({
       </div>
 
       {/* Value prop 2 */}
-      <div className="md:flex flex-col items-center">
+        <div className="flex flex-col items-center">
         <div className="relative w-full aspect-[16/6]">
           <Image
             src="/images/home/AurateWinter-29_1_v2_1200x.jpg"
             alt="Prix Juste"
             fill
+              sizes="60vw"
             className="object-cover object-center"
           />
         </div>
-        <div className="py-16 px-10 sm:max-w-4xl md:text-center lg:flex flex-col justify-center">
-          <h3 className="text-3xl md:text-4xl font-serif text-brandGold">Prix Juste</h3>
+          <div className="py-16 px-10 sm:max-w-4xl text-center flex flex-col justify-center">
+            <h3 className="text-3xl lg:text-4xl font-serif text-brandGold">Prix Juste</h3>
           <p className="mt-6 text-lg text-platinumGray">
             Nous aimons l'or, mais pas les prix excessifs. Notre production locale (sans taxes d'importation), le recyclage des excédents et la fabrication sur commande vous garantissent le luxe sans la majoration. Nous travaillons aussi dur que vous pour que votre investissement dure aussi longtemps que notre or.
           </p>
@@ -585,17 +874,18 @@ export default function HomePage({
       </div>
 
       {/* Value prop 3 */}
-      <div className="md:flex flex-col items-center">
+        <div className="flex flex-col items-center">
         <div className="relative w-full aspect-[16/6]">
           <Image
             src="/images/home/Aurate_Early_Black_Friday-18kira_long_2_v333_1200x.jpg"
             alt="Éthique Irréprochable"
             fill
+              sizes="60vw"
             className="object-cover object-center"
           />
         </div>
-        <div className="py-16 px-10 sm:max-w-4xl md:text-center lg:flex flex-col justify-center">
-          <h3 className="text-3xl md:text-4xl font-serif text-brandGold">Éthique Irréprochable</h3>
+          <div className="py-16 px-10 sm:max-w-4xl text-center flex flex-col justify-center">
+            <h3 className="text-3xl lg:text-4xl font-serif text-brandGold">Éthique Irréprochable</h3>
           <p className="mt-6 text-lg text-platinumGray">
             L'approvisionnement éthique et la fabrication durable ne sont pas seulement notre devise, c'est notre méthode. Tout ce que vous voyez est fabriqué à partir d'or recyclé. Nos diamants sans conflit sont soigneusement sélectionnés pour maintenir la qualité et adhérer au Processus de Kimberley. Et nous parcourons le globe pour trouver nos perles et pierres précieuses auprès d'établissements familiaux qui soutiennent les communautés locales.
           </p>
@@ -603,20 +893,22 @@ export default function HomePage({
       </div>
 
       {/* Value prop 4 */}
-      <div className="md:flex flex-col items-center">
+        <div className="flex flex-col items-center">
         <div className="relative w-full aspect-[16/6]">
           <Image
             src="/images/home/Aurate_Early_Black_Friday-16_2_v3_1200x.jpg"
             alt="Durabilité Inégalée"
             fill
+              sizes="60vw"
             className="object-cover object-center"
           />
         </div>
-        <div className="py-16 px-10 sm:max-w-4xl md:text-center lg:flex flex-col justify-center">
-          <h3 className="text-3xl md:text-4xl font-serif text-brandGold">Durabilité Inégalée</h3>
+          <div className="py-16 px-10 sm:max-w-4xl text-center flex flex-col justify-center">
+            <h3 className="text-3xl lg:text-4xl font-serif text-brandGold">Durabilité Inégalée</h3>
           <p className="mt-6 text-lg text-platinumGray">
             Des bijoux authentiques pour une vie authentique. Toutes nos créations sont conçues pour résister et briller quels que soient les aléas de la vie. Et nous tenons parole : elles sont garanties à vie. Faites pour durer, pour raconter une histoire, pour conserver un souvenir. Pour que vous puissiez les transmettre à vos enfants. Et à leurs enfants. Et peut-être aux leurs, s'ils ont de la chance.
           </p>
+          </div>
         </div>
       </div>
     </div>
@@ -629,7 +921,7 @@ export default function HomePage({
             ----------------------------------------------------
             */}
             <motion.section
-                className="relative py-28 overflow-hidden"
+                className="relative py-16 md:py-28 overflow-hidden"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ duration: 0.8 }}
@@ -641,42 +933,46 @@ export default function HomePage({
                         src="/images/rings/08a58c59664d--Aurate-Holiday-36kira-1v2.jpg"
                         alt="Événement Diamant Rouge"
                         fill
+                        sizes="100vw"
                         className="object-cover object-center"
                     />
-                    {/* Elegant overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-richEbony/90 via-richEbony/50 to-richEbony/90" />
+                    {/* Elegant overlay - slightly darker on mobile for better readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-richEbony/90 via-richEbony/70 to-richEbony/90 md:from-richEbony/90 md:via-richEbony/50 md:to-richEbony/90" />
                 </div>
 
                 {/* Content */}
-                <div className="container mx-auto px-6 md:px-10 relative z-10">
-                    <div className="max-w-lg ml-auto">
-                        <h3 className="text-4xl md:text-5xl font-serif text-brandGold mb-6">
+                <div className="container mx-auto px-4 md:px-10 relative z-10">
+                    <div className="max-w-lg mx-auto md:ml-auto md:mr-0 text-center md:text-right">
+                        <h3 className="text-3xl md:text-4xl lg:text-5xl font-serif text-brandGold mb-4 md:mb-6">
                             Événements Exclusifs
                         </h3>
                         
-                        <div className="h-0.5 w-16 bg-brandGold mb-8"></div>
+                        {/* Decorative line - centered on mobile, right-aligned on desktop */}
+                        <div className="h-0.5 w-16 bg-brandGold mx-auto md:ml-auto md:mr-0 mb-6 md:mb-8"></div>
                         
-                        <p className="text-xl text-brandIvory/90 mb-8 leading-relaxed">
+                        <p className="text-lg md:text-xl text-brandIvory/90 mb-6 md:mb-8 leading-relaxed">
                             Découvrez en avant-première nos collections lors de nos soirées privées.
                             Une expérience intime où le luxe se révèle dans chaque détail.
                         </p>
                         
-                        <div className="bg-brandGold/10 backdrop-blur-sm border border-brandGold/30 p-6 mb-10">
-                            <h4 className="font-serif text-2xl text-brandGold mb-3">Dynastie Éblouissante</h4>
-                            <p className="text-brandIvory mb-4">
+                        <div className="bg-brandGold/10 backdrop-blur-sm border border-brandGold/30 p-5 md:p-6 mb-8 md:mb-10 rounded-sm md:rounded-none">
+                            <h4 className="font-serif text-xl md:text-2xl text-brandGold mb-3">Dynastie Éblouissante</h4>
+                            <p className="text-brandIvory mb-4 text-sm md:text-base">
                                 Notre nouvelle collection sera dévoilée le 15 décembre
                                 lors d'une soirée exclusive dans notre boutique de Casablanca.
                             </p>
-                            <p className="text-sm text-brandIvory/70">
+                            <p className="text-xs md:text-sm text-brandIvory/70">
                                 Sur invitation uniquement • Places limitées
                             </p>
                         </div>
                         
+                        <div className="flex justify-center md:justify-end">
                         <Link href="/appointments">
-                            <button className="px-10 py-3 bg-brandGold text-richEbony hover:bg-brandIvory transition-colors duration-300 tracking-wider">
+                                <button className="px-8 py-2.5 md:py-3 bg-brandGold text-richEbony hover:bg-brandIvory transition-colors duration-300 tracking-wider text-sm md:text-base">
                                 Demander une Invitation
                             </button>
                         </Link>
+                        </div>
                     </div>
                 </div>
             </motion.section>
@@ -689,6 +985,14 @@ export default function HomePage({
                 .scrollbar-hide {
                     -ms-overflow-style: none;
                     scrollbar-width: none;
+                }
+            `}</style>
+
+            {/* Define the extremely small font size */}
+            <style jsx global>{`
+                .text-2xs {
+                    font-size: 0.625rem;
+                    line-height: 1rem;
                 }
             `}</style>
 

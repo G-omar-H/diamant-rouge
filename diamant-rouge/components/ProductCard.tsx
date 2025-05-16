@@ -76,7 +76,7 @@ export default function ProductCard({ product, locale, isWishlisted = false }: P
 
     return (
         <motion.div
-            className="group relative"
+            className="group relative product-card-mobile"
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
             initial={{ opacity: 0 }}
@@ -84,7 +84,7 @@ export default function ProductCard({ product, locale, isWishlisted = false }: P
             transition={{ duration: 0.5 }}
         >
             {/* Product Image - with refined hover effect */}
-            <div className="relative overflow-hidden mb-6 aspect-[1/1]">
+            <div className="relative overflow-hidden mb-4 md:mb-6 aspect-[1/1] shadow-mobile-subtle rounded-md md:rounded-none">
                 <Link 
                     href={`/products/${product.id}`} 
                     locale={locale}
@@ -115,63 +115,59 @@ export default function ProductCard({ product, locale, isWishlisted = false }: P
                         />
                     </div>
                 </Link>
+
+                {/* Wishlist button - Optimized for mobile (larger touch target, positioned better) */}
+                <button
+                    onClick={handleWishlistToggle}
+                    className="absolute top-2 right-2 p-2 rounded-full bg-brandIvory/80 backdrop-blur-sm shadow-sm z-30 transition-all duration-300 transform hover:scale-110"
+                    aria-label={isInWishlist ? "Retirer des favoris" : "Ajouter aux favoris"}
+                >
+                    <Heart 
+                        size={20} 
+                        className={`transition-all duration-300 ${
+                            isInWishlist 
+                                ? "fill-burgundy stroke-burgundy" 
+                                : "fill-transparent stroke-brandGold hover:stroke-burgundy"
+                        }`} 
+                    />
+                </button>
             </div>
 
             {/* Product Details - Refined typography and spacing */}
-            <div className="px-0">
-                {/* Product Name and Wishlist button in the same row */}
-                <div className="flex items-start justify-between mb-2">
-                    <Link 
-                        href={`/products/${product.id}`} 
-                        locale={locale}
-                        className="flex-1"
-                    >
-                        <h3 className="text-base font-serif text-platinumGray hover:text-brandGold transition-colors duration-300 pr-3">
-                            {getProductName()}
-                        </h3>
-                    </Link>
-                    
-                    {/* Wishlist button - always visible, next to title */}
-                    <button
-                        onClick={handleWishlistToggle}
-                        className="p-1.5 rounded-full transition-all duration-300 transform hover:scale-110"
-                        aria-label={isInWishlist ? "Retirer des favoris" : "Ajouter aux favoris"}
-                    >
-                        <Heart 
-                            size={18} 
-                            className={`transition-all duration-300 ${
-                                isInWishlist 
-                                    ? "fill-burgundy stroke-burgundy" 
-                                    : "fill-transparent stroke-brandGold hover:stroke-burgundy"
-                            }`} 
-                        />
-                    </button>
-                </div>
+            <div className="px-1 text-left">
+                {/* Product Name with better spacing */}
+                <Link 
+                    href={`/products/${product.id}`} 
+                    locale={locale}
+                >
+                    <h3 className="text-base font-serif text-platinumGray hover:text-brandGold transition-colors duration-300 mb-1.5">
+                        {getProductName()}
+                    </h3>
+                </Link>
                 
                 {/* Material Information */}
                 {materialInfo && (
-                    <p className="text-xs font-light italic text-platinumGray mb-3">
+                    <p className="text-xs font-light italic text-platinumGray mb-2">
                         {materialInfo}
                     </p>
                 )}
                 
                 {/* Price - More elegant styling with "Starting at" for variations */}
-                <p className="text-sm font-light text-platinumGray mb-4">
+                <p className="text-sm font-light text-platinumGray mb-3">
                     {hasVariations && <span className="italic mr-1">À partir de </span>}
                     <span className="font-normal text-brandGold">
                         {parseFloat(product.basePrice).toLocaleString('fr-FR', { minimumFractionDigits: 0 })} MAD
                     </span>
                 </p>
 
-                {/* View Product Link - Refined to match title styling with elegant borders */}
-                <div className="mt-3">
+                {/* View Product Link - Refined, simpler for mobile */}
+                <div className="mt-2">
                     <Link 
                         href={`/products/${product.id}`}
                         locale={locale}
+                        className="block md:inline-block text-sm text-platinumGray hover:text-brandGold transition-colors duration-300 border border-platinumGray/30 hover:border-brandGold/50 px-4 py-2 md:py-1.5 rounded-sm w-full md:w-auto"
                     >
-                        <span className="inline-block text-sm text-platinumGray hover:text-brandGold transition-colors duration-300 border border-platinumGray/30 hover:border-brandGold/50 px-4 py-1.5 rounded-sm">
-                            Voir la création
-                        </span>
+                        Voir la création
                     </Link>
                 </div>
             </div>

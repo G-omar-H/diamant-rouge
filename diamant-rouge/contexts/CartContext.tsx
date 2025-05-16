@@ -77,11 +77,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
             // Add each local cart item to the server
             for (const item of localCart) {
               try {
+                const cartData = {
+                  productId: item.productId,
+                  variationId: item.variationId,
+                  quantity: item.quantity
+                };
+                
                 await fetch("/api/cart", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   credentials: "include",
-                  body: JSON.stringify(item),
+                  body: JSON.stringify(cartData),
                 });
               } catch (error) {
                 console.error("Error syncing cart item to server:", error);
@@ -176,11 +182,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
     } else {
       try {
+        // Only send the necessary fields to the server
+        const cartData = {
+          productId: item.productId,
+          variationId: item.variationId,
+          quantity: item.quantity
+        };
+        
         const res = await fetch("/api/cart", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify(item),
+          body: JSON.stringify(cartData),
         });
         if (res.ok) {
           await fetchCartFromServer();
