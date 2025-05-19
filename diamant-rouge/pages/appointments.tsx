@@ -8,17 +8,33 @@ import {
   Calendar, Clock, MapPin, Video, Users, Coffee, Diamond, ChevronDown, 
   User, UserPlus, GlassWater, Utensils, Mail, Lock, Eye, EyeOff
 } from "lucide-react";
+import React from "react";
+
+// Define interfaces for the component props
+interface DropdownOption {
+  value: string | number;
+  label: string;
+  icon?: React.ComponentType<{ size: number; className?: string }> | null;
+}
+
+interface LuxuryDropdownProps {
+  options: DropdownOption[];
+  value: string | number;
+  onChange: (value: string | number) => void;
+  label: string;
+  icon?: React.ComponentType<{ size: number; className?: string }>;
+}
 
 // Luxury Dropdown Component
-const LuxuryDropdown = ({ options, value, onChange, label, icon: Icon }) => {
+const LuxuryDropdown: React.FC<LuxuryDropdownProps> = ({ options, value, onChange, label, icon: Icon }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const selectedOption = options.find(option => option.value === value);
 
   // Close dropdown when clicking outside
     useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -43,14 +59,14 @@ const LuxuryDropdown = ({ options, value, onChange, label, icon: Icon }) => {
               <selectedOption.icon size={18} className="mr-3 text-brandGold" />
             )}
             <span className="text-richEbony">{selectedOption?.label}</span>
-          </div>
+                        </div>
           <div className="w-6 h-6 rounded-full bg-brandGold/10 flex items-center justify-center">
             <ChevronDown 
               size={14} 
               className={`text-brandGold transition-transform duration-300 ${isOpen ? 'transform rotate-180' : ''}`} 
-            />
-                    </div>
-                    </div>
+                                        />
+                                    </div>
+                                    </div>
                         </div>
       
       {/* Animated dropdown with luxury styling */}
@@ -65,7 +81,7 @@ const LuxuryDropdown = ({ options, value, onChange, label, icon: Icon }) => {
           >
             {options.map((option) => (
               <div 
-                key={option.value}
+                key={option.value.toString()}
                 onClick={() => {
                   onChange(option.value);
                   setIsOpen(false);
@@ -85,7 +101,7 @@ const LuxuryDropdown = ({ options, value, onChange, label, icon: Icon }) => {
       {/* Elegant hover effect */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brandGold/60 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
       <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full bg-brandGold/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-    </div>
+                                </div>
   );
 };
 
@@ -230,7 +246,7 @@ export default function AppointmentPage() {
     }, [isAuthenticated, pendingSubmission, handlePendingSubmission]);
 
     // Handle form submission
-    async function handleSubmitAppointment(e) {
+    async function handleSubmitAppointment(e: React.FormEvent) {
         e.preventDefault();
         
         // Basic validation
@@ -292,9 +308,11 @@ export default function AppointmentPage() {
                 behavior: 'smooth'
             });
             
-        } catch (error) {
+        } catch (error: unknown) {
             console.error('Erreur lors de la soumission du rendez-vous:', error);
-            setSubmitError(error.message || 'Une erreur est survenue lors de la réservation');
+            setSubmitError(
+                error instanceof Error ? error.message : 'Une erreur est survenue lors de la réservation'
+            );
         } finally {
             setIsSubmitting(false);
         }
@@ -308,6 +326,15 @@ export default function AppointmentPage() {
         specialRequests, 
         isSubmitting
     ]);
+    
+    // Handlers for dropdown state changes with proper type handling
+    const handleGuestsChange = (value: string | number) => {
+        setGuests(typeof value === 'number' ? value : parseInt(value as string));
+    };
+    
+    const handlePreferencesChange = (value: string | number) => {
+        setPreferences(value.toString());
+    };
     
     // Handle authentication with a single submission attempt
     async function handleAuthentication(e: React.FormEvent) {
@@ -894,7 +921,7 @@ export default function AppointmentPage() {
                                   label="Nombre de personnes"
                                   icon={Users}
                                   value={guests}
-                                  onChange={setGuests}
+                                  onChange={handleGuestsChange}
                                   options={guestOptions}
                                 />
                                 
@@ -902,7 +929,7 @@ export default function AppointmentPage() {
                                   label="Préférences particulières"
                                   icon={Coffee}
                                   value={preferences}
-                                  onChange={setPreferences}
+                                  onChange={handlePreferencesChange}
                                   options={preferenceOptions}
                                 />
                             </div>

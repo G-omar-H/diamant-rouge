@@ -20,6 +20,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const successUrl = process.env.CMI_SUCCESS_URL;
         const failureUrl = process.env.CMI_FAILURE_URL;
 
+        if (!merchantId || !secretKey || !paymentUrl || !successUrl || !failureUrl) {
+            return res.status(500).json({ error: 'Missing CMI configuration' });
+        }
+
         const requestData = {
             MID: merchantId,
             ORDERID: orderId,

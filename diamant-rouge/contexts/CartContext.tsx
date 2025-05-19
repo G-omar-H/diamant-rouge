@@ -1,26 +1,35 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useSession } from "next-auth/react";
 
-export type CartItem = {
+// Define Product interface with sku property
+interface Product {
+  id: number;
+  images: string[];
+  basePrice: string;
+  translations: any[];
+  sku?: string;
+}
+
+// Define CartItem interface
+export interface CartItem {
   id?: number;
   productId: number;
-  variationId?: number;
-  sku: string;
-  name: string;
-  price?: number; // if not stored, we'll get it from product
+  variationId?: string;
   quantity: number;
+  price?: number;
+  name?: string;
   image?: string;
-  // Optionally, if you fetch the related product, you can include:
-  product?: { images: string[]; basePrice: string; translations: any[] };
-};
+  sku?: string;
+  product?: Product;
+}
 
 type CartContextType = {
   cart: CartItem[];
   addToCart: (item: CartItem) => Promise<void>;
-  removeFromCart: (productId: number, variationId?: number) => Promise<void>;
+  removeFromCart: (productId: number, variationId?: string) => Promise<void>;
   clearCart: () => Promise<void>;
   refreshCart: () => Promise<void>;
-  updateQuantity: (productId: number, variationId: number | undefined, quantity: number) => Promise<void>;
+  updateQuantity: (productId: number, variationId: string | undefined, quantity: number) => Promise<void>;
   isCartLoading: boolean;
 };
 
@@ -204,7 +213,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function removeFromCart(productId: number, variationId?: number) {
+  async function removeFromCart(productId: number, variationId?: string) {
     // Handle guest cart (not authenticated)
     if (!isAuthenticated) {
       const updatedCart = cart.filter(
@@ -272,7 +281,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }
 
   // Update quantity function with guest cart support
-  async function updateQuantity(productId: number, variationId: number | undefined, quantity: number) {
+  async function updateQuantity(productId: number, variationId: string | undefined, quantity: number) {
     if (quantity < 1) return; // Prevent negative quantities
     
     // Handle guest cart (not authenticated)

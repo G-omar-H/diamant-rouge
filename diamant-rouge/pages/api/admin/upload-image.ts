@@ -70,3 +70,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.error("Server error:", error);
     return res.status(500).json({ error: "Erreur serveur" });
   }
+}

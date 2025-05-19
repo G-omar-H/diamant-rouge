@@ -3,12 +3,34 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
+interface Translation {
+    language: string;
+    name: string;
+    description: string;
+}
+
+interface Variation {
+    variationType: string;
+    variationValue: string;
+    additionalPrice: number;
+}
+
+interface FormData {
+    sku: string;
+    basePrice: string;
+    categoryId: string;
+    featured: boolean;
+    translations: Translation[];
+    variations: Variation[];
+    images: string[];
+}
+
 export default function CreateProduct() {
     const router = useRouter();
 
     // ✅ State Management
     const [categories, setCategories] = useState<any[]>([]);
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<FormData>({
         sku: "",
         basePrice: "",
         categoryId: "",
@@ -105,7 +127,7 @@ export default function CreateProduct() {
     const handleRemoveImage = (index: number) => {
         setFormData((prev) => ({
             ...prev,
-            images: prev.images.filter((_, i) => i !== index),
+            images: prev.images.filter((_: string, i: number) => i !== index),
         }));
     };
 
@@ -256,7 +278,7 @@ export default function CreateProduct() {
                         type="number"
                         value={v.additionalPrice}
                         onChange={(e) =>
-                            handleVariationChange(index, "additionalPrice", e.target.value)
+                            handleVariationChange(index, "additionalPrice", Number(e.target.value))
                         }
                         className="input-field md:w-1/3"
                         placeholder="Extra Cost"

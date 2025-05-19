@@ -1,13 +1,26 @@
 import { useState, useEffect } from "react";
 
+interface Translation {
+    language: string;
+    name: string;
+    description: string;
+    [key: string]: string;
+}
+
+interface Category {
+    id: string;
+    slug: string;
+    translations: Translation[];
+}
+
 export default function ManageCategories() {
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [newCategorySlug, setNewCategorySlug] = useState("");
-    const [translations, setTranslations] = useState([
+    const [translations, setTranslations] = useState<Translation[]>([
         { language: "en", name: "", description: "" },
     ]);
     const [error, setError] = useState("");
-    const [editingCategory, setEditingCategory] = useState(null);
+    const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
     useEffect(() => {
         fetchCategories();
@@ -19,7 +32,7 @@ export default function ManageCategories() {
         setCategories(data);
     };
 
-    const handleTranslationChange = (index, key, value) => {
+    const handleTranslationChange = (index: number, key: string, value: string) => {
         const updatedTranslations = [...translations];
         updatedTranslations[index][key] = value;
         setTranslations(updatedTranslations);
@@ -70,7 +83,7 @@ export default function ManageCategories() {
     };
 
     // ✅ Handle Category Deletion
-    const handleDeleteCategory = async (id) => {
+    const handleDeleteCategory = async (id: string) => {
         if (!window.confirm("Are you sure you want to delete this category?")) return;
 
         const res = await fetch(`/api/admin/categories/${id}`, { method: "DELETE" });
@@ -134,8 +147,9 @@ export default function ManageCategories() {
             {/* Category List */}
             <ul className="mt-4 list-disc list-inside space-y-4">
                 {categories.map((category) => {
-                    const translation =
-                        category.translations.find((t) => t.language === "en") || {};
+                    const translation = 
+                        category.translations.find((t) => t.language === "en") || 
+                        { name: "", description: "" } as Translation;
 
                     return (
                         <li

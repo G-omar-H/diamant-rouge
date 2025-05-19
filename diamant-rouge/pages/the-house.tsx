@@ -294,11 +294,11 @@ export default function LaMaisonPage() {
               </p>
             </div>
             <div className="relative h-[300px] sm:h-[400px] md:h-[500px] order-1 md:order-2 mb-4 md:mb-0">
-              <Image 
+                    <Image 
                 src="/images/home/atelier.jpg" 
                 alt="Atelier Diamant Rouge" 
-                layout="fill"
-                objectFit="cover"
+                      layout="fill"
+                      objectFit="cover"
                 className="rounded-sm"
               />
             </div>

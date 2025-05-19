@@ -81,7 +81,7 @@ export default function EditProductPage({
     const handleRemoveImage = (index: number) => {
         setFormData((prev) => ({
             ...prev,
-            images: prev.images.filter((_, i) => i !== index),
+            images: prev.images.filter((_: any, i: number) => i !== index),
         }));
     };
 

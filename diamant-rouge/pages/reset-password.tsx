@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
+import React from 'react';
 
 export default function ResetPassword() {
     const [password, setPassword] = useState('');
@@ -23,7 +24,7 @@ export default function ResetPassword() {
         }
     }, [router.isReady, router.query]);
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError('');
         
@@ -66,8 +67,8 @@ export default function ResetPassword() {
                 router.push('/auth');
             }, 3000);
             
-        } catch (err) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Une erreur est survenue lors de la réinitialisation du mot de passe');
         } finally {
             setLoading(false);
         }

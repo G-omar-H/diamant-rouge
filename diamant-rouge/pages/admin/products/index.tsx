@@ -8,6 +8,7 @@ type AdminProduct = {
     id: number;
     sku: string;
     basePrice: string;
+    featured: boolean;
     translations: {
         language: string;
         name: string;

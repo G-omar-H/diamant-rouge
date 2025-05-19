@@ -194,8 +194,8 @@ export default function Header() {
   // Handle product click - navigate to product and close search
   const handleProductClick = (category: string, id: number) => {
     router.push(`/collections/${category}/${id}`);
-    setSearchOpen(false);
-    setSearchQuery("");
+      setSearchOpen(false);
+      setSearchQuery("");
     setSearchResults([]);
   };
 
@@ -770,14 +770,14 @@ export default function Header() {
                 
                 <div className="flex flex-col md:flex-row gap-3 mb-3">
                   <div className="relative flex-grow">
-                    <input
+                <input
                       ref={searchInputRef}
-                      type="text"
-                      placeholder="Rechercher des créations, des collections..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full bg-transparent border-none text-brandIvory text-lg md:text-xl py-3 px-2 pr-12 outline-none focus:ring-0 placeholder-brandIvory/50"
-                      autoFocus
+                  type="text"
+                  placeholder="Rechercher des créations, des collections..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-transparent border-none text-brandIvory text-lg md:text-xl py-3 px-2 pr-12 outline-none focus:ring-0 placeholder-brandIvory/50"
+                  autoFocus
                       aria-label="Rechercher des produits"
                     />
                     <button
@@ -789,13 +789,13 @@ export default function Header() {
                     >
                       <X size={16} />
                     </button>
-                    <button
-                      type="submit"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-brandGold hover:scale-110 transition-transform duration-300"
-                      aria-label="Rechercher"
-                    >
-                      <Search size={22} />
-                    </button>
+                <button
+                  type="submit"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-brandGold hover:scale-110 transition-transform duration-300"
+                  aria-label="Rechercher"
+                >
+                  <Search size={22} />
+                </button>
                   </div>
                   
                   <select
@@ -971,26 +971,26 @@ export default function Header() {
               {/* Show categories if no search or if results are shown but there's still space */}
               {(searchQuery.length < 2 || (!isSearching && searchResults.length > 0)) && (
                 <div className={`${searchResults.length > 0 ? 'mt-10 pt-6 border-t border-brandGold/20' : 'mt-10'} md:mt-14`}>
-                  <h3 className="text-brandIvory/70 text-xs md:text-sm uppercase tracking-widest mb-6 text-center">Explorez nos collections</h3>
+                <h3 className="text-brandIvory/70 text-xs md:text-sm uppercase tracking-widest mb-6 text-center">Explorez nos collections</h3>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
-                    <CategoryLink href="/collections?category=bagues" label="Bagues" count={22} onClick={() => setSearchOpen(false)} locale={router.locale} />
-                    <CategoryLink href="/collections?category=colliers" label="Colliers" count={18} onClick={() => setSearchOpen(false)} locale={router.locale} />
-                    <CategoryLink href="/collections?category=bracelets" label="Bracelets" count={14} onClick={() => setSearchOpen(false)} locale={router.locale} />
-                    <CategoryLink href="/collections?category=boucles" label="Boucles d'oreilles" count={16} onClick={() => setSearchOpen(false)} locale={router.locale} />
-                  </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
+  <CategoryLink href="/collections?category=bagues" label="Bagues" count={22} onClick={() => setSearchOpen(false)} locale={router.locale} />
+  <CategoryLink href="/collections?category=colliers" label="Colliers" count={18} onClick={() => setSearchOpen(false)} locale={router.locale} />
+  <CategoryLink href="/collections?category=bracelets" label="Bracelets" count={14} onClick={() => setSearchOpen(false)} locale={router.locale} />
+  <CategoryLink href="/collections?category=boucles" label="Boucles d'oreilles" count={16} onClick={() => setSearchOpen(false)} locale={router.locale} />
+</div>
 
-                  <div className="text-center mt-8 md:mt-10">
-                    <Link
-                      href="/collections"
-                      onClick={() => setSearchOpen(false)}
-                      className="inline-flex items-center text-brandGold hover:text-brandGold/80 transition-colors duration-300"
-                    >
-                      <span className="text-sm uppercase tracking-wider font-medium">Voir toutes nos créations</span>
-                      <Diamond size={10} className="ml-2 fill-brandGold" />
-                    </Link>
-                  </div>
+                <div className="text-center mt-8 md:mt-10">
+                  <Link
+                    href="/collections"
+                    onClick={() => setSearchOpen(false)}
+                    className="inline-flex items-center text-brandGold hover:text-brandGold/80 transition-colors duration-300"
+                  >
+                    <span className="text-sm uppercase tracking-wider font-medium">Voir toutes nos créations</span>
+                    <Diamond size={10} className="ml-2 fill-brandGold" />
+                  </Link>
                 </div>
+              </div>
               )}
             </motion.div>
           </motion.div>

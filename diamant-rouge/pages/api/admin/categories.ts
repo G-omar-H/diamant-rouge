@@ -2,6 +2,12 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
 
+interface CategoryTranslation {
+    language: string;
+    name: string;
+    description?: string;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "GET") {
         // ✅ Fetch categories with their translations
@@ -21,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             data: {
                 slug,
                 translations: {
-                    create: translations.map((t) => ({
+                    create: translations.map((t: CategoryTranslation) => ({
                         language: t.language,
                         name: t.name,
                         description: t.description || "",

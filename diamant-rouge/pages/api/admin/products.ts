@@ -10,6 +10,18 @@ interface DecodedPayload {
     email: string;
 }
 
+interface ProductTranslation {
+    language: string;
+    name: string;
+    description: string;
+}
+
+interface ProductVariation {
+    variationType: string;
+    variationValue: string;
+    additionalPrice: number | string;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     console.log("--- ADMIN PRODUCT MANAGEMENT ROUTE START ---");
 
@@ -99,17 +111,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     featured: featured || false,
                     categoryId: assignedCategoryId, // assign category
                     translations: {
-                        create: (translations || []).map((t: any) => ({
+                        create: (translations || []).map((t: ProductTranslation) => ({
                             language: t.language,
                             name: t.name,
                             description: t.description || "",
                         })),
                     },
                     variations: {
-                        create: (variations || []).map((v: any) => ({
+                        create: (variations || []).map((v: ProductVariation) => ({
                             variationType: v.variationType,
                             variationValue: v.variationValue,
-                            additionalPrice: parseFloat(v.additionalPrice) || 0,
+                            additionalPrice: parseFloat(v.additionalPrice as string) || 0,
                         })),
                     },
                     images: images || [],

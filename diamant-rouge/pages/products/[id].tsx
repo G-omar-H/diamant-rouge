@@ -223,7 +223,7 @@ export default function ProductPage({
     const primaryVariation = selectedVariations["diamondShape"] || undefined;
     const cartItem = {
       productId: productData.id,
-      variationId: primaryVariation ? primaryVariation.id : undefined,
+      variationId: primaryVariation ? String(primaryVariation.id) : undefined,
       quantity: 1,
       // These fields are used for the local cart display but not sent to the server
       sku: productData.sku,

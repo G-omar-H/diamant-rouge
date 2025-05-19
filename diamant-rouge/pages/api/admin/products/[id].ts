@@ -2,6 +2,14 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../../../../lib/prisma';
 
+interface ProductTranslation {
+    language: string;
+    name: string;
+    description?: string;
+    id?: number; // Optional because it may be removed
+    productId?: number; // Optional because it may not be set yet
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { id } = req.query;
     const productId = Number(id);
@@ -23,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const parsedCategoryId = categoryId ? parseInt(categoryId) : null;
 
             // ✅ Clean translations (remove unnecessary IDs)
-            const cleanedTranslations = translations.map(({ id, ...rest }) => rest);
+            const cleanedTranslations = translations.map(({ id, ...rest }: ProductTranslation) => rest);
 
             // ✅ Update product in a transaction to maintain integrity
             const updatedProduct = await prisma.$transaction(async (tx) => {
@@ -45,7 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                 // ✅ Step 3: Recreate translations
                 await tx.productTranslation.createMany({
-                    data: cleanedTranslations.map((t) => ({
+                    data: cleanedTranslations.map((t: ProductTranslation) => ({
                         ...t,
                         productId,
                     })),

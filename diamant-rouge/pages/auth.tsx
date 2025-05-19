@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import React from 'react';
 
 export default function Authentication() {
   const [mode, setMode] = useState('login'); // 'login', 'signup', or 'forgotPassword'
@@ -32,7 +33,7 @@ export default function Authentication() {
   const isSignup = mode === 'signup';
   const isForgotPassword = mode === 'forgotPassword';
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setSuccessMessage('');
@@ -109,9 +110,9 @@ export default function Authentication() {
 
         setSuccessMessage('Instructions de réinitialisation envoyées à votre adresse email.');
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Authentication error:', err);
-      setError(err.message || 'Une erreur est survenue. Veuillez réessayer.');
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setLoading(false);
     }
@@ -130,10 +131,10 @@ export default function Authentication() {
         });
         
         // Redirect to product page or favorites page
-        router.push(returnUrl || `/product/${productId}?added=favorite`);
+        router.push(returnUrl?.toString() || `/product/${productId}?added=favorite`);
       } catch (err) {
         console.error('Error adding to favorites:', err);
-        router.push(returnUrl || '/');
+        router.push(returnUrl?.toString() || '/');
       }
     } 
     else if (action === 'cart' && productId) {
@@ -151,11 +152,11 @@ export default function Authentication() {
     }
     else {
       // Default redirect if no specific action
-      router.push(returnUrl || '/');
+      router.push(returnUrl?.toString() || '/');
     }
   };
 
-  const switchMode = (newMode) => {
+  const switchMode = (newMode: string) => {
     setMode(newMode);
     setError('');
     setSuccessMessage('');

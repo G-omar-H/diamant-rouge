@@ -41,7 +41,7 @@ export default function CartPage() {
                insuranceFee;
 
   // Format currency as MAD
-  const formatPrice = (price) => {
+  const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-MA', { 
       style: 'currency', 
       currency: 'MAD',

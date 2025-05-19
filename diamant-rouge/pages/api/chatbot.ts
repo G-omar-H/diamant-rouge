@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       messages: [{ role: "user", content: prompt }],
     });
 
-    const reply = completion.choices[0].message?.content.trim();
+    const reply = completion.choices[0]?.message?.content?.trim() || "";
     return res.status(200).json({ reply });
   } catch (error) {
     console.error("Error in chatbot API:", error);
