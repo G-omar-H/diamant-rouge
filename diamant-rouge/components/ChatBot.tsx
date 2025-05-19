@@ -22,6 +22,8 @@ export default function ChatBot() {
   const [isTyping, setIsTyping] = useState(false);
   const [showTopics, setShowTopics] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [processingQuestion, setProcessingQuestion] = useState(false);
 
   // Same suggested topics as before
   const suggestedTopics: SuggestionTopic[] = [
@@ -71,15 +73,50 @@ export default function ChatBot() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Body scroll lock when chat is open
+  useEffect(() => {
+    if (isOpen) {
+      // Disable scrolling on body when chat is open
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      
+      // Store current scroll position
+      const scrollY = window.scrollY;
+      document.body.style.top = `-${scrollY}px`;
+    } else {
+      // Re-enable scrolling when chat is closed
+      const scrollY = document.body.style.top;
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = 'auto';
+      document.body.style.top = '';
+      
+      // Restore scroll position
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
+      }
+    }
+    
+    return () => {
+      // Cleanup function to ensure body scrolling is restored if component unmounts
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = 'auto';
+      document.body.style.top = '';
+    };
+  }, [isOpen]);
+
   // Same handleSend function as before
   async function handleSend() {
-    if (!input.trim()) return;
+    if (!input.trim() || processingQuestion) return;
     
     const userMessage: Message = { sender: "user", text: input.trim() };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setShowTopics(false);
     setIsTyping(true);
+    setProcessingQuestion(true);
 
     // Call the chatbot API
     try {
@@ -101,6 +138,7 @@ export default function ChatBot() {
       setTimeout(() => {
         const aiMessage: Message = { sender: "ai", text: data.reply };
         setMessages((prev) => [...prev, aiMessage]);
+        setProcessingQuestion(false);
       }, 300);
       
     } catch (error) {
@@ -110,12 +148,17 @@ export default function ChatBot() {
         ...prev,
         { sender: "ai", text: "Je vous prie de m'excuser pour ce contretemps. Pourriez-vous reformuler votre demande? Ou peut-être préféreriez-vous être contacté(e) directement par l'un de nos conseillers?" },
       ]);
+      setProcessingQuestion(false);
     }
   }
 
   function handleSuggestedQuestion(question: string) {
+    if (processingQuestion) return;
     setInput(question);
-    handleSend();
+    // Add a slight delay to allow reading the question before sending
+    setTimeout(() => {
+      handleSend();
+    }, 100);
   }
 
   return (
@@ -184,7 +227,11 @@ export default function ChatBot() {
             </div>
 
             {/* Messages Container - Fixed height */}
-            <div className="flex-1 bg-white bg-opacity-95 backdrop-blur-sm overflow-y-auto p-5" style={{ maxHeight: "50vh" }}>
+            <div 
+              className="flex-1 bg-white bg-opacity-95 backdrop-blur-sm overflow-y-auto p-5" 
+              style={{ maxHeight: "50vh" }}
+              onClick={() => inputRef.current?.blur()} // Blur input when clicking elsewhere
+            >
               <div className="space-y-4">
                 {messages.map((msg, index) => (
                   <motion.div
@@ -291,6 +338,7 @@ export default function ChatBot() {
                               key={idx}
                               onClick={() => handleSuggestedQuestion(question)}
                               className="w-full text-left p-2 text-xs text-platinumGray hover:bg-brandGold/5 transition-colors rounded flex items-center justify-between"
+                              disabled={processingQuestion}
                             >
                               <span className="line-clamp-1">{question}</span>
                               <ChevronRight size={12} className="text-brandGold/60 flex-shrink-0 ml-1" />
@@ -308,6 +356,7 @@ export default function ChatBot() {
             <div className="bg-white border-t border-brandGold/10 p-4">
               <div className="flex items-center bg-brandIvory/50 rounded-lg border border-brandGold/20 focus-within:border-brandGold/50 px-3 py-2 transition-all">
                 <input
+                  ref={inputRef}
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -317,9 +366,9 @@ export default function ChatBot() {
                 />
                 <button 
                   onClick={handleSend} 
-                  disabled={!input.trim()}
+                  disabled={!input.trim() || processingQuestion}
                   className={`ml-2 p-2 rounded-full transition-all ${
-                    input.trim() 
+                    input.trim() && !processingQuestion
                       ? 'bg-brandGold text-white hover:bg-brandGold/90' 
                       : 'bg-gray-100 text-gray-400'
                   }`}

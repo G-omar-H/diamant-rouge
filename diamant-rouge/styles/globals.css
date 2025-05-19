@@ -348,3 +348,29 @@ p {
     left: 0;
 }
 */
+
+/* ==========================================================
+   🔍 Custom Scrollbar for Search Results
+   ========================================================== */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--brand-gold) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(212, 175, 55, 0.1);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--brand-gold);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(212, 175, 55, 0.8);
+}

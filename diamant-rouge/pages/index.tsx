@@ -170,6 +170,7 @@ export default function HomePage({
     
     const [activeFilter, setActiveFilter] = useState("Tous");
     const carouselRef = useRef<HTMLDivElement>(null);
+    const filterContainerRef = useRef<HTMLDivElement>(null);
     const [initialLoad, setInitialLoad] = useState(true);
 
     // Generate product categories from fetched data - prioritize French
@@ -192,7 +193,7 @@ export default function HomePage({
         return categoryNames;
     }, [categories, currentLocale]);
 
-   // Filter products based on selected category - prioritize French translations
+    // Filter products based on selected category - prioritize French translations
     const filteredProducts = useMemo(() => {
         if (!products || products.length === 0) return [];
         if (activeFilter === "Tous") return products;
@@ -208,6 +209,33 @@ export default function HomePage({
             return categoryTranslation.name === activeFilter;
         });
     }, [products, activeFilter, currentLocale]);
+    
+    // Handle filter change and scroll selected filter into view on mobile
+    const handleFilterChange = (category: string) => {
+        setActiveFilter(category);
+        setInitialLoad(true);
+        
+        // Scroll the selected filter into view on mobile - safely check for window in browser environment
+        setTimeout(() => {
+            if (typeof window !== 'undefined' && window.innerWidth < 768 && filterContainerRef.current) {
+                // Find the selected button
+                const selectedButton = Array.from(filterContainerRef.current.querySelectorAll('button'))
+                    .find(btn => btn.textContent === category);
+                    
+                if (selectedButton) {
+                    // Calculate the scroll position to center the element
+                    const container = filterContainerRef.current;
+                    const scrollLeft = selectedButton.offsetLeft - (container.offsetWidth / 2) + (selectedButton.offsetWidth / 2);
+                    
+                    // Smooth scroll to the element
+                    container.scrollTo({
+                        left: Math.max(0, scrollLeft),
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        }, 0);
+    };
 
     // Scroll to section of carousel
     const scrollCarousel = (position: 'left' | 'center' | 'right') => {
@@ -291,30 +319,35 @@ export default function HomePage({
                     </p>
                 </div>
 
-                {/* Filter tabs - Enhanced for mobile with horizontal scroll */}
-                <div className="relative mb-8 md:mb-10 px-4 md:px-6">
+                {/* Filter tabs - Enhanced with true centering for desktop while preserving mobile scroll */}
+                <div className="relative mb-8 md:mb-10 px-4 md:px-0">
                     <div className="flex justify-center">
-                        <div className="w-full overflow-x-auto scrollbar-hide py-2 md:py-0 -mx-1 px-1">
-                            <div className="flex space-x-2 md:space-x-3 min-w-max mx-auto">
+                        {/* Elegant background for desktop filters */}
+                        <div className="hidden md:block absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-14 bg-brandGold/5 rounded-full"></div>
+                        
+                        <div ref={filterContainerRef} className="relative w-full md:w-auto md:max-w-3xl overflow-x-auto scrollbar-hide py-2 md:py-3 -mx-1 px-1 md:px-4">
+                            <div className="flex space-x-2 md:space-x-4 min-w-max md:min-w-0 md:flex-wrap md:justify-center mx-auto">
                                 {productCategories.map((category) => (
                                     <button
                                         key={category}
-                                        onClick={() => {
-                                            setActiveFilter(category);
-                                            setInitialLoad(true);
-                                        }}
-                                        className={`px-4 py-2 md:px-5 md:py-2.5 text-xs md:text-sm whitespace-nowrap transition-all duration-300 border rounded-full ${
+                                        onClick={() => handleFilterChange(category)}
+                                        className={`px-4 py-2 md:px-6 md:py-2.5 text-xs md:text-sm whitespace-nowrap transition-all duration-300 border rounded-full ${
                                             activeFilter === category
                                                 ? "border-brandGold bg-brandGold text-richEbony shadow-sm"
                                                 : "border-brandGold/40 text-platinumGray hover:border-brandGold hover:bg-brandGold/5"
-                                        }`}
+                                        } ${category === "Tous" ? "md:order-first" : ""}`}
                                     >
                                         {category}
                                     </button>
                                 ))}
                             </div>
+                            
+                            {/* Elegant fade effect for mobile to indicate scrollable content */}
+                            <div className="absolute top-0 right-0 h-full w-8 bg-gradient-to-l from-white to-transparent md:hidden"></div>
+                            <div className="absolute top-0 left-0 h-full w-8 bg-gradient-to-r from-white to-transparent md:hidden"></div>
                         </div>
                     </div>
+                    
                     {/* Mobile indicator for horizontal scrolling */}
                     <div className="flex justify-center mt-2 md:hidden">
                         <div className="flex items-center space-x-1">

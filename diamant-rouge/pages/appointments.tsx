@@ -16,7 +16,7 @@ const LuxuryDropdown = ({ options, value, onChange, label, icon: Icon }) => {
   const selectedOption = options.find(option => option.value === value);
 
   // Close dropdown when clicking outside
-  useEffect(() => {
+    useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
@@ -49,9 +49,9 @@ const LuxuryDropdown = ({ options, value, onChange, label, icon: Icon }) => {
               size={14} 
               className={`text-brandGold transition-transform duration-300 ${isOpen ? 'transform rotate-180' : ''}`} 
             />
-          </div>
-        </div>
-      </div>
+                    </div>
+                    </div>
+                        </div>
       
       {/* Animated dropdown with luxury styling */}
       <AnimatePresence>
@@ -76,7 +76,7 @@ const LuxuryDropdown = ({ options, value, onChange, label, icon: Icon }) => {
               >
                 {option.icon && <option.icon size={16} className={`mr-3 ${option.value === value ? 'text-brandGold' : 'text-platinumGray'}`} />}
                 <span className={`${option.value === value ? 'text-brandGold' : 'text-richEbony'}`}>{option.label}</span>
-              </div>
+                                    </div>
             ))}
           </motion.div>
         )}
@@ -417,7 +417,7 @@ export default function AppointmentPage() {
     {/* Hero Section - Preserving the central diamond with bottom-left positioning */}
 <section className="relative h-[80vh] flex items-end">
   {/* Background Image - No overlay */}
-  <Image
+                                    <Image
     src="/images/showroom.jpg"
     layout="fill"
     objectFit="cover"
@@ -472,9 +472,9 @@ export default function AppointmentPage() {
     >
       <div className="w-16 h-16 border border-brandGold/50 rounded-full flex items-center justify-center">
         <div className="w-8 h-8 bg-brandGold/20 rounded-full"></div>
-      </div>
+                                                    </div>
     </motion.div>
-  </div>
+                                                    </div>
 </section>
             {/* Signature Experience Section */}
             <section className="bg-brandIvory py-24 px-6">
@@ -506,7 +506,7 @@ export default function AppointmentPage() {
                         >
                             <div className="w-20 h-20 rounded-full bg-brandGold/10 flex items-center justify-center mx-auto mb-6">
                                 <span className="text-3xl font-serif text-brandGold">1</span>
-                            </div>
+                                                </div>
                             <h3 className="text-xl font-serif text-brandGold mb-4">Consultation Personnalisée</h3>
                             <p className="text-platinumGray">
                                 Une rencontre exclusive avec nos gemmologues experts qui vous guideront parmi nos créations les plus précieuses.
@@ -524,7 +524,7 @@ export default function AppointmentPage() {
                         >
                             <div className="w-20 h-20 rounded-full bg-brandGold/10 flex items-center justify-center mx-auto mb-6">
                                 <span className="text-3xl font-serif text-brandGold">2</span>
-                            </div>
+                                            </div>
                             <h3 className="text-xl font-serif text-brandGold mb-4">Découverte des Créations</h3>
                             <p className="text-platinumGray">
                                 Essayez nos pièces d'exception et découvrez comment elles subliment votre élégance naturelle.
@@ -542,13 +542,13 @@ export default function AppointmentPage() {
                         >
                             <div className="w-20 h-20 rounded-full bg-brandGold/10 flex items-center justify-center mx-auto mb-6">
                                 <span className="text-3xl font-serif text-brandGold">3</span>
-                            </div>
+                                        </div>
                             <h3 className="text-xl font-serif text-brandGold mb-4">Création Sur-Mesure</h3>
                             <p className="text-platinumGray">
                                 Explorez les possibilités infinies de la création sur-mesure pour donner vie à votre vision personnelle.
                             </p>
                         </motion.div>
-                    </div>
+                                    </div>
                 </div>
             </section>
 
@@ -572,7 +572,7 @@ export default function AppointmentPage() {
                                     alt="Diamant Rouge Gemologist"
                                 />
                                 <div className="absolute -bottom-6 -right-6 w-24 h-24 border border-brandGold"></div>
-                            </div>
+                                                    </div>
                         </motion.div>
 
                         <motion.div
@@ -595,13 +595,13 @@ export default function AppointmentPage() {
                                     <p className="text-platinumGray">
                                         <span className="font-medium">Séance privée</span> avec un maître gemmologue
                                     </p>
-                                </div>
+                                                    </div>
                                 <div className="flex items-start">
                                     <div className="w-1.5 h-1.5 rounded-full bg-brandGold mt-2 mr-3"></div>
                                     <p className="text-platinumGray">
                                         Découvrez l'art et la science derrière chaque diamant
                                     </p>
-                                </div>
+                                                </div>
                                 <div className="flex items-start">
                                     <div className="w-1.5 h-1.5 rounded-full bg-brandGold mt-2 mr-3"></div>
                                     <p className="text-platinumGray">
@@ -612,12 +612,12 @@ export default function AppointmentPage() {
                                     <div className="w-1.5 h-1.5 rounded-full bg-brandGold mt-2 mr-3"></div>
                                     <p className="text-platinumGray">
                                         Personnalisation sur-mesure avec nos experts
-                                    </p>
-                                </div>
-                            </div>
+                                                    </p>
+                                                </div>
+                                            </div>
                         </motion.div>
-                    </div>
-                </div>
+                                        </div>
+                                    </div>
             </section>
 
  {/* Enhanced Booking Form */}
@@ -651,8 +651,8 @@ export default function AppointmentPage() {
                             <p className="text-center mb-6">
                                 Nous avons bien reçu votre demande de rendez-vous. Un conseiller vous contactera très prochainement pour confirmer les détails.
                             </p>
-                            <a 
-                                href="#" 
+                                        <a
+                                            href="#"
                                 className="px-6 py-3 bg-brandGold text-richEbony rounded-sm font-medium hover:bg-brandGold/90 transition-all duration-300 shadow-sm"
                                 onClick={() => {
                                     // Reset form
@@ -697,7 +697,7 @@ export default function AppointmentPage() {
                                             <>
                                                 <h4 className="text-base font-serif text-brandGold mb-1">
                                                     Bonjour, {session.user.name || session.user.email}
-                                                </h4>
+                                                            </h4>
                                                 <p className="text-sm text-platinumGray">
                                                     Votre réservation sera associée à votre compte.
                                                 </p>
@@ -706,7 +706,7 @@ export default function AppointmentPage() {
                                             <>
                                                 <h4 className="text-base font-serif text-brandGold mb-1">
                                                     Connexion Nécessaire
-                                                </h4>
+                                                            </h4>
                                                 <p className="text-sm text-platinumGray">
                                                     Vous serez invité à vous connecter ou à créer un compte lors de la confirmation de votre rendez-vous.
                                                 </p>
@@ -831,7 +831,7 @@ export default function AppointmentPage() {
                                     <h4 className="font-medium text-platinumGray mb-4 flex items-center">
                                         <Clock size={16} className="mr-2 text-brandGold" />
                                         Disponibilités du {new Date(selectedDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}
-                                    </h4>
+                                                            </h4>
 
                                     <div className="mb-6">
                                         <h5 className="text-sm font-medium text-platinumGray mb-3">Matinée</h5>
@@ -1234,7 +1234,7 @@ export default function AppointmentPage() {
                         <div className="border-b border-brandGold/20 pb-6">
                             <h4 className="text-base font-serif text-brandGold mb-3">
                                 Comment se déroule un rendez-vous privé ?
-                            </h4>
+                                                            </h4>
                             <p className="text-platinumGray">
                                 Chaque consultation commence par un accueil personnalisé avec une boisson de bienvenue (thé marocain, café arabe ou rafraîchissements sans alcool). Votre conseiller dédié vous guidera ensuite à travers les collections adaptées à vos préférences. Vous aurez tout le temps nécessaire pour essayer les pièces et poser vos questions dans un cadre confidentiel et luxueux.
                             </p>
@@ -1243,7 +1243,7 @@ export default function AppointmentPage() {
                         <div className="border-b border-brandGold/20 pb-6">
                             <h4 className="text-base font-serif text-brandGold mb-3">
                                 Puis-je modifier ou annuler mon rendez-vous ?
-                            </h4>
+                                                            </h4>
                             <p className="text-platinumGray">
                                 Bien sûr, nous comprenons que votre emploi du temps peut changer. Nous vous demandons simplement de nous prévenir au moins 24 heures à l'avance afin que nous puissions réorganiser au mieux votre visite.
                             </p>
@@ -1252,7 +1252,7 @@ export default function AppointmentPage() {
                         <div className="border-b border-brandGold/20 pb-6">
                             <h4 className="text-base font-serif text-brandGold mb-3">
                                 Comment fonctionnent les consultations virtuelles ?
-                            </h4>
+                                                            </h4>
                             <p className="text-platinumGray">
                                 Nos consultations virtuelles sont réalisées via une plateforme sécurisée avec un lien privé que nous vous envoyons. Pour une expérience optimale, nous pouvons vous faire parvenir au préalable une sélection de pièces dans un coffret scellé, accompagnée d'une loupe gemmologique pour apprécier tous les détails.
                             </p>
@@ -1261,14 +1261,14 @@ export default function AppointmentPage() {
                         <div className="border-b border-brandGold/20 pb-6">
                             <h4 className="text-base font-serif text-brandGold mb-3">
                                 Quels sont les délais pour une création sur-mesure ?
-                            </h4>
+                                                            </h4>
                             <p className="text-platinumGray">
                                 Chaque création sur-mesure est unique et nécessite un temps de réalisation variable. En général, comptez entre 4 et 12 semaines selon la complexité du design, le sourcing des pierres et les finitions souhaitées. Votre conseiller vous communiquera un calendrier précis lors de votre consultation.
                             </p>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
             {/* Contact CTA Section */}
             <section className="bg-white py-16 px-6 text-center">
@@ -1303,9 +1303,9 @@ export default function AppointmentPage() {
                                 </span>
                                 concierge@diamantrouge.com
                             </a>
-                        </div>
+                    </div>
                     </motion.div>
-                </div>
+            </div>
             </section>
         </>
     );

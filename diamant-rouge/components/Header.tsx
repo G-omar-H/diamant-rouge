@@ -27,6 +27,19 @@ import {
   Phone
 } from "lucide-react";
 import { useRouter } from "next/router";
+import axios from "axios";
+
+// Interface for search results
+interface SearchResult {
+  id: number;
+  name: string;
+  image: string;
+  category: string;
+  categoryName?: string;
+  price: number;
+  slug?: string;
+  description?: string;
+}
 
 export default function Header() {
   const { cart } = useCart();
@@ -37,10 +50,17 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [collectionsOpen, setCollectionsOpen] = useState(false);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [selectedResultIndex, setSelectedResultIndex] = useState(-1);
+  const [searchCategory, setSearchCategory] = useState<string>("");
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const router = useRouter();
 
-  // Ref for dropdown menu
+  // Refs
   const collectionsMenuRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchResultsRef = useRef<HTMLDivElement>(null);
 
   // Handle scroll effect with precise threshold
   useEffect(() => {
@@ -64,6 +84,39 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Load recent searches from localStorage
+  useEffect(() => {
+    const storedSearches = localStorage.getItem('recentSearches');
+    if (storedSearches) {
+      try {
+        const parsedSearches = JSON.parse(storedSearches);
+        if (Array.isArray(parsedSearches)) {
+          setRecentSearches(parsedSearches.slice(0, 5)); // Keep only 5 most recent
+        }
+      } catch (e) {
+        console.error('Error parsing recent searches:', e);
+      }
+    }
+  }, []);
+  
+  // Save search to recent searches
+  const addToRecentSearches = (query: string) => {
+    if (!query.trim()) return;
+    
+    const newRecentSearches = [
+      query,
+      ...recentSearches.filter(s => s !== query) // Remove duplicates
+    ].slice(0, 5); // Keep only 5 most recent
+    
+    setRecentSearches(newRecentSearches);
+    
+    try {
+      localStorage.setItem('recentSearches', JSON.stringify(newRecentSearches));
+    } catch (e) {
+      console.error('Error saving recent searches:', e);
+    }
+  };
+
   // Refined animation variants for an elegant transition
   const headerVariants = {
     initial: {
@@ -80,15 +133,153 @@ export default function Header() {
     }
   };
 
+  // Effect to search products when query changes
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (searchQuery && searchQuery.trim().length >= 2) {
+        searchProducts(searchQuery.trim());
+      } else {
+        setSearchResults([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
+  // Function to search products from the API
+  const searchProducts = async (query: string) => {
+    if (!query) return;
+    
+    setIsSearching(true);
+    try {
+      let endpoint = `/api/products/search?q=${encodeURIComponent(query)}`;
+      
+      // Add category filter if selected
+      if (searchCategory) {
+        endpoint += `&category=${encodeURIComponent(searchCategory)}`;
+      }
+      
+      // Add locale for localized search results
+      if (router.locale) {
+        endpoint += `&locale=${router.locale}`;
+      }
+      
+      const { data } = await axios.get(endpoint);
+      if (data && data.results) {
+        setSearchResults(data.results);
+        
+        // Only add to recent searches if there are results and it's a user-initiated search
+        if (data.results.length > 0) {
+          addToRecentSearches(query);
+        }
+      } else {
+        setSearchResults([]);
+      }
+    } catch (error) {
+      console.error('Error searching products:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   // Handle search submit
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
-      setSearchOpen(false);
-      setSearchQuery("");
+      searchProducts(searchQuery);
     }
   };
+
+  // Handle product click - navigate to product and close search
+  const handleProductClick = (category: string, id: number) => {
+    router.push(`/collections/${category}/${id}`);
+    setSearchOpen(false);
+    setSearchQuery("");
+    setSearchResults([]);
+  };
+
+  // Enhanced keyboard navigation within search results
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (!searchResults.length) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedResultIndex(prev => {
+          const newIndex = prev < searchResults.length - 1 ? prev + 1 : 0;
+          // Scroll the item into view if needed
+          const resultItem = searchResultsRef.current?.children[newIndex] as HTMLElement;
+          resultItem?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          return newIndex;
+        });
+        break;
+        
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedResultIndex(prev => {
+          const newIndex = prev > 0 ? prev - 1 : searchResults.length - 1;
+          // Scroll the item into view if needed
+          const resultItem = searchResultsRef.current?.children[newIndex] as HTMLElement;
+          resultItem?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          return newIndex;
+        });
+        break;
+        
+      case 'Enter':
+        if (selectedResultIndex >= 0) {
+          e.preventDefault();
+          const selected = searchResults[selectedResultIndex];
+          handleProductClick(selected.category, selected.id);
+        }
+        break;
+        
+      case 'Escape':
+        e.preventDefault();
+        setSearchOpen(false);
+        setSearchQuery('');
+        setSearchResults([]);
+        break;
+        
+      default:
+        break;
+    }
+  };
+
+  // Reset selected result when results change
+  useEffect(() => {
+    setSelectedResultIndex(-1);
+  }, [searchResults]);
+
+  // Focus input when search opens
+  useEffect(() => {
+    if (searchOpen && searchInputRef.current) {
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 100);
+    }
+  }, [searchOpen]);
+
+  // Close search on escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && searchOpen) {
+        setSearchOpen(false);
+        setSearchQuery('');
+        setSearchResults([]);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [searchOpen]);
+
+  // Reset search when closed
+  useEffect(() => {
+    if (!searchOpen) {
+      setSearchCategory("");
+    }
+  }, [searchOpen]);
 
   return (
     <motion.header
@@ -541,6 +732,13 @@ export default function Header() {
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
             className="fixed inset-0 bg-richEbony/80 z-50 flex items-start justify-center pt-28 md:pt-28 px-4 md:px-0"
+            onClick={(e) => {
+              if ((e.target as HTMLElement).classList.contains('fixed')) {
+                setSearchOpen(false);
+                setSearchQuery("");
+                setSearchResults([]);
+              }
+            }}
           >
             <motion.div
               initial={{ y: -20, opacity: 0 }}
@@ -548,11 +746,18 @@ export default function Header() {
               exit={{ y: -20, opacity: 0 }}
               transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
               className="w-full max-w-2xl"
+              onKeyDown={handleSearchKeyDown}
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-center mb-6 md:mb-10">
                 <h2 className="text-brandGold font-serif text-2xl md:text-3xl">Recherche</h2>
                 <button
-                  onClick={() => setSearchOpen(false)}
+                  onClick={() => {
+                    setSearchOpen(false);
+                    setSearchQuery("");
+                    setSearchResults([]);
+                    setSearchCategory("");
+                  }}
                   className="text-brandIvory hover:text-brandGold transition-colors duration-300 p-1"
                   aria-label="Fermer la recherche"
                 >
@@ -562,45 +767,231 @@ export default function Header() {
 
               <form onSubmit={handleSearchSubmit} className="relative mx-auto w-full">
                 <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-brandGold/40 to-transparent mb-4"></div>
-                <input
-                  type="text"
-                  placeholder="Rechercher des créations, des collections..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-transparent border-none text-brandIvory text-lg md:text-xl py-3 px-2 pr-12 outline-none focus:ring-0 placeholder-brandIvory/50"
-                  autoFocus
-                />
-                <button
-                  type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-brandGold hover:scale-110 transition-transform duration-300"
-                  aria-label="Rechercher"
-                >
-                  <Search size={22} />
-                </button>
+                
+                <div className="flex flex-col md:flex-row gap-3 mb-3">
+                  <div className="relative flex-grow">
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      placeholder="Rechercher des créations, des collections..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full bg-transparent border-none text-brandIvory text-lg md:text-xl py-3 px-2 pr-12 outline-none focus:ring-0 placeholder-brandIvory/50"
+                      autoFocus
+                      aria-label="Rechercher des produits"
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-12 top-1/2 -translate-y-1/2 text-brandIvory/50 hover:text-brandGold transition-colors duration-300"
+                      onClick={() => setSearchQuery('')}
+                      aria-label="Effacer la recherche"
+                      style={{ visibility: searchQuery ? 'visible' : 'hidden' }}
+                    >
+                      <X size={16} />
+                    </button>
+                    <button
+                      type="submit"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-brandGold hover:scale-110 transition-transform duration-300"
+                      aria-label="Rechercher"
+                    >
+                      <Search size={22} />
+                    </button>
+                  </div>
+                  
+                  <select
+                    value={searchCategory}
+                    onChange={(e) => {
+                      setSearchCategory(e.target.value);
+                      if (searchQuery.trim().length >= 2) {
+                        searchProducts(searchQuery.trim());
+                      }
+                    }}
+                    className="bg-transparent border border-brandGold/30 rounded text-brandIvory py-2 px-3 focus:border-brandGold focus:ring-1 focus:ring-brandGold md:w-48"
+                    aria-label="Filtrer par catégorie"
+                  >
+                    <option value="" className="bg-richEbony">Toutes catégories</option>
+                    <option value="bagues" className="bg-richEbony">Bagues</option>
+                    <option value="colliers" className="bg-richEbony">Colliers</option>
+                    <option value="bracelets" className="bg-richEbony">Bracelets</option>
+                    <option value="boucles" className="bg-richEbony">Boucles d'oreilles</option>
+                  </select>
+                </div>
+                
                 <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-brandGold/40 to-transparent mt-4"></div>
               </form>
 
-              <div className="mt-10 md:mt-14">
-                <h3 className="text-brandIvory/70 text-xs md:text-sm uppercase tracking-widest mb-6 text-center">Explorez nos collections</h3>
-
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
-  <CategoryLink href="/collections?category=bagues" label="Bagues" count={22} onClick={() => setSearchOpen(false)} locale={router.locale} />
-  <CategoryLink href="/collections?category=colliers" label="Colliers" count={18} onClick={() => setSearchOpen(false)} locale={router.locale} />
-  <CategoryLink href="/collections?category=bracelets" label="Bracelets" count={14} onClick={() => setSearchOpen(false)} locale={router.locale} />
-  <CategoryLink href="/collections?category=boucles" label="Boucles d'oreilles" count={16} onClick={() => setSearchOpen(false)} locale={router.locale} />
-</div>
-
-                <div className="text-center mt-8 md:mt-10">
-                  <Link
-                    href="/collections"
-                    onClick={() => setSearchOpen(false)}
-                    className="inline-flex items-center text-brandGold hover:text-brandGold/80 transition-colors duration-300"
-                  >
-                    <span className="text-sm uppercase tracking-wider font-medium">Voir toutes nos créations</span>
-                    <Diamond size={10} className="ml-2 fill-brandGold" />
-                  </Link>
+              {/* Recent Searches */}
+              {!isSearching && !searchResults.length && recentSearches.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-brandIvory/70 text-xs uppercase tracking-widest mb-3">Recherches récentes</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {recentSearches.map((term, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          setSearchQuery(term);
+                          searchProducts(term);
+                        }}
+                        className="bg-brandIvory/10 text-brandIvory/90 text-sm px-3 py-1 rounded-full hover:bg-brandGold/20 transition-colors duration-200 flex items-center"
+                      >
+                        <span>{term}</span>
+                      </button>
+                    ))}
+                    {recentSearches.length > 0 && (
+                      <button 
+                        onClick={() => {
+                          setRecentSearches([]);
+                          localStorage.removeItem('recentSearches');
+                        }}
+                        className="text-brandIvory/50 text-xs hover:text-brandGold transition-colors duration-200 px-2"
+                      >
+                        Effacer
+                      </button>
+                    )}
+                  </div>
                 </div>
+              )}
+
+              {/* Search Results */}
+              <div className="mt-8">
+                {isSearching && (
+                  <div className="text-center py-8">
+                    <div className="inline-block w-6 h-6 border-2 border-brandGold border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-brandIvory/70 mt-2 text-sm">Recherche en cours...</p>
+                  </div>
+                )}
+
+                {!isSearching && searchQuery.length >= 2 && searchResults.length === 0 && (
+                  <div className="text-center py-8">
+                    <p className="text-brandIvory/90 text-lg">Aucun résultat trouvé pour "{searchQuery}"</p>
+                    <p className="text-brandIvory/60 mt-2 text-sm">
+                      {searchCategory 
+                        ? `Essayez de rechercher dans une autre catégorie ou modifiez votre requête.` 
+                        : `Essayez avec d'autres termes ou explorez nos collections ci-dessous.`
+                      }
+                    </p>
+                  </div>
+                )}
+
+                {!isSearching && searchResults.length > 0 && (
+                  <div>
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-brandIvory/90 text-sm uppercase tracking-widest">
+                        Résultats ({searchResults.length})
+                      </h3>
+                      
+                      {searchResults.length > 1 && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-brandIvory/50 text-xs">Trier par:</span>
+                          <button 
+                            onClick={() => {
+                              const sorted = [...searchResults].sort((a, b) => 
+                                a.name.localeCompare(b.name, router.locale || 'fr')
+                              );
+                              setSearchResults(sorted);
+                            }}
+                            className="text-xs text-brandIvory/70 hover:text-brandGold px-2 py-1 rounded transition-colors"
+                          >
+                            Nom
+                          </button>
+                          <button 
+                            onClick={() => {
+                              const sorted = [...searchResults].sort((a, b) => 
+                                (typeof a.price === 'number' && typeof b.price === 'number') 
+                                  ? a.price - b.price 
+                                  : 0
+                              );
+                              setSearchResults(sorted);
+                            }}
+                            className="text-xs text-brandIvory/70 hover:text-brandGold px-2 py-1 rounded transition-colors"
+                          >
+                            Prix
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div 
+                      ref={searchResultsRef}
+                      className="space-y-4 max-h-[40vh] overflow-y-auto custom-scrollbar pr-2"
+                    >
+                      {searchResults.map((result, index) => (
+                        <div 
+                          key={result.id}
+                          onClick={() => handleProductClick(result.category, result.id)}
+                          className={`flex items-center gap-4 p-3 rounded cursor-pointer transition-colors duration-200 ${
+                            index === selectedResultIndex 
+                              ? 'bg-brandGold/20 ring-1 ring-brandGold/50' 
+                              : 'bg-brandIvory/5 hover:bg-brandIvory/10'
+                          }`}
+                          tabIndex={0}
+                          onMouseEnter={() => setSelectedResultIndex(index)}
+                          aria-selected={index === selectedResultIndex}
+                        >
+                          <div className="w-16 h-16 flex-shrink-0 rounded overflow-hidden bg-brandIvory/10">
+                            {result.image ? (
+                              <Image 
+                                src={result.image} 
+                                alt={result.name} 
+                                width={64} 
+                                height={64} 
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  // If image fails to load, replace with default
+                                  (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
+                                }}
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-brandGold/10">
+                                <Diamond size={24} className="text-brandGold" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-grow">
+                            <div className="flex justify-between items-start">
+                              <h4 className="text-brandIvory font-medium">{result.name}</h4>
+                              <p className="text-brandGold font-serif ml-2">{(typeof result.price === 'number' ? result.price : 0).toLocaleString('fr-FR')} €</p>
+                            </div>
+                            <div className="flex items-center mt-1">
+                              <span className="text-brandIvory/60 text-xs">
+                                {result.categoryName || result.category.charAt(0).toUpperCase() + result.category.slice(1)}
+                              </span>
+                              {result.description && (
+                                <span className="text-brandIvory/40 text-xs ml-2 line-clamp-1">• {result.description.substring(0, 40)}...</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
+
+              {/* Show categories if no search or if results are shown but there's still space */}
+              {(searchQuery.length < 2 || (!isSearching && searchResults.length > 0)) && (
+                <div className={`${searchResults.length > 0 ? 'mt-10 pt-6 border-t border-brandGold/20' : 'mt-10'} md:mt-14`}>
+                  <h3 className="text-brandIvory/70 text-xs md:text-sm uppercase tracking-widest mb-6 text-center">Explorez nos collections</h3>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
+                    <CategoryLink href="/collections?category=bagues" label="Bagues" count={22} onClick={() => setSearchOpen(false)} locale={router.locale} />
+                    <CategoryLink href="/collections?category=colliers" label="Colliers" count={18} onClick={() => setSearchOpen(false)} locale={router.locale} />
+                    <CategoryLink href="/collections?category=bracelets" label="Bracelets" count={14} onClick={() => setSearchOpen(false)} locale={router.locale} />
+                    <CategoryLink href="/collections?category=boucles" label="Boucles d'oreilles" count={16} onClick={() => setSearchOpen(false)} locale={router.locale} />
+                  </div>
+
+                  <div className="text-center mt-8 md:mt-10">
+                    <Link
+                      href="/collections"
+                      onClick={() => setSearchOpen(false)}
+                      className="inline-flex items-center text-brandGold hover:text-brandGold/80 transition-colors duration-300"
+                    >
+                      <span className="text-sm uppercase tracking-wider font-medium">Voir toutes nos créations</span>
+                      <Diamond size={10} className="ml-2 fill-brandGold" />
+                    </Link>
+                  </div>
+                </div>
+              )}
             </motion.div>
           </motion.div>
         )}
