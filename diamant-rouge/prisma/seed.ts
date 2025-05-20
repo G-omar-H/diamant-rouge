@@ -23,6 +23,10 @@ async function main() {
   }
 }
 
+// Define types for our collections
+type CategoryRecord = Record<string, any>;
+type ProductRecord = Record<string, any>;
+
 // ✨ CATEGORIES
 async function seedCategories() {
   console.log('🔹 Creating jewelry categories...');
@@ -70,7 +74,7 @@ async function seedCategories() {
     }
   ];
   
-  const createdCategories = {};
+  const createdCategories: CategoryRecord = {};
   
   for (const category of categories) {
     const created = await prisma.category.upsert({
@@ -97,7 +101,7 @@ async function seedProducts() {
   
   // Get all categories
   const categories = await prisma.category.findMany();
-  const categoriesMap = categories.reduce((acc, cat) => {
+  const categoriesMap: Record<string, number> = categories.reduce((acc: Record<string, number>, cat: any) => {
     acc[cat.slug] = cat.id;
     return acc;
   }, {});
@@ -212,7 +216,7 @@ async function seedProducts() {
   ];
 
   // Create products and their variations
-  const createdProducts = {};
+  const createdProducts: ProductRecord = {};
   
   for (const product of products) {
     const createdProduct = await prisma.product.upsert({
@@ -365,7 +369,7 @@ async function seedOrders() {
     return;
   }
   
-  const productMap = products.reduce((acc, product) => {
+  const productMap: Record<number, any> = products.reduce((acc: Record<number, any>, product: any) => {
     acc[product.id] = product;
     return acc;
   }, {});
