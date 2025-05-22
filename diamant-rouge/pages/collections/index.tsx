@@ -9,10 +9,20 @@ import type { Product } from "@prisma/client";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { FaSpinner } from 'react-icons/fa';
+import { serializeData } from "../../lib/utils";
 
 type CollectionPageProps = {
-    products: Array<Product & { category?: { slug: string; translations?: any[] } | null }>;
+    products: Array<Product & { 
+        category?: { slug: string; translations?: any[] } | null;
+        variations?: {
+            id: number;
+            variationType: string;
+            variationValue: string;
+            additionalPrice: string;
+        }[];
+    }>;
     categories: Array<{ slug: string; translations: any[] }>;
+    productTypes: Array<string>;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -39,23 +49,35 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             },
         });
 
+        // Extract unique product types from variations
+        const allTypes = products
+            .flatMap(product => product.variations?.map(v => v.variationType) || [])
+            .filter(Boolean);
+        
+        // Get unique values
+        const productTypes = [...new Set(allTypes)];
+
+        // Use our utility to serialize everything in one go
+        const serializedData = serializeData({
+            products: products,
+            categories: categoryRecords,
+            productTypes: productTypes
+        });
+
         return {
-            props: {
-                products: JSON.parse(JSON.stringify(products)),
-                categories: JSON.parse(JSON.stringify(categoryRecords)),
-            },
+            props: serializedData,
         };
     } catch (error) {
         console.error("❌ Error fetching collections:", error);
         return {
-            props: { products: [], categories: [] },
+            props: { products: [], categories: [], productTypes: [] },
         };
     }
 };
 
-export default function CollectionsPage({ products, categories }: CollectionPageProps) {
+export default function CollectionsPage({ products, categories, productTypes }: CollectionPageProps) {
     const router = useRouter();
-    const { category: categoryParam, minPrice: minPriceParam, maxPrice: maxPriceParam } = router.query;
+    const { category: categoryParam, minPrice: minPriceParam, maxPrice: maxPriceParam, type: typeParam } = router.query;
     
     // Initialize state from URL parameters
     const [selectedCategory, setSelectedCategory] = useState<string>(
@@ -72,6 +94,11 @@ export default function CollectionsPage({ products, categories }: CollectionPage
       typeof maxPriceParam === 'string' && !isNaN(Number(maxPriceParam)) 
         ? Number(maxPriceParam) 
         : ""
+    );
+    
+    // Add state for product type
+    const [selectedType, setSelectedType] = useState<string>(
+      typeof typeParam === 'string' ? typeParam : ""
     );
     
     const [loading, setLoading] = useState(true);
@@ -129,7 +156,7 @@ export default function CollectionsPage({ products, categories }: CollectionPage
     
     // Read query params from URL
     useEffect(() => {
-        const { category, minPrice: minPriceParam, maxPrice: maxPriceParam } = router.query;
+        const { category, minPrice: minPriceParam, maxPrice: maxPriceParam, type: typeParam } = router.query;
 
         // Only set states if different from current to avoid loops
         if (category && typeof category === 'string' && category !== selectedCategory) {
@@ -145,43 +172,39 @@ export default function CollectionsPage({ products, categories }: CollectionPage
             setMaxPrice(Number(maxPriceParam));
             setPriceRange([priceRange[0], Number(maxPriceParam)]);
         }
+
+        if (typeParam && typeof typeParam === 'string' && typeParam !== selectedType) {
+            setSelectedType(typeParam);
+        }
     }, [router.query]); // Only depend on router.query to avoid infinite loops
 
     // Update URL when filters change
     useEffect(() => {
-        // Skip URL updates during active dragging to prevent excessive state changes
-        if (isDragging) return;
+        const newQuery: { [key: string]: string } = {};
         
-        // Use timeout for debouncing URL updates
-        const updateTimeout = setTimeout(() => {
-            const categoryQuery = selectedCategory ? { category: selectedCategory } : {};
-            const minPriceQuery = minPrice !== "" ? { minPrice: String(minPrice) } : {};
-            const maxPriceQuery = maxPrice !== "" ? { maxPrice: String(maxPrice) } : {};
-            
-            // Create a new URL with the updated query parameters
-            const newQuery = {
-                ...categoryQuery,
-                ...minPriceQuery,
-                ...maxPriceQuery,
-            };
-            
-            // Only update if the query is different to avoid unnecessary navigation
-            if (JSON.stringify(newQuery) !== JSON.stringify(router.query)) {
-                // Use the router.replace instead of push to prevent adding to history stack
-                // This prevents the browser from creating multiple history entries
-                router.replace(
-                    {
-                        pathname: '/collections',
-                        query: newQuery,
-                    },
-                    undefined,
-                    { locale: router.locale, scroll: false }
-                );
-            }
-        }, 300); // 300ms debounce
+        if (selectedCategory) {
+            newQuery.category = selectedCategory;
+        }
         
-        return () => clearTimeout(updateTimeout);
-    }, [selectedCategory, minPrice, maxPrice, isDragging, router.locale]);
+        if (minPrice !== "") {
+            newQuery.minPrice = String(minPrice);
+        }
+        
+        if (maxPrice !== "") {
+            newQuery.maxPrice = String(maxPrice);
+        }
+        
+        // Add type to URL params
+        if (selectedType) {
+            newQuery.type = selectedType;
+        }
+        
+        router.push({
+            pathname: router.pathname,
+            query: newQuery
+        }, undefined, { shallow: true });
+        
+    }, [selectedCategory, minPrice, maxPrice, selectedType, router]);
     
     // Get translated category names
     const getCategoryName = (slug: string) => {
@@ -280,15 +303,21 @@ export default function CollectionsPage({ products, categories }: CollectionPage
             return false;
         }
         
-            const basePriceNum = Number(product.basePrice);
+        const basePriceNum = Number(product.basePrice);
         
         // Min price filter
         if (minPrice !== "" && basePriceNum < Number(minPrice)) {
-                return false;
-            }
+            return false;
+        }
         
         // Max price filter
         if (maxPrice !== "" && basePriceNum > Number(maxPrice)) {
+            return false;
+        }
+        
+        // Product type filter
+        if (selectedType && (!product.variations || !product.variations.some(v => 
+            v.variationType === selectedType || v.variationValue === selectedType))) {
             return false;
         }
         
@@ -306,6 +335,7 @@ export default function CollectionsPage({ products, categories }: CollectionPage
         setSelectedCategory("");
         setMinPrice("");
         setMaxPrice("");
+        setSelectedType("");
     };
 
 
@@ -358,7 +388,7 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                                 <h2 className="text-2xl font-serif text-brandGold">
                                     {sortedProducts.length} {sortedProducts.length > 1 ? 'Créations' : 'Création'}
                                 </h2>
-                                {(selectedCategory || minPrice !== "" || maxPrice !== "") && (
+                                {(selectedCategory || minPrice !== "" || maxPrice !== "" || selectedType !== "") && (
                                     <div className="flex flex-wrap gap-2 mt-1.5 items-center">
                                         <span className="text-xs text-platinumGray">Filtres:</span>
                                         {selectedCategory && (
@@ -373,6 +403,20 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                                                 </button>
                                             </div>
                                         )}
+                                        
+                                        {selectedType && (
+                                            <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-brandGold/5 rounded text-xs border border-brandGold/20">
+                                                <span className="text-platinumGray">{selectedType}</span>
+                                                <button 
+                                                    onClick={() => setSelectedType("")}
+                                                    className="text-brandGold hover:text-burgundy transition-colors ml-1"
+                                                    aria-label="Supprimer le filtre de type"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        )}
+                                        
                                         {minPrice !== "" && (
                                             <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-brandGold/5 rounded text-xs border border-brandGold/20">
                                                 <span className="text-platinumGray">Min: {formatPrice(minPrice)} MAD</span>
@@ -405,9 +449,10 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                                         )}
                                         <button 
                                             onClick={resetFilters}
-                                            className="text-xs text-burgundy hover:underline transition-colors"
+                                            className="text-xs text-burgundy hover:text-burgundy/80 transition-colors underline ml-2"
+                                            aria-label="Réinitialiser tous les filtres"
                                         >
-                                            Réinitialiser
+                                            Effacer tout
                                         </button>
                                     </div>
                                 )}
@@ -451,6 +496,35 @@ export default function CollectionsPage({ products, categories }: CollectionPage
                                             <div className="w-1 h-1 bg-brandGold/40 rounded-full"></div>
                                             <div className="w-1 h-1 bg-brandGold/40 rounded-full"></div>
                                             <div className="w-1 h-1 bg-brandGold/40 rounded-full"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Product type filters - NEW SECTION */}
+                                <div>
+                                    <h3 className="text-sm font-medium text-richEbony mb-3">Types de bijoux</h3>
+                                    <div className="overflow-x-auto pb-2">
+                                        <div className="flex flex-nowrap gap-2 min-w-min">
+                                            <button
+                                                onClick={() => setSelectedType("")}
+                                                className={`text-xs px-5 py-2.5 rounded-full transition-all duration-300 whitespace-nowrap ${!selectedType 
+                                                    ? "bg-gradient-to-r from-brandGold to-brandGold/90 text-white shadow-md" 
+                                                    : "bg-brandIvory/80 text-platinumGray hover:bg-brandGold/10 hover:text-brandGold hover:border-brandGold/40 border border-brandGold/20"}`}
+                                            >
+                                                Tous
+                                            </button>
+                                            
+                                            {productTypes.map((type) => (
+                                                <button
+                                                    key={type}
+                                                    onClick={() => setSelectedType(type)}
+                                                    className={`text-xs px-5 py-2.5 rounded-full transition-all duration-300 whitespace-nowrap ${selectedType === type 
+                                                        ? "bg-gradient-to-r from-brandGold to-brandGold/90 text-white shadow-md" 
+                                                        : "bg-brandIvory/80 text-platinumGray hover:bg-brandGold/10 hover:text-brandGold hover:border-brandGold/40 border border-brandGold/20"}`}
+                                                >
+                                                    {type}
+                                                </button>
+                                            ))}
                                         </div>
                                     </div>
                                 </div>

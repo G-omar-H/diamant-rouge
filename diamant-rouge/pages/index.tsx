@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { useState, useRef, useMemo, useEffect } from "react";
 import { prisma } from "../lib/prisma";
 import { jwtVerify } from "jose";
+import { serializeData } from "../lib/utils";
 
 import HeroCarousel from "../components/HeroCarousel";
 import ProductCard from "../components/ProductCard";
@@ -22,6 +23,13 @@ interface CategoryTranslation {
 interface Category {
     id: number;
     translations: CategoryTranslation[];
+}
+
+interface ProductVariation {
+    id: number;
+    variationType: string;
+    variationValue: string;
+    additionalPrice: string;
 }
 
 // Define a type for the slide that matches the HeroCarousel component's Slide interface
@@ -65,20 +73,20 @@ export async function getServerSideProps(context: any) {
             }
         }
 
-                // Fetch featured products with categories
-                const featuredProducts = await prisma.product.findMany({
-                    where: { featured: true },  // Only get featured products
-                    include: { 
-                        translations: true, 
-                        variations: true,
-                        category: {
-                            include: {
-                                translations: true
-                            }
-                        }
-                    },
-                    take: 12,
-                });
+        // Fetch featured products with categories
+        const featuredProducts = await prisma.product.findMany({
+            where: { featured: true },  // Only get featured products
+            include: { 
+                translations: true, 
+                variations: true,
+                category: {
+                    include: {
+                        translations: true
+                    }
+                }
+            },
+            take: 12,
+        });
 
         // If user is logged in, fetch their wishlist
         if (userId) {
@@ -96,13 +104,25 @@ export async function getServerSideProps(context: any) {
             }
         });
 
+        // Extract unique product types from variations
+        const allTypes = featuredProducts
+            .flatMap(product => product.variations?.map(v => v.variationType) || [])
+            .filter(Boolean);
+        
+        // Get unique values
+        const productTypes = [...new Set(allTypes)];
+
+        // Use our serialization utility to ensure everything is JSON-safe
+        const serializedData = serializeData({
+            products: featuredProducts,
+            categories: categories,
+            productTypes: productTypes,
+            wishlist,
+            locale: context.locale || "fr",
+        });
+
         return {
-            props: {
-                products: JSON.parse(JSON.stringify(featuredProducts)),
-                categories: JSON.parse(JSON.stringify(categories)),
-                wishlist,
-                locale: context.locale || "fr",
-            },
+            props: serializedData,
         };
     } catch (error) {
         console.error("❌ Homepage Data Fetch Error:", error);
@@ -110,6 +130,7 @@ export async function getServerSideProps(context: any) {
             props: { 
                 products: [], 
                 categories: [],
+                productTypes: [],
                 wishlist: [], 
                 locale: context.locale || "fr" 
             },
@@ -157,20 +178,26 @@ const slides: Slide[] = [
 export default function HomePage({
     products,
     categories,
+    productTypes,
     wishlist,
     locale,
 }: {
     products: any[];
     categories: Category[];
+    productTypes: string[];
     wishlist: number[];
     locale: string;
 }) {
     // Set the default language to French if not specified
     const currentLocale = locale || "fr";
     
+    // Update to store filter type and value separately
+    const [activeFilterType, setActiveFilterType] = useState("category");
     const [activeFilter, setActiveFilter] = useState("Tous");
+    
     const carouselRef = useRef<HTMLDivElement>(null);
-    const filterContainerRef = useRef<HTMLDivElement>(null);
+    const categoryFilterRef = useRef<HTMLDivElement>(null);
+    const typeFilterRef = useRef<HTMLDivElement>(null);
     const [initialLoad, setInitialLoad] = useState(true);
 
     // Generate product categories from fetched data - prioritize French
@@ -193,45 +220,72 @@ export default function HomePage({
         return categoryNames;
     }, [categories, currentLocale]);
 
-    // Filter products based on selected category - prioritize French translations
+    // Prepare the product types array with "Tous" at the beginning
+    const formattedProductTypes = useMemo(() => {
+        return ["Tous", ...productTypes];
+    }, [productTypes]);
+
+    // Filter products based on selected category and/or type
     const filteredProducts = useMemo(() => {
         if (!products || products.length === 0) return [];
-        if (activeFilter === "Tous") return products;
         
         return products.filter(product => {
-            if (!product.category) return false;
+            // If both filters are "Tous", return all products
+            if (activeFilter === "Tous" && activeFilterType === "category") {
+                return true;
+            }
             
-            // Prioritize French translation
-            const categoryTranslation = product.category.translations.find((t: CategoryTranslation) => t.language === "fr") || 
-                                       product.category.translations.find((t: CategoryTranslation) => t.language === currentLocale) ||
-                                       product.category.translations[0];
+            // Filter by category
+            if (activeFilterType === "category" && activeFilter !== "Tous") {
+                if (!product.category) return false;
+                
+                // Prioritize French translation
+                const categoryTranslation = product.category.translations.find((t: CategoryTranslation) => t.language === "fr") || 
+                                           product.category.translations.find((t: CategoryTranslation) => t.language === currentLocale) ||
+                                           product.category.translations[0];
+                
+                return categoryTranslation.name === activeFilter;
+            }
             
-            return categoryTranslation.name === activeFilter;
+            // Filter by product type
+            if (activeFilterType === "type" && activeFilter !== "Tous") {
+                return product.variations && product.variations.some((v: ProductVariation) => 
+                    v.variationType === activeFilter || v.variationValue === activeFilter
+                );
+            }
+            
+            // Default fallback
+            return true;
         });
-    }, [products, activeFilter, currentLocale]);
+    }, [products, activeFilter, activeFilterType, currentLocale]);
     
-    // Handle filter change and scroll selected filter into view on mobile
-    const handleFilterChange = (category: string) => {
-        setActiveFilter(category);
+    // Handle filter change and scroll selected filter into view
+    const handleFilterChange = (filterType: "category" | "type", value: string) => {
+        setActiveFilterType(filterType);
+        setActiveFilter(value);
         setInitialLoad(true);
         
-        // Scroll the selected filter into view on mobile - safely check for window in browser environment
+        // Scroll the selected filter into view on mobile
         setTimeout(() => {
-            if (typeof window !== 'undefined' && window.innerWidth < 768 && filterContainerRef.current) {
-                // Find the selected button
-                const selectedButton = Array.from(filterContainerRef.current.querySelectorAll('button'))
-                    .find(btn => btn.textContent === category);
-                    
-                if (selectedButton) {
-                    // Calculate the scroll position to center the element
-                    const container = filterContainerRef.current;
-                    const scrollLeft = selectedButton.offsetLeft - (container.offsetWidth / 2) + (selectedButton.offsetWidth / 2);
-                    
-                    // Smooth scroll to the element
-                    container.scrollTo({
-                        left: Math.max(0, scrollLeft),
-                        behavior: 'smooth'
-                    });
+            if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                const containerRef = filterType === "category" ? categoryFilterRef : typeFilterRef;
+                
+                if (containerRef.current) {
+                    // Find the selected button
+                    const selectedButton = Array.from(containerRef.current.querySelectorAll('button'))
+                        .find(btn => btn.textContent === value);
+                        
+                    if (selectedButton) {
+                        // Calculate the scroll position to center the element
+                        const container = containerRef.current;
+                        const scrollLeft = selectedButton.offsetLeft - (container.offsetWidth / 2) + (selectedButton.offsetWidth / 2);
+                        
+                        // Smooth scroll to the element
+                        container.scrollTo({
+                            left: Math.max(0, scrollLeft),
+                            behavior: 'smooth'
+                        });
+                    }
                 }
             }
         }, 0);
@@ -325,14 +379,15 @@ export default function HomePage({
                         {/* Elegant background for desktop filters */}
                         <div className="hidden md:block absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-14 bg-brandGold/5 rounded-full"></div>
                         
-                        <div ref={filterContainerRef} className="relative w-full md:w-auto md:max-w-3xl overflow-x-auto scrollbar-hide py-2 md:py-3 -mx-1 px-1 md:px-4">
+                        <div ref={categoryFilterRef} className="relative w-full md:w-auto md:max-w-3xl overflow-x-auto scrollbar-hide py-2 md:py-3 -mx-1 px-1 md:px-4">
+                            <h3 className="text-sm font-medium text-richEbony mb-2 px-4">Collections</h3>
                             <div className="flex space-x-2 md:space-x-4 min-w-max md:min-w-0 md:flex-wrap md:justify-center mx-auto">
                                 {productCategories.map((category) => (
                                     <button
                                         key={category}
-                                        onClick={() => handleFilterChange(category)}
+                                        onClick={() => handleFilterChange("category", category)}
                                         className={`px-4 py-2 md:px-6 md:py-2.5 text-xs md:text-sm whitespace-nowrap transition-all duration-300 border rounded-full ${
-                                            activeFilter === category
+                                            activeFilterType === "category" && activeFilter === category
                                                 ? "border-brandGold bg-brandGold text-richEbony shadow-sm"
                                                 : "border-brandGold/40 text-platinumGray hover:border-brandGold hover:bg-brandGold/5"
                                         } ${category === "Tous" ? "md:order-first" : ""}`}
@@ -344,7 +399,6 @@ export default function HomePage({
                             
                             {/* Elegant fade effect for mobile to indicate scrollable content */}
                             <div className="absolute top-0 right-0 h-full w-8 bg-gradient-to-l from-white to-transparent md:hidden"></div>
-                            <div className="absolute top-0 left-0 h-full w-8 bg-gradient-to-r from-white to-transparent md:hidden"></div>
                         </div>
                     </div>
                     
@@ -354,6 +408,36 @@ export default function HomePage({
                             <div className="w-1 h-1 bg-brandGold/40 rounded-full"></div>
                             <div className="w-1 h-1 bg-brandGold/40 rounded-full"></div>
                             <div className="w-1 h-1 bg-brandGold/40 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Type Filter Section */}
+                <div className="relative">
+                    <div className="flex justify-center">
+                        {/* Elegant background for desktop filters */}
+                        <div className="hidden md:block absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-14 bg-brandGold/5 rounded-full"></div>
+                        
+                        <div ref={typeFilterRef} className="relative w-full md:w-auto md:max-w-3xl overflow-x-auto scrollbar-hide py-2 md:py-3 -mx-1 px-1 md:px-4">
+                            <h3 className="text-sm font-medium text-richEbony mb-2 px-4">Types de bijoux</h3>
+                            <div className="flex space-x-2 md:space-x-4 min-w-max md:min-w-0 md:flex-wrap md:justify-center mx-auto">
+                                {formattedProductTypes.map((type) => (
+                                    <button
+                                        key={type}
+                                        onClick={() => handleFilterChange("type", type)}
+                                        className={`px-4 py-2 md:px-6 md:py-2.5 text-xs md:text-sm whitespace-nowrap transition-all duration-300 border rounded-full ${
+                                            activeFilterType === "type" && activeFilter === type
+                                                ? "border-brandGold bg-brandGold text-richEbony shadow-sm"
+                                                : "border-brandGold/40 text-platinumGray hover:border-brandGold hover:bg-brandGold/5"
+                                        } ${type === "Tous" ? "md:order-first" : ""}`}
+                                    >
+                                        {type}
+                                    </button>
+                                ))}
+                            </div>
+                            
+                            {/* Elegant fade effect for mobile to indicate scrollable content */}
+                            <div className="absolute top-0 right-0 h-full w-8 bg-gradient-to-l from-white to-transparent md:hidden"></div>
                         </div>
                     </div>
                 </div>
