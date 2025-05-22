@@ -67,7 +67,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Create appointment in database
     const appointment = await prisma.appointment.create({
       data: {
-        clientName: user.name || 'Client',
         clientEmail: user.email,
         clientPhone: user.phoneNumber || '',
         appointmentDate,

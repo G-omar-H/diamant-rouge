@@ -41,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const appointments = await prisma.appointment.findMany({
         where,
         orderBy: {
-          createdAt: 'desc',
+          id: 'desc',
         },
       });
       
