@@ -28,9 +28,22 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: '*.vercel.app',
                 pathname: '**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'raw.githubusercontent.com',
+                pathname: '**',
+            },
+            {
+                protocol: 'https',
+                hostname: '*.githubusercontent.com',
+                pathname: '**',
             }
         ],
-        unoptimized: process.env.NODE_ENV === 'development',
+        formats: ['image/avif', 'image/webp'],
+        minimumCacheTTL: 60,
+        dangerouslyAllowSVG: true,
+        contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     },
     // other config if needed...
 }
