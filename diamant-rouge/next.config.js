@@ -13,7 +13,6 @@ const nextConfig = {
         ignoreDuringBuilds: true,
     },
     images: {
-        unoptimized: true, // This will bypass Next.js image optimization
         remotePatterns: [
             {
                 protocol: 'https',
@@ -29,23 +28,9 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: '*.vercel.app',
                 pathname: '**',
-            },
-            {
-                protocol: 'https',
-                hostname: 'raw.githubusercontent.com',
-                pathname: '**',
-            },
-            {
-                protocol: 'https',
-                hostname: '*.githubusercontent.com',
-                pathname: '**',
             }
         ],
-        formats: ['image/avif', 'image/webp'],
-        minimumCacheTTL: 60,
-        dangerouslyAllowSVG: true,
-        contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-        domains: ['github.com', 'raw.githubusercontent.com'], // Add explicit domains
+        unoptimized: process.env.NODE_ENV === 'development',
     },
     // other config if needed...
 }

@@ -303,61 +303,63 @@ export default function ProductPage({
             
             {/* LEFT COLUMN: Product Gallery - refined for all devices */}
             <div className="space-y-4 md:space-y-5">
-              {/* Main Image with Zoom */}
+              {/* Main Image with Zoom - refined aspect ratio and smoother transitions */}
               <div 
                 className="relative overflow-hidden rounded-md md:rounded-lg shadow-luxury cursor-zoom-in aspect-square md:aspect-[4/3]"
                 ref={mainImageRef}
                 onClick={handleImageZoom}
                 onMouseLeave={handleZoomEnd}
                 style={{
-                    transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    transform: isZoomed ? 'scale(1.75)' : 'scale(1)'
+                  transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)', // Elegant easing
+                  transform: isZoomed ? 'scale(1.75)' : 'scale(1)'
                 }}
               >
-                <img
-                    src={selectedImage}
-                    alt={productTranslation?.name || "Bijou Diamant Rouge"}
-                    className="w-full h-full object-cover"
-                    loading="eager"
+                <Image
+                  src={selectedImage}
+                  width={1200}
+                  height={900}
+                  alt={productTranslation?.name || "Bijou Diamant Rouge"}
+                  className="w-full h-full object-cover"
+                  priority
                 />
                 {!isZoomed && (
-                    <motion.button 
-                        initial={{ opacity: 0.8 }}
-                        whileHover={{ opacity: 1 }}
-                        className="absolute bottom-3 right-3 bg-richEbony/70 text-brandIvory p-1.5 rounded-full backdrop-blur-sm"
-                    >
-                        <ZoomIn size={18} />
-                    </motion.button>
+                  <motion.button 
+                    initial={{ opacity: 0.8 }}
+                    whileHover={{ opacity: 1 }}
+                    className="absolute bottom-3 right-3 bg-richEbony/70 text-brandIvory p-1.5 rounded-full backdrop-blur-sm"
+                  >
+                    <ZoomIn size={18} />
+                  </motion.button>
                 )}
               </div>
 
-              {/* Thumbnails */}
+              {/* Thumbnails - refined for touch with better visual feedback */}
               <div className="flex gap-2.5 md:gap-3 overflow-x-auto pb-1 snap-x snap-mandatory scrollbar-hide">
                 {productData.images.map((img, index) => {
-                    const isSelected = selectedImage === img;
-                    return (
-                        <motion.button
-                            key={index}
-                            onClick={() => setSelectedImage(img)}
-                            whileHover={{ y: -2 }}
-                            whileTap={{ scale: 0.95 }}
-                            className={`relative border-2 rounded-md overflow-hidden flex-none snap-center transition-all ${
-                                isSelected ? "border-brandGold ring-2 ring-brandGold/30" : "border-transparent hover:border-brandGold/40"
-                            }`}
-                        >
-                            <div className="relative h-18 w-18 md:h-20 md:w-20">
-                                <img
-                                    src={img}
-                                    alt={`${productTranslation?.name} - Vue ${index + 1}`}
-                                    className="object-cover w-full h-full"
-                                    loading="lazy"
-                                />
-                                {isSelected && (
-                                    <div className="absolute inset-0 bg-brandGold/10"></div>
-                                )}
-                            </div>
-                        </motion.button>
-                    );
+                  const isSelected = selectedImage === img;
+                  return (
+                    <motion.button
+                      key={index}
+                      onClick={() => setSelectedImage(img)}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`relative border-2 rounded-md overflow-hidden flex-none snap-center transition-all ${
+                        isSelected ? "border-brandGold ring-2 ring-brandGold/30" : "border-transparent hover:border-brandGold/40"
+                      }`}
+                    >
+                      <div className="relative h-18 w-18 md:h-20 md:w-20">
+                      <Image
+                        src={img}
+                          fill
+                        alt={`${productTranslation?.name} - Vue ${index + 1}`}
+                          className="object-cover"
+                        />
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-brandGold/10"></div>
+                        )}
+                      </div>
+                    </motion.button>
+                  );
                 })}
               </div>
 
