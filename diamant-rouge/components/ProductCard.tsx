@@ -130,22 +130,20 @@ export default function ProductCard({ product, locale, isWishlisted = false }: P
                     className="block h-full w-full"
                 >
                     <div className="relative h-full w-full">
-                        {/* Fallback div in case Image fails */}
+                        {/* Fallback div in case image fails */}
                         <div className="absolute inset-0 bg-brandIvory/50 flex items-center justify-center">
                             <span className="text-platinumGray font-light italic">Image</span>
                         </div>
                         
                         {/* Main Product Image */}
-                        <Image
+                        <img
                             src={imageSrc}
                             alt={getProductName()}
-                            fill
-                            sizes="(max-width: 768px) 100vw, 300px"
-                            className="object-cover z-10 transition-transform duration-700 ease-out"
+                            className="object-cover w-full h-full z-10 transition-transform duration-700 ease-out"
                             style={{
                                 transform: hovered ? 'scale(1.05)' : 'scale(1)'
                             }}
-                            priority
+                            loading="lazy"
                         />
                         
                         {/* Luxury hover effect - subtle gold gradient overlay with description preview */}

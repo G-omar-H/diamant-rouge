@@ -13,6 +13,7 @@ const nextConfig = {
         ignoreDuringBuilds: true,
     },
     images: {
+        unoptimized: true, // This will bypass Next.js image optimization
         remotePatterns: [
             {
                 protocol: 'https',
@@ -44,6 +45,7 @@ const nextConfig = {
         minimumCacheTTL: 60,
         dangerouslyAllowSVG: true,
         contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+        domains: ['github.com', 'raw.githubusercontent.com'], // Add explicit domains
     },
     // other config if needed...
 }

@@ -162,12 +162,11 @@ export default function CartPage() {
                       className="bg-white rounded-lg p-6 shadow-luxury flex gap-6 relative"
                     >
                       <div className="w-24 h-24 rounded-md overflow-hidden flex-shrink-0 shadow-md">
-                        <Image
+                        <img
                           src={imageSrc}
-                          width={120}
-                          height={120}
                           alt={productName || "Bijou Diamant Rouge"}
                           className="w-full h-full object-cover"
+                          loading="lazy"
                           onError={(e) => {
                             e.currentTarget.src = "/images/placeholder.jpg";
                           }}
