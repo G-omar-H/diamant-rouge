@@ -194,39 +194,33 @@ export default function ProfilePage({
     }
 
     // Handle saving jewelry preferences (real implementation)
-    async function handleSavePreferences(e: React.FormEvent) {
+    async function handleSavePreferences(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
-        setUpdateMsg("");
         setIsSubmitting(true);
+        setUpdateMsg("");
 
         try {
-            const res = await fetch("/api/user/update-preferences", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
+            const response = await fetch('/api/profile/preferences', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify({
                     preferredMetals,
                     preferredGemstones,
                     ringSize,
                     braceletSize,
-                    necklaceLength
+                    necklaceLength,
                 }),
             });
 
-            if (res.ok) {
-                setUpdateMsg(effectiveLocale === 'fr'
-                    ? "Préférences mises à jour avec succès"
-                    : "Preferences updated successfully");
-            } else {
-                const data = await res.json();
-                setUpdateMsg(data.error || (effectiveLocale === 'fr'
-                    ? "Erreur lors de la mise à jour des préférences"
-                    : "Error updating preferences"));
-            }
+            if (!response.ok) throw new Error('Failed to update preferences');
+
+            setUpdateMsg(effectiveLocale === 'fr' ? 'Préférences mises à jour' : 'Preferences updated');
+            setTimeout(() => setUpdateMsg(""), 3000);
         } catch (error) {
-            console.error("Update preferences error:", error);
-            setUpdateMsg(effectiveLocale === 'fr'
-                ? "Une erreur est survenue lors de la mise à jour"
-                : "An error occurred during the update");
+            console.error('Error updating preferences:', error);
+            setUpdateMsg(effectiveLocale === 'fr' ? 'Erreur lors de la mise à jour' : 'Error updating preferences');
         } finally {
             setIsSubmitting(false);
         }
