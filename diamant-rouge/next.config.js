@@ -24,7 +24,13 @@ const nextConfig = {
                 hostname: 'localhost',
                 pathname: '**',
             },
+            {
+                protocol: 'https',
+                hostname: '*.vercel.app',
+                pathname: '**',
+            }
         ],
+        unoptimized: process.env.NODE_ENV === 'development',
     },
     // other config if needed...
 }
