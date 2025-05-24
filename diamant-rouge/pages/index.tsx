@@ -22,7 +22,16 @@ interface CategoryTranslation {
 
 interface Category {
     id: number;
+    slug?: string;
     translations: CategoryTranslation[];
+}
+
+interface ProductTranslation {
+    id: number;
+    language: string;
+    name: string;
+    description: string;
+    productId: number;
 }
 
 interface ProductVariation {
@@ -30,6 +39,18 @@ interface ProductVariation {
     variationType: string;
     variationValue: string;
     additionalPrice: string;
+}
+
+interface Product {
+    id: number;
+    sku: string;
+    basePrice: string | number;
+    categoryId?: number;
+    category?: Category;
+    translations: ProductTranslation[];
+    variations: ProductVariation[];
+    images: string[];
+    featured: boolean;
 }
 
 // Define a type for the slide that matches the HeroCarousel component's Slide interface
@@ -41,6 +62,11 @@ interface Slide {
     actionText?: string;
     position?: "left" | "right" | "center";
 }
+
+// Define the jewelry filter map type
+type JewelryTypeMapType = {
+    [key: string]: string[];
+};
 
 /* ----------------------------------------------------------
    1. Server-Side Data Fetching
@@ -182,7 +208,7 @@ export default function HomePage({
     wishlist,
     locale,
 }: {
-    products: any[];
+    products: Product[];
     categories: Category[];
     productTypes: string[];
     wishlist: number[];
@@ -191,93 +217,132 @@ export default function HomePage({
     // Set the default language to French if not specified
     const currentLocale = locale || "fr";
     
-    // Update to store filter type and value separately
-    const [activeFilterType, setActiveFilterType] = useState("category");
+    // Simplified filter system - only jewelry type
     const [activeFilter, setActiveFilter] = useState("Tous");
     
     const carouselRef = useRef<HTMLDivElement>(null);
-    const categoryFilterRef = useRef<HTMLDivElement>(null);
-    const typeFilterRef = useRef<HTMLDivElement>(null);
+    const filterRef = useRef<HTMLDivElement>(null);
     const [initialLoad, setInitialLoad] = useState(true);
 
-    // Generate product categories from fetched data - prioritize French
-    const productCategories = useMemo(() => {
-        const categoryNames = ["Tous"];
-        
-        if (categories && categories.length) {
-            categories.forEach(category => {
-                // Prioritize French translation, fall back to any available translation
-                const translation = category.translations.find((t: CategoryTranslation) => t.language === "fr") || 
-                                   category.translations.find((t: CategoryTranslation) => t.language === currentLocale) ||
-                                   category.translations[0];
-                                   
-                if (translation) {
-                    categoryNames.push(translation.name);
-                }
-            });
+    // Debug on first render to inspect products
+    useEffect(() => {
+        if (process.env.NODE_ENV === 'development') {
+            console.log('Product Categories:', categories.map(c => ({
+                id: c.id,
+                slug: c.slug,
+                translations: c.translations.map(t => ({
+                    language: t.language,
+                    name: t.name
+                }))
+            })));
+            
+            // Log first 3 products as examples
+            console.log('Example Products:', products.slice(0, 3).map(p => ({
+                id: p.id,
+                category: p.category?.slug,
+                categoryId: p.categoryId,
+                translations: p.translations?.map((t: ProductTranslation) => ({
+                    language: t.language,
+                    name: t.name?.substring(0, 30) + '...'
+                })),
+                variations: p.variations?.map((v: ProductVariation) => ({
+                    type: v.variationType,
+                    value: v.variationValue
+                }))
+            })));
         }
-        
-        return categoryNames;
-    }, [categories, currentLocale]);
+    }, [categories, products]);
 
-    // Prepare the product types array with "Tous" at the beginning
-    const formattedProductTypes = useMemo(() => {
-        return ["Tous", ...productTypes];
-    }, [productTypes]);
-
-    // Filter products based on selected category and/or type
+    // Define jewelry type categories and their mappings
+    const jewelryTypes = ["Tous", "Bagues", "Colliers", "Bracelets", "Boucles d'oreilles", "Pendentifs"];
+    
+    // Map for matching jewelry types to category slugs and variation types
+    const jewelryTypeMap: JewelryTypeMapType = {
+        "Bagues": ["rings", "ring", "bague", "bagues", "alliance", "ring_size", "taille_bague"],
+        "Colliers": ["necklaces", "necklace", "collier", "colliers", "pendant", "necklace_length", "longueur_collier"],
+        "Bracelets": ["bracelets", "bracelet", "bracelet_size", "taille_bracelet"],
+        "Boucles d'oreilles": ["earrings", "earring", "boucle", "boucles"],
+        "Pendentifs": ["pendants", "pendant", "pendentif", "charm"]
+    };
+    
+    // Filter products based on the active filter
     const filteredProducts = useMemo(() => {
-        if (!products || products.length === 0) return [];
-        
-        return products.filter(product => {
-            // If both filters are "Tous", return all products
-            if (activeFilter === "Tous" && activeFilterType === "category") {
+        return products.filter((product) => {
+            // Show all products when "Tous" is selected
+            if (activeFilter === "Tous") return true;
+            
+            // Get matching terms for the selected filter
+            const matchTerms = jewelryTypeMap[activeFilter] || [];
+            if (!matchTerms.length) return false;
+
+            // Check product category
+            if (product.category && product.category.slug) {
+                // Match on category slug
+                if (matchTerms.includes(product.category.slug.toLowerCase())) {
                 return true;
             }
             
-            // Filter by category
-            if (activeFilterType === "category" && activeFilter !== "Tous") {
-                if (!product.category) return false;
-                
-                // Prioritize French translation
-                const categoryTranslation = product.category.translations.find((t: CategoryTranslation) => t.language === "fr") || 
-                                           product.category.translations.find((t: CategoryTranslation) => t.language === currentLocale) ||
-                                           product.category.translations[0];
-                
-                return categoryTranslation.name === activeFilter;
+                // Match on category translations
+                if (product.category.translations && product.category.translations.length) {
+                    const hasMatchingCategory = product.category.translations.some(
+                        (t: CategoryTranslation) => {
+                            if (!t.name) return false;
+                            return matchTerms.some((term: string) => 
+                                t.name.toLowerCase().includes(term)
+                            );
+                        }
+                    );
+                    if (hasMatchingCategory) return true;
+                }
             }
             
-            // Filter by product type
-            if (activeFilterType === "type" && activeFilter !== "Tous") {
-                return product.variations && product.variations.some((v: ProductVariation) => 
-                    v.variationType === activeFilter || v.variationValue === activeFilter
-                );
+            // Check product translations for the name (might contain type info)
+            if (product.translations && product.translations.length) {
+                const hasMatchingName = product.translations.some((t: ProductTranslation) => {
+                    if (!t.name) return false;
+                    const name = t.name.toLowerCase();
+                    return matchTerms.some((term: string) => name.includes(term));
+                });
+                if (hasMatchingName) return true;
             }
             
-            // Default fallback
-            return true;
+            // Check product variations
+            if (product.variations && product.variations.length) {
+                const hasMatchingVariation = product.variations.some((v: ProductVariation) => {
+                    if (!v.variationType || !v.variationValue) return false;
+                    
+                    // Check if variation type matches any of the match terms
+                    const typeMatches = matchTerms.some((term: string) => 
+                        v.variationType.toLowerCase().includes(term) ||
+                        v.variationValue.toLowerCase().includes(term)
+                    );
+                    
+                    return typeMatches;
+                });
+                if (hasMatchingVariation) return true;
+            }
+            
+            // No match found
+            return false;
         });
-    }, [products, activeFilter, activeFilterType, currentLocale]);
+    }, [products, activeFilter, jewelryTypeMap]);
     
     // Handle filter change and scroll selected filter into view
-    const handleFilterChange = (filterType: "category" | "type", value: string) => {
-        setActiveFilterType(filterType);
+    const handleFilterChange = (value: string) => {
         setActiveFilter(value);
         setInitialLoad(true);
         
         // Scroll the selected filter into view on mobile
         setTimeout(() => {
             if (typeof window !== 'undefined' && window.innerWidth < 768) {
-                const containerRef = filterType === "category" ? categoryFilterRef : typeFilterRef;
-                
-                if (containerRef.current) {
+                if (filterRef.current) {
                     // Find the selected button
-                    const selectedButton = Array.from(containerRef.current.querySelectorAll('button'))
+                    const selectedButton = Array.from(filterRef.current.querySelectorAll('button'))
                         .find(btn => btn.textContent === value);
                         
                     if (selectedButton) {
                         // Calculate the scroll position to center the element
-                        const container = containerRef.current;
+                        const container = filterRef.current;
                         const scrollLeft = selectedButton.offsetLeft - (container.offsetWidth / 2) + (selectedButton.offsetWidth / 2);
                         
                         // Smooth scroll to the element
@@ -373,26 +438,25 @@ export default function HomePage({
                     </p>
                 </div>
 
-                {/* Filter tabs - Enhanced with true centering for desktop while preserving mobile scroll */}
+                {/* Single Jewelry Type Filter */}
                 <div className="relative mb-8 md:mb-10 px-4 md:px-0">
                     <div className="flex justify-center">
-                        {/* Elegant background for desktop filters */}
-                        <div className="hidden md:block absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-14 bg-brandGold/5 rounded-full"></div>
+                        {/* Remove background entirely */}
                         
-                        <div ref={categoryFilterRef} className="relative w-full md:w-auto md:max-w-3xl overflow-x-auto scrollbar-hide py-2 md:py-3 -mx-1 px-1 md:px-4">
-                            <h3 className="text-sm font-medium text-richEbony mb-2 px-4">Collections</h3>
-                            <div className="flex space-x-2 md:space-x-4 min-w-max md:min-w-0 md:flex-wrap md:justify-center mx-auto">
-                                {productCategories.map((category) => (
+                        <div ref={filterRef} className="relative w-full md:w-auto overflow-x-auto scrollbar-hide py-2 md:py-3 -mx-1 px-1 md:px-4">
+                            {/* Remove the h3 title */}
+                            <div className="flex space-x-2 md:space-x-4 min-w-max mx-auto">
+                                {jewelryTypes.map((type) => (
                                     <button
-                                        key={category}
-                                        onClick={() => handleFilterChange("category", category)}
+                                        key={type}
+                                        onClick={() => handleFilterChange(type)}
                                         className={`px-4 py-2 md:px-6 md:py-2.5 text-xs md:text-sm whitespace-nowrap transition-all duration-300 border rounded-full ${
-                                            activeFilterType === "category" && activeFilter === category
+                                            activeFilter === type
                                                 ? "border-brandGold bg-brandGold text-richEbony shadow-sm"
                                                 : "border-brandGold/40 text-platinumGray hover:border-brandGold hover:bg-brandGold/5"
-                                        } ${category === "Tous" ? "md:order-first" : ""}`}
+                                        } ${type === "Tous" ? "order-first" : ""}`}
                                     >
-                                        {category}
+                                        {type}
                                     </button>
                                 ))}
                             </div>
@@ -412,149 +476,76 @@ export default function HomePage({
                     </div>
                 </div>
 
-                {/* Type Filter Section */}
-                <div className="relative">
-                    <div className="flex justify-center">
-                        {/* Elegant background for desktop filters */}
-                        <div className="hidden md:block absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-14 bg-brandGold/5 rounded-full"></div>
-                        
-                        <div ref={typeFilterRef} className="relative w-full md:w-auto md:max-w-3xl overflow-x-auto scrollbar-hide py-2 md:py-3 -mx-1 px-1 md:px-4">
-                            <h3 className="text-sm font-medium text-richEbony mb-2 px-4">Types de bijoux</h3>
-                            <div className="flex space-x-2 md:space-x-4 min-w-max md:min-w-0 md:flex-wrap md:justify-center mx-auto">
-                                {formattedProductTypes.map((type) => (
-                                    <button
-                                        key={type}
-                                        onClick={() => handleFilterChange("type", type)}
-                                        className={`px-4 py-2 md:px-6 md:py-2.5 text-xs md:text-sm whitespace-nowrap transition-all duration-300 border rounded-full ${
-                                            activeFilterType === "type" && activeFilter === type
-                                                ? "border-brandGold bg-brandGold text-richEbony shadow-sm"
-                                                : "border-brandGold/40 text-platinumGray hover:border-brandGold hover:bg-brandGold/5"
-                                        } ${type === "Tous" ? "md:order-first" : ""}`}
-                                    >
-                                        {type}
-                                    </button>
-                                ))}
-                            </div>
-                            
-                            {/* Elegant fade effect for mobile to indicate scrollable content */}
-                            <div className="absolute top-0 right-0 h-full w-8 bg-gradient-to-l from-white to-transparent md:hidden"></div>
-                        </div>
-                    </div>
-                </div>
-
                 {/* Products carousel with refined mobile experience */}
                 <div className="relative w-full px-3 md:px-10 lg:px-16">
                     {/* Mobile carousel scrolling instructions (visible only on mobile) */}
                     <div className="flex items-center justify-center mb-4 md:hidden">
                         <span className="text-xs text-platinumGray flex items-center">
-                            <span className="inline-block animate-pulse mr-2">←</span>
-                            <span>Glissez pour voir plus</span>
-                            <span className="inline-block animate-pulse ml-2">→</span>
+                            <span>Glisser pour découvrir</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
                         </span>
                     </div>
 
+                    {/* Desktop carousel navigation */}
+                    <div className="hidden md:flex justify-between absolute top-1/2 left-0 right-0 transform -translate-y-1/2 z-10 px-1 md:px-4 pointer-events-none">
+                        <button 
+                            className="bg-white/80 hover:bg-white text-platinumGray hover:text-brandGold w-9 h-9 flex items-center justify-center rounded-full shadow-sm backdrop-blur-sm hover:scale-105 transition-all pointer-events-auto border border-brandGold/10"
+                            onClick={() => scrollCarousel('left')}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <button 
+                            className="bg-white/80 hover:bg-white text-platinumGray hover:text-brandGold w-9 h-9 flex items-center justify-center rounded-full shadow-sm backdrop-blur-sm hover:scale-105 transition-all pointer-events-auto border border-brandGold/10"
+                            onClick={() => scrollCarousel('right')}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {/* Products carousel */}
                     <div 
                         ref={carouselRef}
-                        className="flex overflow-x-auto custom-scrollbar snap-x scroll-smooth gap-4 md:gap-6 lg:gap-8 pb-6 md:pb-8"
+                        className="flex overflow-x-auto pb-8 pt-4 scrollbar-hide gap-4 md:gap-6 snap-x"
                     >
-                        {filteredProducts.length > 0 ? (
+                        {filteredProducts.length === 0 ? (
+                            <div className="flex justify-center items-center w-full h-48">
+                                <p className="text-platinumGray text-center">
+                                    Aucun produit ne correspond à ce critère. <br />
+                                    Veuillez essayer un autre filtre.
+                                </p>
+                            </div>
+                        ) : (
                             filteredProducts.map((product) => (
-                                <div 
-                                    key={product.id} 
-                                    className="product-item flex-none w-64 sm:w-72 md:w-80 snap-start"
-                                >
+                                <div key={product.id} className="snap-start shrink-0">
                                     <ProductCard
                                         product={product}
-                                        locale={locale}
+                                        locale={currentLocale}
                                         isWishlisted={wishlist.includes(product.id)}
                                     />
                                 </div>
                             ))
-                        ) : (
-                            <div className="w-full text-center py-8 md:py-10 text-platinumGray">
-                                <p>Aucun produit trouvé dans cette catégorie.</p>
-                            </div>
                         )}
                     </div>
                     </div>
                     
-                {/* Position indicators for desktop - hidden on mobile */}
-                <div className="hidden md:flex justify-center mt-8 space-x-6">
-                    <button 
-                        onClick={() => scrollCarousel('left')}
-                        className="text-sm text-platinumGray hover:text-brandGold transition-colors flex items-center gap-2"
-                    >
-                        <span className="w-6 h-[1px] bg-current"></span>
-                        <span>Début</span>
-                    </button>
-                    <button 
-                        onClick={() => scrollCarousel('center')}
-                        className="text-sm text-platinumGray hover:text-brandGold transition-colors flex items-center gap-2"
-                    >
-                        <span>Milieu</span>
-                    </button>
-                    <button 
-                        onClick={() => scrollCarousel('right')}
-                        className="text-sm text-platinumGray hover:text-brandGold transition-colors flex items-center gap-2"
-                    >
-                        <span>Fin</span>
-                        <span className="w-6 h-[1px] bg-current"></span>
-                    </button>
-                </div>
-
-                {/* View all collections button */}
-                <div className="text-center mt-10 md:mt-12 px-4">
-                    <Link href="/collections">
-                        <button className="px-8 py-2.5 md:py-3 border-2 border-brandGold text-brandGold hover:bg-brandGold hover:text-richEbony transition-all duration-300 tracking-wider text-sm md:text-base rounded-sm md:rounded-none">
-                            Découvrir Toutes Nos Collections
-                        </button>
+                {/* View All Button */}
+                <div className="mt-4 md:mt-8 text-center">
+                    <Link href="/collections/all" legacyBehavior>
+                        <a className="inline-flex items-center px-6 py-2.5 text-sm border border-brandGold text-brandGold hover:bg-brandGold hover:text-white transition-colors rounded-full">
+                            <span>Voir toutes les collections</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </a>
                     </Link>
                 </div>
             </motion.section>
-
-            {/* Add custom scrollbar styling */}
-            <style jsx global>{`
-                /* Custom scrollbar styling */
-                .custom-scrollbar::-webkit-scrollbar {
-                    height: 4px;
-                    width: 4px;
-                }
-                
-                .custom-scrollbar::-webkit-scrollbar-track {
-                    background: rgba(209, 213, 219, 0.1);
-                }
-                
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: rgba(169, 138, 95, 0.5);
-                    border-radius: 2px;
-                }
-                
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background: rgba(169, 138, 95, 0.8);
-                }
-                
-                /* For Firefox */
-                .custom-scrollbar {
-                    scrollbar-width: thin;
-                    scrollbar-color: rgba(169, 138, 95, 0.5) rgba(209, 213, 219, 0.1);
-                }
-                
-                /* Subtle product hover effect */
-                .product-item {
-                    transition: transform 0.3s ease;
-                    cursor: pointer;
-                }
-                
-                .product-item:hover {
-                    transform: translateY(-3px);
-                }
-                
-                /* Snap alignment */
-                .snap-start {
-                    scroll-snap-align: start;
-                }
-            `}</style>
-       
 
             {/* 
             ----------------------------------------------------

@@ -9,14 +9,15 @@ import { useToast } from "../contexts/ToastContext";
 type ProductTranslation = {
     language: string;
     name: string;
-    materialDescription?: string; // Added for material information
+    description?: string; // Added for description
+    materialDescription?: string; // For material information
 };
 
 type ProductCardProps = {
     product: {
         id: number;
         sku: string;
-        basePrice: string;
+        basePrice: string | number;  // Updated to accept both string and number
         images: string[];
         translations: ProductTranslation[];
         material?: string; // Added direct material property
@@ -32,16 +33,54 @@ export default function ProductCard({ product, locale, isWishlisted = false }: P
     const [hovered, setHovered] = useState(false);
     const [isInWishlist, setIsInWishlist] = useState(isWishlisted);
 
-    // Determine product name based on current locale
+    // Get product name based on current locale with French fallback
     const getProductName = () => {
         const translation = product.translations.find((t) => t.language === locale);
-        return translation ? translation.name : product.translations[0]?.name || "Product Name";
+        
+        // If translation for current locale not found, try French as fallback
+        if (!translation) {
+            const frenchTranslation = product.translations.find((t) => t.language === 'fr');
+            if (frenchTranslation) return frenchTranslation.name;
+        }
+        
+        return translation ? translation.name : product.translations[0]?.name || "Bijou";
+    };
+
+    // Get product description preview for hover state
+    const getDescriptionPreview = () => {
+        const translation = product.translations.find((t) => t.language === locale);
+        
+        // If translation for current locale not found, try French as fallback
+        if (!translation || !translation.description) {
+            const frenchTranslation = product.translations.find((t) => t.language === 'fr');
+            if (frenchTranslation?.description) {
+                // Return short preview of description
+                return frenchTranslation.description.length > 60 
+                    ? frenchTranslation.description.substring(0, 60) + '...'
+                    : frenchTranslation.description;
+            }
+        }
+        
+        if (translation?.description) {
+            return translation.description.length > 60
+                ? translation.description.substring(0, 60) + '...'
+                : translation.description;
+        }
+        
+        return "";
     };
 
     // Get material information if available
     const getMaterialInfo = () => {
         // Try to get from translations first
         const translation = product.translations.find((t) => t.language === locale);
+        
+        // If translation for current locale not found, try French as fallback
+        if (!translation || !translation.materialDescription) {
+            const frenchTranslation = product.translations.find((t) => t.language === 'fr');
+            if (frenchTranslation?.materialDescription) return frenchTranslation.materialDescription;
+        }
+        
         if (translation?.materialDescription) return translation.materialDescription;
         
         // Fall back to direct material property if available
@@ -109,10 +148,17 @@ export default function ProductCard({ product, locale, isWishlisted = false }: P
                             priority
                         />
                         
-                        {/* Luxury hover effect - subtle gold gradient overlay */}
+                        {/* Luxury hover effect - subtle gold gradient overlay with description preview */}
                         <div 
-                            className="absolute inset-0 bg-gradient-to-t from-brandGold/10 to-transparent opacity-0 transition-opacity duration-500 z-20 group-hover:opacity-100"
-                        />
+                            className="absolute inset-0 bg-gradient-to-t from-brandGold/20 to-transparent opacity-0 transition-opacity duration-500 z-20 group-hover:opacity-100 flex flex-col justify-end p-3"
+                        >
+                            {/* Description preview on hover */}
+                            {hovered && (
+                                <div className="description-preview text-xs text-platinumGray bg-white/80 p-2 rounded backdrop-blur-sm transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                                    {getDescriptionPreview()}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </Link>
 
@@ -135,12 +181,12 @@ export default function ProductCard({ product, locale, isWishlisted = false }: P
 
             {/* Product Details - Refined typography and spacing */}
             <div className="px-1 text-left">
-                {/* Product Name with better spacing */}
+                {/* Fancy Product Name with elegant styling */}
                 <Link 
                     href={`/products/${product.id}`} 
                     locale={locale}
                 >
-                    <h3 className="text-base font-serif text-platinumGray hover:text-brandGold transition-colors duration-300 mb-1.5">
+                    <h3 className="font-serif text-lg text-brandGold hover:text-burgundy transition-colors duration-300 mb-1.5">
                         {getProductName()}
                     </h3>
                 </Link>
@@ -156,7 +202,7 @@ export default function ProductCard({ product, locale, isWishlisted = false }: P
                 <p className="text-sm font-light text-platinumGray mb-3">
                     {hasVariations && <span className="italic mr-1">À partir de </span>}
                     <span className="font-normal text-brandGold">
-                        {parseFloat(product.basePrice).toLocaleString('fr-FR', { minimumFractionDigits: 0 })} MAD
+                        {parseFloat(product.basePrice.toString()).toLocaleString('fr-FR', { minimumFractionDigits: 0 })} MAD
                     </span>
                 </p>
 

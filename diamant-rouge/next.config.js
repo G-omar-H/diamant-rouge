@@ -3,8 +3,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     i18n: {
-        locales: ['en', 'fr', 'ar'],
-        defaultLocale: 'en',
+        locales: ['fr', 'en', 'ar'],
+        defaultLocale: 'fr',
         localeDetection: false,  // Changed from true to false to resolve the warning
     },
     eslint: {

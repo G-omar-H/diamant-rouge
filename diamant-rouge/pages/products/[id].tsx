@@ -144,6 +144,9 @@ export default function ProductPage({
       productData.translations.find((t) => t.language === "fr") ||
       productData.translations.find((t) => t.language === "en");
   
+    const productName = productTranslation?.name || "Création";
+    const productDescription = productTranslation?.description || "";
+  
     // States
     const [selectedVariations, setSelectedVariations] = useState<{
       [key: string]: ProductVariation;
@@ -395,15 +398,37 @@ export default function ProductPage({
             
             {/* RIGHT COLUMN: Product Details - refined and polished */}
             <div className="space-y-5 md:space-y-7">
-              {/* Product title and price - elegant desktop presentation */}
-              <div className="hidden lg:block">
-                <h1 className="text-3xl md:text-4xl font-serif text-richEbony mb-4 leading-snug">
-                  {productTranslation?.name}
+              {/* Product Name Section - Updated for luxury display */}
+              <div className="mb-8">
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif text-brandGold mb-3 font-medium">
+                  {productName}
                 </h1>
-                <p className="text-3xl font-serif text-brandGold mb-3">
-                  {formattedPrice}
+                
+                {/* SKU and Reference shown elegantly */}
+                <p className="text-xs text-platinumGray/80 uppercase tracking-wider">
+                  Réf: {productData.sku}
                 </p>
-                <div className="h-px w-28 bg-gradient-to-r from-brandGold to-transparent mb-6"></div>
+              </div>
+
+              {/* Price display - More elegant and prominent */}
+              <div className="mb-8">
+                <div className="flex items-baseline mb-2">
+                  <span className="text-2xl md:text-3xl font-light text-brandGold">
+                    {formattedPrice}
+                  </span>
+                  {additionalPriceSum > 0 && (
+                    <span className="ml-2 text-sm text-platinumGray italic">
+                      (Prix incluant vos options)
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Product Description - More elegant display with better typography */}
+              <div className="mb-8">
+                <p className="text-platinumGray leading-relaxed">
+                  {productDescription}
+                </p>
               </div>
 
               {/* Tabs for different content sections - refined scrolling and indicators */}

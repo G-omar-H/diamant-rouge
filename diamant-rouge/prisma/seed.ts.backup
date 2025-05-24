@@ -108,17 +108,16 @@ async function seedProducts() {
   
   // Products data array
   const products = [
-    // Rings
     {
       sku: 'ROUGE-PASSION-001',
       basePrice: 4999.99,
       featured: true,
       categoryId: categoriesMap['rings'],
-      images: ['/images/products/IMG_7719.png'],
+      images: ['/images/products/IMG_7719.png', '/images/products/IMG_7721.png'],
       translations: [
-        { language: 'en', name: 'Rouge Passion Diamond Ring', description: 'A symbol of eternal love, set with a rare crimson diamond in a delicate gold setting.' },
-        { language: 'fr', name: 'Bague Diamant Rouge Passion', description: "Un symbole d'amour éternel, serti d'un diamant rouge rare dans une délicate monture en or." },
-        { language: 'ar', name: 'خاتم الألماس روج باشون', description: 'رمز الحب الأبدي، مرصع بألماس قرمزي نادر في إطار ذهبي رقيق.' },
+        { language: 'en', name: 'Rouge Passion Diamond Ring', description: 'A symbol of eternal love, set with a rare crimson diamond.' },
+        { language: 'fr', name: 'Bague Diamant Rouge Passion', description: "Un symbole d'amour éternel, serti d'un diamant rouge rare." },
+        { language: 'ar', name: 'خاتم الألماس روج باشون', description: 'رمز الحب الأبدي، مرصع بألماس قرمزي نادر.' },
       ],
       variations: [
         { type: 'Size', value: '48', addPrice: 0, inventory: 5 },
@@ -212,161 +211,6 @@ async function seedProducts() {
         { type: 'Material', value: 'Rose Gold', addPrice: 0, inventory: 3 },
         { type: 'Material', value: 'White Gold', addPrice: 0, inventory: 3 },
         { type: 'Material', value: 'Platinum', addPrice: 4000, inventory: 2 },
-      ]
-    },
-    // Additional products with more images
-    {
-      sku: 'VINTAGE-RINGS-001',
-      basePrice: 3499.99,
-      featured: true,
-      categoryId: categoriesMap['rings'],
-      images: ['/images/products/IMG_7410 - Copy.png', '/images/products/IMG_7412 - Copy.png'],
-      translations: [
-        { language: 'en', name: 'Vintage Gold Ring', description: 'Classic vintage design with exquisite filigree detailing.' },
-        { language: 'fr', name: 'Bague Vintage en Or', description: 'Design vintage classique avec des détails en filigrane exquis.' },
-        { language: 'ar', name: 'خاتم ذهبي عتيق', description: 'تصميم كلاسيكي عتيق مع تفاصيل فيليغري رائعة.' },
-      ],
-      variations: [
-        { type: 'Size', value: '48', addPrice: 0, inventory: 4 },
-        { type: 'Size', value: '50', addPrice: 0, inventory: 5 },
-        { type: 'Size', value: '52', addPrice: 0, inventory: 5 },
-        { type: 'Size', value: '54', addPrice: 0, inventory: 4 },
-      ]
-    },
-    {
-      sku: 'MODERN-EARRINGS-001',
-      basePrice: 2799.99,
-      featured: false,
-      categoryId: categoriesMap['earrings'],
-      images: ['/images/products/IMG_7366 - Copy.png', '/images/products/IMG_7381 - Copy.png'],
-      translations: [
-        { language: 'en', name: 'Modern Diamond Earrings', description: 'Contemporary design with brilliant-cut diamonds.' },
-        { language: 'fr', name: 'Boucles d\'Oreilles Diamant Modernes', description: 'Design contemporain avec diamants taille brillant.' },
-        { language: 'ar', name: 'أقراط الماس العصرية', description: 'تصميم معاصر مع ألماس مقطوع بشكل لامع.' },
-      ],
-      variations: [
-        { type: 'Metal', value: 'White Gold', addPrice: 0, inventory: 7 },
-        { type: 'Metal', value: 'Yellow Gold', addPrice: 0, inventory: 6 },
-        { type: 'Metal', value: 'Rose Gold', addPrice: 100, inventory: 5 },
-      ]
-    },
-    {
-      sku: 'LUXURY-NECKLACE-001',
-      basePrice: 5899.99,
-      featured: true,
-      categoryId: categoriesMap['necklaces'],
-      images: ['/images/products/IMG_7587.2.png', '/images/products/IMG_7589.png'],
-      translations: [
-        { language: 'en', name: 'Luxury Diamond Necklace', description: 'Opulent diamond-studded necklace for special occasions.' },
-        { language: 'fr', name: 'Collier Diamant de Luxe', description: 'Collier opulent serti de diamants pour les occasions spéciales.' },
-        { language: 'ar', name: 'قلادة الماس الفاخرة', description: 'قلادة فاخرة مرصعة بالماس للمناسبات الخاصة.' },
-      ],
-      variations: [
-        { type: 'Length', value: '42cm', addPrice: 0, inventory: 4 },
-        { type: 'Length', value: '45cm', addPrice: 0, inventory: 5 },
-        { type: 'Length', value: '50cm', addPrice: 200, inventory: 3 },
-      ]
-    },
-    {
-      sku: 'ELEGANT-BRACELET-001',
-      basePrice: 3299.99,
-      featured: false,
-      categoryId: categoriesMap['bracelets'],
-      images: ['/images/products/IMG_7258 - Copy.png', '/images/products/IMG_7260 - Copy (2).png'],
-      translations: [
-        { language: 'en', name: 'Elegant Gold Bracelet', description: 'Delicate chain bracelet with intricate gold work.' },
-        { language: 'fr', name: 'Bracelet Élégant en Or', description: 'Bracelet à chaîne délicate avec un travail d\'or complexe.' },
-        { language: 'ar', name: 'سوار ذهبي أنيق', description: 'سوار سلسلة رقيقة مع عمل ذهبي معقد.' },
-      ],
-      variations: [
-        { type: 'Length', value: '16cm', addPrice: 0, inventory: 5 },
-        { type: 'Length', value: '18cm', addPrice: 0, inventory: 6 },
-        { type: 'Length', value: '20cm', addPrice: 100, inventory: 4 },
-      ]
-    },
-    {
-      sku: 'LUXURY-WATCH-001',
-      basePrice: 12999.99,
-      featured: true,
-      categoryId: categoriesMap['watches'],
-      images: ['/images/products/IMG_8582.png', '/images/products/IMG_8586.png'],
-      translations: [
-        { language: 'en', name: 'Luxury Mechanical Watch', description: 'Precision-engineered mechanical watch with sapphire crystal.' },
-        { language: 'fr', name: 'Montre Mécanique de Luxe', description: 'Montre mécanique de précision avec cristal saphir.' },
-        { language: 'ar', name: 'ساعة ميكانيكية فاخرة', description: 'ساعة ميكانيكية مصممة بدقة مع كريستال الياقوت.' },
-      ],
-      variations: [
-        { type: 'Material', value: 'Rose Gold', addPrice: 0, inventory: 3 },
-        { type: 'Material', value: 'White Gold', addPrice: 500, inventory: 2 },
-        { type: 'Material', value: 'Titanium', addPrice: 0, inventory: 4 },
-      ]
-    },
-    {
-      sku: 'SAPPHIRE-EARRINGS-001',
-      basePrice: 4599.99,
-      featured: false,
-      categoryId: categoriesMap['earrings'],
-      images: ['/images/products/IMG_8570.png', '/images/products/IMG_8578.png'],
-      translations: [
-        { language: 'en', name: 'Sapphire Drop Earrings', description: 'Stunning blue sapphire earrings with diamond accents.' },
-        { language: 'fr', name: 'Boucles d\'Oreilles Saphir', description: 'Magnifiques boucles d\'oreilles en saphir bleu avec accents diamants.' },
-        { language: 'ar', name: 'أقراط الياقوت المتدلية', description: 'أقراط رائعة من الياقوت الأزرق مع لمسات من الماس.' },
-      ],
-      variations: [
-        { type: 'Metal', value: 'White Gold', addPrice: 0, inventory: 6 },
-        { type: 'Metal', value: 'Platinum', addPrice: 500, inventory: 3 },
-      ]
-    },
-    {
-      sku: 'EMERALD-RING-001',
-      basePrice: 5499.99,
-      featured: true,
-      categoryId: categoriesMap['rings'],
-      images: ['/images/products/IMG_7456 - Copy.png', '/images/products/IMG_7466 - Copy.png'],
-      translations: [
-        { language: 'en', name: 'Emerald Halo Ring', description: 'Vibrant Colombian emerald surrounded by a halo of diamonds.' },
-        { language: 'fr', name: 'Bague Halo Émeraude', description: 'Émeraude colombienne vibrante entourée d\'un halo de diamants.' },
-        { language: 'ar', name: 'خاتم الزمرد بهالة', description: 'زمردة كولومبية نابضة بالحياة محاطة بهالة من الماس.' },
-      ],
-      variations: [
-        { type: 'Size', value: '48', addPrice: 0, inventory: 3 },
-        { type: 'Size', value: '50', addPrice: 0, inventory: 4 },
-        { type: 'Size', value: '52', addPrice: 0, inventory: 4 },
-        { type: 'Size', value: '54', addPrice: 0, inventory: 3 },
-      ]
-    },
-    {
-      sku: 'PEARL-NECKLACE-001',
-      basePrice: 2999.99,
-      featured: false,
-      categoryId: categoriesMap['necklaces'],
-      images: ['/images/products/IMG_7839.png', '/images/products/IMG_7810.png'],
-      translations: [
-        { language: 'en', name: 'South Sea Pearl Necklace', description: 'Elegant strand of graduated South Sea pearls.' },
-        { language: 'fr', name: 'Collier de Perles des Mers du Sud', description: 'Élégant collier de perles graduées des Mers du Sud.' },
-        { language: 'ar', name: 'قلادة لؤلؤ بحر الجنوب', description: 'خيط أنيق من لآلئ بحر الجنوب المتدرجة.' },
-      ],
-      variations: [
-        { type: 'Length', value: '42cm', addPrice: 0, inventory: 5 },
-        { type: 'Length', value: '45cm', addPrice: 100, inventory: 4 },
-        { type: 'Length', value: '50cm', addPrice: 200, inventory: 3 },
-      ]
-    },
-    {
-      sku: 'MOONPHASE-WATCH-001',
-      basePrice: 8599.99,
-      featured: true,
-      categoryId: categoriesMap['watches'],
-      images: ['/images/products/IMG_8611.png', '/images/products/IMG_8620.png'],
-      translations: [
-        { language: 'en', name: 'Moonphase Automatic Watch', description: 'Sophisticated watch with moonphase complication and exhibition case back.' },
-        { language: 'fr', name: 'Montre Automatique Phase de Lune', description: 'Montre sophistiquée avec complication phase de lune et fond transparent.' },
-        { language: 'ar', name: 'ساعة أوتوماتيكية بمراحل القمر', description: 'ساعة متطورة مع تعقيد مراحل القمر وخلفية معرض.' },
-      ],
-      variations: [
-        { type: 'Dial Color', value: 'Blue', addPrice: 0, inventory: 4 },
-        { type: 'Dial Color', value: 'Black', addPrice: 0, inventory: 4 },
-        { type: 'Dial Color', value: 'Silver', addPrice: 0, inventory: 4 },
       ]
     }
   ];
