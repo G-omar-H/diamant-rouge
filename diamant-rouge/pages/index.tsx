@@ -1038,7 +1038,7 @@ export default function HomePage({
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
                     <Image
-                        src="/images/rings/08a58c59664d--Aurate-Holiday-36kira-1v2.jpg"
+                        src="/images/home/Aura/08a58c59664d--Aurate-Holiday-36kira-1v2.jpg"
                         alt="Événement Diamant Rouge"
                         fill
                         sizes="100vw"
