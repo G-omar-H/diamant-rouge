@@ -491,6 +491,16 @@ async function seedAppointments() {
   console.log('🔹 Creating appointments...');
   
   const appointments = [];
+  const users = await prisma.user.findMany();
+  
+  if (!users.length) {
+    console.warn('⚠️ No users found, skipping appointment creation');
+    return;
+  }
+
+  const appointmentTypes = ['CONSULTATION', 'FITTING', 'REPAIR'];
+  const locationTypes = ['IN_STORE', 'VIRTUAL'];
+  const locations = ['Paris Store', 'Online Meeting'];
   
   // Create 10 future appointments
   for (let i = 0; i < 10; i++) {
@@ -503,10 +513,30 @@ async function seedAppointments() {
     const minute = [0, 30][Math.floor(Math.random() * 2)]; // Only on the hour or half hour
     const timeStr = `${hour}:${minute === 0 ? '00' : '30'}`;
     
+    // Select a random user
+    const user = users[Math.floor(Math.random() * users.length)];
+    
+    // Create appointment with all required fields
+    const appointmentType = appointmentTypes[Math.floor(Math.random() * appointmentTypes.length)];
+    const locationType = locationTypes[Math.floor(Math.random() * locationTypes.length)];
+    const location = locations[locationTypes.indexOf(locationType)];
+    
     await prisma.appointment.create({
       data: {
-        date,
-        time: timeStr
+        userId: user.id,
+        clientEmail: user.email,
+        clientPhone: user.phoneNumber || '+1234567890',
+        appointmentDate: date,
+        appointmentTime: timeStr,
+        duration: '60',
+        status: 'PENDING',
+        location: location,
+        locationType: locationType,
+        appointmentType: appointmentType,
+        appointmentTypeLabel: `${appointmentType} Session`,
+        guestCount: 1,
+        preferences: 'No specific preferences',
+        specialRequests: 'None'
       }
     });
     
