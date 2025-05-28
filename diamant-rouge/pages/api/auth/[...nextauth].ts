@@ -40,12 +40,22 @@ export const authOptions: NextAuthOptions = {
             // Ensure secret is a string
             const secretString = typeof secret === 'string' ? secret : secret.toString();
             // Verify & decode the sign-only JWT
-            if (!token) return null;
+            if (!token) {
+                console.log('Token is null or undefined in decode function');
+                return null;
+            }
             try {
                 const { payload } = await jwtVerify(
                     token,
                     new TextEncoder().encode(secretString)
                 );
+                
+                // Verify payload has required properties
+                if (!payload || typeof payload !== 'object') {
+                    console.log('Invalid payload format:', payload);
+                    return null;
+                }
+                
                 // Return payload as NextAuth's token
                 return {
                     id: payload.id as string,

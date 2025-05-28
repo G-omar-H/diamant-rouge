@@ -5,22 +5,42 @@ import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "../../components/ProductCard";
 import Image from "next/image";
 import { FiFilter } from "react-icons/fi";
-import type { Product } from "@prisma/client";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { FaSpinner } from 'react-icons/fa';
 import { serializeData } from "../../lib/utils";
+import debounce from 'lodash/debounce';
+
+type ProductTranslation = {
+    language: string;
+    name: string;
+    description?: string;
+    materialDescription?: string;
+};
+
+type ProductType = {
+    id: number;
+    slug: string;
+    sku: string;
+    basePrice: string;
+    createdAt: Date;
+    images: string[];
+    material?: string;
+    translations: ProductTranslation[];
+    category?: { 
+        slug: string; 
+        translations?: any[] 
+    } | null;
+    variations?: {
+        id: number;
+        variationType: string;
+        variationValue: string;
+        additionalPrice: string;
+    }[];
+};
 
 type CollectionPageProps = {
-    products: Array<Product & { 
-        category?: { slug: string; translations?: any[] } | null;
-        variations?: {
-            id: number;
-            variationType: string;
-            variationValue: string;
-            additionalPrice: string;
-        }[];
-    }>;
+    products: Array<ProductType>;
     categories: Array<{ slug: string; translations: any[] }>;
     productTypes: Array<string>;
 };
@@ -106,22 +126,63 @@ export default function CollectionsPage({ products, categories, productTypes }: 
     // Price range states
     const [priceRangeLimits, setPriceRangeLimits] = useState<[number, number]>([0, 100000]);
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);
-    const [isDragging, setIsDragging] = useState<null | 'min' | 'max'>(null);
     
     // Toggle state for price filter visibility
     const [isPriceFilterVisible, setIsPriceFilterVisible] = useState(false);
     
+    // Use a ref to store the active price range to avoid re-renders during slider dragging
+    const priceRangeRef = useRef<[number, number]>([...priceRange]);
+    
+    // Ref for the price slider track element
     const trackRef = useRef<HTMLDivElement>(null);
+    
+    // Add a debounced function to update the URL with price range
+    const updateUrlWithPrice = useCallback(
+        debounce((minPrice: number, maxPrice: number) => {
+            const newQuery = {...router.query};
+            
+            if (minPrice !== priceRangeLimits[0]) {
+                newQuery.minPrice = minPrice.toString();
+            } else {
+                delete newQuery.minPrice;
+            }
+            
+            if (maxPrice !== priceRangeLimits[1]) {
+                newQuery.maxPrice = maxPrice.toString();
+            } else {
+                delete newQuery.maxPrice;
+            }
+            
+            // Don't update URL if it's the same
+            const currentQueryString = new URLSearchParams(router.query as any).toString();
+            const newQueryString = new URLSearchParams(newQuery as any).toString();
+            
+            if (currentQueryString !== newQueryString) {
+                router.push({
+                    pathname: router.pathname,
+                    query: newQuery
+                }, undefined, { shallow: true });
+            }
+        }, 500),
+        [router, priceRangeLimits]
+    );
+    
+    // Sync the ref with the state when the state changes
+    useEffect(() => {
+        priceRangeRef.current = [...priceRange];
+    }, [priceRange]);
     
     // Get current locale from router
     const locale = router.locale || "fr";
     
     // Prepare products data for ProductCard component to fix type issues
-    const prepareProductsForDisplay = useCallback((products: Array<Product & { category?: { slug: string; translations?: any[] } | null; translations?: any[] }>) => {
+    const prepareProductsForDisplay = useCallback((products: Array<ProductType>) => {
         return products.map(product => ({
             ...product,
             basePrice: String(product.basePrice),
-            translations: product.translations || [], // Ensure translations exist
+            translations: product.translations || [],
+            sku: product.sku || `SKU-${product.id}`, // Ensure SKU exists
+            images: product.images || ["/images/product-placeholder.jpg"], // Ensure images array exists
         }));
     }, []);
     
@@ -180,32 +241,32 @@ export default function CollectionsPage({ products, categories, productTypes }: 
 
     // Update URL when filters change
     useEffect(() => {
-        const newQuery: { [key: string]: string } = {};
+        const newQuery = {...router.query};
         
         if (selectedCategory) {
             newQuery.category = selectedCategory;
+        } else {
+            delete newQuery.category;
         }
         
-        if (minPrice !== "") {
-            newQuery.minPrice = String(minPrice);
-        }
-        
-        if (maxPrice !== "") {
-            newQuery.maxPrice = String(maxPrice);
-        }
-        
-        // Add type to URL params
         if (selectedType) {
             newQuery.type = selectedType;
+        } else {
+            delete newQuery.type;
         }
         
-        router.push({
-            pathname: router.pathname,
-            query: newQuery
-        }, undefined, { shallow: true });
+        // Don't update URL if it's the same
+        const currentQueryString = new URLSearchParams(router.query as any).toString();
+        const newQueryString = new URLSearchParams(newQuery as any).toString();
         
-    }, [selectedCategory, minPrice, maxPrice, selectedType, router]);
-    
+        if (currentQueryString !== newQueryString) {
+            router.push({
+                pathname: router.pathname,
+                query: newQuery
+            }, undefined, { shallow: true });
+        }
+    }, [selectedCategory, selectedType, router]);
+
     // Get translated category names
     const getCategoryName = (slug: string) => {
         const category = categories.find(c => c.slug === slug);
@@ -222,80 +283,129 @@ export default function CollectionsPage({ products, categories, productTypes }: 
         return Number(price).toLocaleString('fr-FR');
     };
     
-    // Calculate percentage position for slider thumbs
-    const calculateThumbPosition = (value: number): string => {
+    // Function to calculate visual position for thumbs
+    const calculateThumbPosition = useCallback((value: number): string => {
         const [min, max] = priceRangeLimits;
         const percentage = ((value - min) / (max - min)) * 100;
         return `${Math.min(Math.max(percentage, 0), 100)}%`;
-    };
+    }, [priceRangeLimits]);
     
-    // Handle slider track click
+    // Simplified track click handler that uses the ref for rendering and only updates state at the end
     const handleTrackClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-        const trackRect = e.currentTarget.getBoundingClientRect();
+        if (!trackRef.current) return;
+        
+        const trackRect = trackRef.current.getBoundingClientRect();
         const clickPosition = (e.clientX - trackRect.left) / trackRect.width;
         const [min, max] = priceRangeLimits;
-        const clickValue = min + clickPosition * (max - min);
+        const clickValue = Math.round(min + clickPosition * (max - min));
         
         // Determine which thumb to move based on the click position
-        const [currentMin, currentMax] = priceRange;
+        const [currentMin, currentMax] = priceRangeRef.current;
         const distToMin = Math.abs(clickValue - currentMin);
         const distToMax = Math.abs(clickValue - currentMax);
         
         if (distToMin <= distToMax) {
-            setMinPrice(Math.round(clickValue));
-            setPriceRange([Math.round(clickValue), currentMax]);
+            const newMin = Math.min(clickValue, currentMax - 1000);
+            priceRangeRef.current = [newMin, currentMax];
+            setMinPrice(newMin);
         } else {
-            setMaxPrice(Math.round(clickValue));
-            setPriceRange([currentMin, Math.round(clickValue)]);
+            const newMax = Math.max(clickValue, currentMin + 1000);
+            priceRangeRef.current = [currentMin, newMax];
+            setMaxPrice(newMax);
         }
-    }, [priceRange, priceRangeLimits]);
-    
-    // Handle thumb drag start
-    const handleThumbMouseDown = (type: 'min' | 'max') => (e: React.MouseEvent) => {
-        e.preventDefault();
-        setIsDragging(type);
-    };
-    
-    // Handle thumb drag
-    useEffect(() => {
-        if (!isDragging) return;
         
-        const handleMouseMove = (e: MouseEvent) => {
-            const sliderTrack = document.getElementById('price-slider-track');
-            if (!sliderTrack) return;
+        // Force re-render
+        setPriceRange([...priceRangeRef.current]);
+        
+        // Update URL with debounce
+        updateUrlWithPrice(priceRangeRef.current[0], priceRangeRef.current[1]);
+    }, [priceRangeLimits, updateUrlWithPrice]);
+    
+    // Simplified thumb drag handler that uses the ref for rendering and only updates state at the end
+    const handleThumbMouseDown = (type: 'min' | 'max') => (e: React.MouseEvent | React.TouchEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Capture initial values
+        const startX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+        const startRange = [...priceRangeRef.current];
+        let isDragging = true;
+        
+        // Convert trackRef to element variable to avoid null checks in every event handler
+        const trackElement = trackRef.current;
+        if (!trackElement) return;
+        
+        const trackRect = trackElement.getBoundingClientRect();
+        
+        const handleMove = (moveEvent: MouseEvent | TouchEvent) => {
+            if (!isDragging) return;
             
-            const trackRect = sliderTrack.getBoundingClientRect();
-            const position = (e.clientX - trackRect.left) / trackRect.width;
-            const [min, max] = priceRangeLimits;
-            let value = Math.round(min + position * (max - min));
+            const currentX = 'touches' in moveEvent ? moveEvent.touches[0].clientX : moveEvent.clientX;
+            const deltaX = currentX - startX;
+            const percentMove = deltaX / trackRect.width;
+            const valueMove = Math.round(percentMove * (priceRangeLimits[1] - priceRangeLimits[0]));
             
-            // Constrain value within limits
-            value = Math.max(min, Math.min(max, value));
-            
-            if (isDragging === 'min') {
-                const newMinPrice = Math.min(value, priceRange[1] - 1000);
-                setMinPrice(newMinPrice);
-                setPriceRange([newMinPrice, priceRange[1]]);
+            if (type === 'min') {
+                const newMin = Math.max(
+                    priceRangeLimits[0],
+                    Math.min(startRange[0] + valueMove, priceRangeRef.current[1] - 1000)
+                );
+                priceRangeRef.current = [newMin, priceRangeRef.current[1]];
+                
+                // Update the visual rendering
+                if (trackElement) {
+                    const thumbElement = trackElement.querySelector('[data-thumb="min"]') as HTMLElement;
+                    const trackHighlight = trackElement.querySelector('[data-track-highlight]') as HTMLElement;
+                    if (thumbElement) thumbElement.style.left = calculateThumbPosition(newMin);
+                    if (trackHighlight) {
+                        trackHighlight.style.left = calculateThumbPosition(newMin);
+                        trackHighlight.style.right = `calc(100% - ${calculateThumbPosition(priceRangeRef.current[1])})`;
+                    }
+                }
             } else {
-                const newMaxPrice = Math.max(value, priceRange[0] + 1000);
-                setMaxPrice(newMaxPrice);
-                setPriceRange([priceRange[0], newMaxPrice]);
+                const newMax = Math.min(
+                    priceRangeLimits[1],
+                    Math.max(startRange[1] + valueMove, priceRangeRef.current[0] + 1000)
+                );
+                priceRangeRef.current = [priceRangeRef.current[0], newMax];
+                
+                // Update the visual rendering
+                if (trackElement) {
+                    const thumbElement = trackElement.querySelector('[data-thumb="max"]') as HTMLElement;
+                    const trackHighlight = trackElement.querySelector('[data-track-highlight]') as HTMLElement;
+                    if (thumbElement) thumbElement.style.left = calculateThumbPosition(newMax);
+                    if (trackHighlight) {
+                        trackHighlight.style.right = `calc(100% - ${calculateThumbPosition(newMax)})`;
+                    }
+                }
             }
         };
         
-        const handleMouseUp = () => {
-            setIsDragging(null);
+        const handleEnd = () => {
+            isDragging = false;
+            
+            // Only update state once at the end of dragging
+            setMinPrice(priceRangeRef.current[0]);
+            setMaxPrice(priceRangeRef.current[1]);
+            setPriceRange([...priceRangeRef.current]);
+            
+            // Update URL with debounce
+            updateUrlWithPrice(priceRangeRef.current[0], priceRangeRef.current[1]);
+            
+            // Remove event listeners
+            document.removeEventListener('mousemove', handleMove);
+            document.removeEventListener('touchmove', handleMove);
+            document.removeEventListener('mouseup', handleEnd);
+            document.removeEventListener('touchend', handleEnd);
         };
         
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
-        
-        return () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
-        };
-    }, [isDragging, priceRange, priceRangeLimits]);
-
+        // Add event listeners
+        document.addEventListener('mousemove', handleMove);
+        document.addEventListener('touchmove', handleMove);
+        document.addEventListener('mouseup', handleEnd);
+        document.addEventListener('touchend', handleEnd);
+    };
+    
     // Filter products
     const filteredProducts = products.filter((product) => {
         // Category filter
@@ -380,12 +490,12 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                     </div>
                 </div>
 
-                <div className="container mx-auto px-4 py-12">
+                <div className="container mx-auto px-4 py-16">
                     {/* FILTERS SECTION - Always visible */}
-                    <div className="mb-8 border-b border-brandGold/10 pb-6">
+                    <div className="mb-10 border-b border-brandGold/10 pb-8">
                         <div className="flex justify-between items-start mb-6">
                             <div>
-                                <h2 className="text-2xl font-serif text-brandGold">
+                                <h2 className="text-2xl font-serif text-brandGold bg-gradient-to-r from-brandGold to-brandGold/80 bg-clip-text text-transparent">
                                     {sortedProducts.length} {sortedProducts.length > 1 ? 'Créations' : 'Création'}
                                 </h2>
                                 {(selectedCategory || minPrice !== "" || maxPrice !== "" || selectedType !== "") && (
@@ -430,12 +540,12 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                                                 >
                                                     ×
                                                 </button>
-                            </div>
+                                            </div>
                                         )}
                                         {maxPrice !== "" && (
                                             <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-brandGold/5 rounded text-xs border border-brandGold/20">
                                                 <span className="text-platinumGray">Max: {formatPrice(maxPrice)} MAD</span>
-                                <button 
+                                                <button 
                                                     onClick={() => {
                                                         setMaxPrice("");
                                                         setPriceRange([priceRange[0], priceRangeLimits[1]]);
@@ -444,7 +554,7 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                                                     aria-label="Supprimer le filtre de prix maximum"
                                                 >
                                                     ×
-                                </button>
+                                                </button>
                                             </div>
                                         )}
                                         <button 
@@ -462,32 +572,117 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                         {/* Refined filters section */}
                         <div className="bg-gradient-to-b from-brandIvory/30 to-brandIvory/10 rounded-lg p-6 border border-brandGold/20 shadow-sm">
                             <div className="flex flex-col items-center gap-8">
-                                {/* Category buttons - centered */}
-                                <div className="w-full">
-                                    <h3 className="font-serif text-center text-lg text-brandGold mb-5 relative after:content-[''] after:absolute after:w-12 after:h-px after:bg-brandGold/30 after:bottom-[-8px] after:left-1/2 after:-translate-x-1/2">
-                                        Catégorie
-                                    </h3>
-                                    <div className="overflow-x-auto py-1 -mx-1 px-1 scrollbar-hide">
-                                        <div className="flex flex-nowrap sm:flex-wrap justify-start sm:justify-center gap-3 min-w-max sm:min-w-0 sm:max-w-3xl mx-auto">
-                                            <button
+                                {/* Jewelry Type Filters - Main Filter */}
+                                <div className="w-full mb-5">
+                                    <div className="overflow-x-auto py-4 -mx-1 px-1 scrollbar-hide">
+                                        <div className="flex flex-nowrap sm:flex-wrap justify-start sm:justify-center gap-5 min-w-max sm:min-w-0 sm:max-w-3xl mx-auto">
+                                             <button
                                                 onClick={() => setSelectedCategory("")}
-                                                className={`text-xs px-5 py-2.5 rounded-full transition-all duration-300 whitespace-nowrap ${selectedCategory === "" 
-                                                    ? "bg-gradient-to-r from-brandGold to-brandGold/90 text-white shadow-md" 
-                                                    : "bg-brandIvory/80 text-platinumGray hover:bg-brandGold/10 hover:text-brandGold hover:border-brandGold/40 border border-brandGold/20"}`}
+                                                className={`flex flex-col items-center gap-2 transition-all duration-300 ${!selectedCategory 
+                                                    ? 'opacity-100 scale-105' 
+                                                    : 'opacity-70 hover:opacity-90 hover:scale-105'}`}
                                             >
-                                                Toutes
+                                                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${!selectedCategory 
+                                                    ? 'bg-gradient-to-br from-brandGold to-brandGold/80 text-white shadow-lg' 
+                                                    : 'bg-brandIvory/60 text-platinumGray hover:bg-brandGold/5 hover:text-brandGold border border-brandGold/20'}`}>
+                                                    <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16m-7 6h7" />
+                                                        <rect x="5" y="8" width="3" height="3" rx="0.5" fill="currentColor" opacity="0.5" />
+                                                        <rect x="5" y="15" width="3" height="3" rx="0.5" fill="currentColor" opacity="0.5" />
+                                                        <rect x="11" y="8" width="3" height="3" rx="0.5" fill="currentColor" opacity="0.5" />
+                                                        <rect x="16" y="15" width="3" height="3" rx="0.5" fill="currentColor" opacity="0.5" />
+                                                    </svg>
+                                                </div>
+                                                <span className="text-xs font-medium tracking-wide">Tous</span>
                                             </button>
-                                            {categories.map((cat) => (
-                                                <button
-                                                    key={cat.slug}
-                                                    onClick={() => setSelectedCategory(cat.slug)}
-                                                    className={`text-xs px-5 py-2.5 rounded-full transition-all duration-300 whitespace-nowrap ${selectedCategory === cat.slug 
-                                                        ? "bg-gradient-to-r from-brandGold to-brandGold/90 text-white shadow-md" 
-                                                        : "bg-brandIvory/80 text-platinumGray hover:bg-brandGold/10 hover:text-brandGold hover:border-brandGold/40 border border-brandGold/20"}`}
-                                                >
-                                                    {getCategoryName(cat.slug)}
-                                                </button>
-                                            ))}
+                                            
+                                            {/* Rings */}
+                                            <button
+                                                onClick={() => setSelectedCategory("rings")}
+                                                className={`flex flex-col items-center gap-2 transition-all duration-300 ${selectedCategory === "rings" 
+                                                    ? 'opacity-100 scale-105' 
+                                                    : 'opacity-70 hover:opacity-90 hover:scale-105'}`}
+                                            >
+                                                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${selectedCategory === "rings" 
+                                                    ? "bg-gradient-to-br from-brandGold to-brandGold/80 text-white shadow-lg" 
+                                                    : "bg-brandIvory/60 text-platinumGray hover:bg-brandGold/5 hover:text-brandGold border border-brandGold/20"}`}>
+                                                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <circle cx="12" cy="12" r="6" strokeWidth="1.5" />
+                                                        <circle cx="12" cy="12" r="3" strokeWidth="1.5" />
+                                                        <path d="M12 5L12 7" strokeWidth="1.2" strokeLinecap="round" />
+                                                        <path d="M12 17L12 19" strokeWidth="1.2" strokeLinecap="round" />
+                                                        <path d="M7 12L5 12" strokeWidth="1.2" strokeLinecap="round" />
+                                                        <path d="M19 12L17 12" strokeWidth="1.2" strokeLinecap="round" />
+                                                        <circle cx="12" cy="12" r="1" fill="currentColor" />
+                                                    </svg>
+                                                </div>
+                                                <span className="text-xs font-medium tracking-wide">Bagues</span>
+                                            </button>
+                                            
+                                            {/* Necklaces */}
+                                            <button
+                                                onClick={() => setSelectedCategory("necklaces")}
+                                                className={`flex flex-col items-center gap-2 transition-all duration-300 ${selectedCategory === "necklaces" 
+                                                    ? 'opacity-100 scale-105' 
+                                                    : 'opacity-70 hover:opacity-90 hover:scale-105'}`}
+                                            >
+                                                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${selectedCategory === "necklaces" 
+                                                    ? "bg-gradient-to-br from-brandGold to-brandGold/80 text-white shadow-lg" 
+                                                    : "bg-brandIvory/60 text-platinumGray hover:bg-brandGold/5 hover:text-brandGold border border-brandGold/20"}`}>
+                                                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path d="M12 6C10.8954 6 10 5.10457 10 4C10 2.89543 10.8954 2 12 2C13.1046 2 14 2.89543 14 4C14 5.10457 13.1046 6 12 6Z" strokeWidth="1.2" />
+                                                        <path d="M12 22V6" strokeWidth="1.5" strokeLinecap="round" />
+                                                        <path d="M8 10L12 14L16 10" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                                        <path d="M6 17H18" strokeWidth="1.5" strokeLinecap="round" />
+                                                        <circle cx="12" cy="4" r="0.6" fill="currentColor" />
+                                                    </svg>
+                                                </div>
+                                                <span className="text-xs font-medium tracking-wide">Colliers</span>
+                                            </button>
+                                            
+                                            {/* Bracelets */}
+                                            <button
+                                                onClick={() => setSelectedCategory("bracelets")}
+                                                className={`flex flex-col items-center gap-2 transition-all duration-300 ${selectedCategory === "bracelets" 
+                                                    ? 'opacity-100 scale-105' 
+                                                    : 'opacity-70 hover:opacity-90 hover:scale-105'}`}
+                                            >
+                                                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${selectedCategory === "bracelets" 
+                                                    ? "bg-gradient-to-br from-brandGold to-brandGold/80 text-white shadow-lg" 
+                                                    : "bg-brandIvory/60 text-platinumGray hover:bg-brandGold/5 hover:text-brandGold border border-brandGold/20"}`}>
+                                                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path d="M4 12C4 10.8954 7.58172 10 12 10C16.4183 10 20 10.8954 20 12C20 13.1046 16.4183 14 12 14C7.58172 14 4 13.1046 4 12Z" strokeWidth="1.5" />
+                                                        <circle cx="12" cy="12" r="8" strokeWidth="1.5" strokeDasharray="2 1.5" />
+                                                        <circle cx="12" cy="12" r="2" strokeWidth="1.2" />
+                                                        <circle cx="12" cy="12" r="0.8" fill="currentColor" />
+                                                    </svg>
+                                                </div>
+                                                <span className="text-xs font-medium tracking-wide">Bracelets</span>
+                                            </button>
+                                            
+                                            {/* Earrings */}
+                                            <button
+                                                onClick={() => setSelectedCategory("earrings")}
+                                                className={`flex flex-col items-center gap-2 transition-all duration-300 ${selectedCategory === "earrings" 
+                                                    ? 'opacity-100 scale-105' 
+                                                    : 'opacity-70 hover:opacity-90 hover:scale-105'}`}
+                                            >
+                                                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${selectedCategory === "earrings" 
+                                                    ? "bg-gradient-to-br from-brandGold to-brandGold/80 text-white shadow-lg" 
+                                                    : "bg-brandIvory/60 text-platinumGray hover:bg-brandGold/5 hover:text-brandGold border border-brandGold/20"}`}>
+                                                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path d="M8 4C8 2.89543 8.89543 2 10 2C11.1046 2 12 2.89543 12 4V6C12 7.10457 11.1046 8 10 8C8.89543 8 8 7.10457 8 6V4Z" strokeWidth="1.3" />
+                                                        <path d="M16 4C16 2.89543 16.8954 2 18 2C19.1046 2 20 2.89543 20 4V6C20 7.10457 19.1046 8 18 8C16.8954 8 16 7.10457 16 6V4Z" strokeWidth="1.3" />
+                                                        <path d="M10 8L10 18" strokeWidth="1.3" strokeLinecap="round" />
+                                                        <path d="M18 8L18 18" strokeWidth="1.3" strokeLinecap="round" />
+                                                        <circle cx="10" cy="4" r="0.8" fill="currentColor" />
+                                                        <circle cx="18" cy="4" r="0.8" fill="currentColor" />
+                                                        <path d="M6 12L10 16" strokeWidth="1" strokeLinecap="round" stroke-opacity="0.6" />
+                                                        <path d="M14 12L18 16" strokeWidth="1" strokeLinecap="round" stroke-opacity="0.6" />
+                                                    </svg>
+                                                </div>
+                                                <span className="text-xs font-medium tracking-wide">Boucles d'Oreilles</span>
+                                            </button>
                                         </div>
                                     </div>
                                     {/* Mobile indicator for scroll */}
@@ -500,34 +695,7 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                                     </div>
                                 </div>
 
-                                {/* Product type filters - NEW SECTION */}
-                                <div>
-                                    <h3 className="text-sm font-medium text-richEbony mb-3">Types de bijoux</h3>
-                                    <div className="overflow-x-auto pb-2">
-                                        <div className="flex flex-nowrap gap-2 min-w-min">
-                                            <button
-                                                onClick={() => setSelectedType("")}
-                                                className={`text-xs px-5 py-2.5 rounded-full transition-all duration-300 whitespace-nowrap ${!selectedType 
-                                                    ? "bg-gradient-to-r from-brandGold to-brandGold/90 text-white shadow-md" 
-                                                    : "bg-brandIvory/80 text-platinumGray hover:bg-brandGold/10 hover:text-brandGold hover:border-brandGold/40 border border-brandGold/20"}`}
-                                            >
-                                                Tous
-                                            </button>
-                                            
-                                            {productTypes.map((type) => (
-                                                <button
-                                                    key={type}
-                                                    onClick={() => setSelectedType(type)}
-                                                    className={`text-xs px-5 py-2.5 rounded-full transition-all duration-300 whitespace-nowrap ${selectedType === type 
-                                                        ? "bg-gradient-to-r from-brandGold to-brandGold/90 text-white shadow-md" 
-                                                        : "bg-brandIvory/80 text-platinumGray hover:bg-brandGold/10 hover:text-brandGold hover:border-brandGold/40 border border-brandGold/20"}`}
-                                                >
-                                                    {type}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
+
 
                                 {/* Price filter toggle button */}
                                 <div className="w-full flex justify-center my-1">
@@ -569,7 +737,7 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                                                         {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])} <span className="text-2xs opacity-70">MAD</span>
                                                     </span>
                                                 </div>
-                                        </div>
+                                            </div>
 
                                             {/* Show price distribution indicator */}
                                             <div className="relative h-1 mb-5 mt-6 w-full bg-brandGold/5 rounded-full overflow-hidden">
@@ -584,48 +752,51 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                                                         />
                                                     );
                                                 })}
-                                        </div>
-                                        
+                                            </div>
+                                            
                                             {/* Enhanced slider track */}
                                             <div 
-                                                id="price-slider-track"
+                                                ref={trackRef}
                                                 className="relative h-1.5 w-full bg-gradient-to-r from-brandGold/10 via-brandGold/5 to-brandGold/10 rounded-full cursor-pointer"
                                                 onClick={handleTrackClick}
                                                 aria-label="Ajuster la fourchette de prix"
                                             >
                                                 {/* Active track */}
                                                 <div 
+                                                    data-track-highlight
                                                     className="absolute h-full bg-gradient-to-r from-brandGold/70 to-brandGold/80 rounded-full"
                                                     style={{
-                                                        left: calculateThumbPosition(priceRange[0]),
-                                                        right: `calc(100% - ${calculateThumbPosition(priceRange[1])})`
+                                                        left: calculateThumbPosition(priceRangeRef.current[0]),
+                                                        right: `calc(100% - ${calculateThumbPosition(priceRangeRef.current[1])})`
                                                     }}
                                                 ></div>
                                                 
                                                 {/* Min thumb */}
                                                 <div 
-                                                    className={`absolute w-4 h-4 -mt-[5px] -ml-2 rounded-full cursor-grab border border-brandGold/30 
-                                                        ${isDragging === 'min' ? 'cursor-grabbing ring-2 ring-brandGold/20 shadow-lg scale-110' : 'shadow-md hover:scale-110'} 
-                                                        transition-all duration-150`}
+                                                    data-thumb="min"
+                                                    className="absolute w-4 h-4 -mt-[5px] -ml-2 rounded-full cursor-grab border border-brandGold/30 shadow-md hover:scale-110 transition-all duration-150"
                                                     style={{
-                                                        left: calculateThumbPosition(priceRange[0]),
-                                                        background: 'linear-gradient(to bottom right, #f8efdb, #d4af37)'
+                                                        left: calculateThumbPosition(priceRangeRef.current[0]),
+                                                        background: 'linear-gradient(to bottom right, #f8efdb, #d4af37)',
+                                                        zIndex: 20
                                                     }}
                                                     onMouseDown={handleThumbMouseDown('min')}
+                                                    onTouchStart={handleThumbMouseDown('min')}
                                                     aria-label="Prix minimum"
                                                 >
                                                 </div>
                                                 
                                                 {/* Max thumb */}
                                                 <div 
-                                                    className={`absolute w-4 h-4 -mt-[5px] -ml-2 rounded-full cursor-grab border border-brandGold/30 
-                                                        ${isDragging === 'max' ? 'cursor-grabbing ring-2 ring-brandGold/20 shadow-lg scale-110' : 'shadow-md hover:scale-110'} 
-                                                        transition-all duration-150`}
+                                                    data-thumb="max"
+                                                    className="absolute w-4 h-4 -mt-[5px] -ml-2 rounded-full cursor-grab border border-brandGold/30 shadow-md hover:scale-110 transition-all duration-150"
                                                     style={{
-                                                        left: calculateThumbPosition(priceRange[1]),
-                                                        background: 'linear-gradient(to bottom right, #f8efdb, #d4af37)'
+                                                        left: calculateThumbPosition(priceRangeRef.current[1]),
+                                                        background: 'linear-gradient(to bottom right, #f8efdb, #d4af37)',
+                                                        zIndex: 20
                                                     }}
                                                     onMouseDown={handleThumbMouseDown('max')}
+                                                    onTouchStart={handleThumbMouseDown('max')}
                                                     aria-label="Prix maximum"
                                                 >
                                                 </div>

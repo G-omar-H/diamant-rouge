@@ -395,14 +395,14 @@ export default function Header() {
                         <div className={`absolute top-full left-0 w-48 bg-brandIvory shadow-luxury border border-brandGold/10 rounded py-2 z-50 transition-all duration-300 ${collectionsOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'}`}>
                           <div className="absolute -top-2 left-6 w-4 h-4 rotate-45 bg-brandIvory border-t border-l border-brandGold/10"></div>
                           <Link 
-                            href="/collections?category=bagues"
+                            href="/collections?category=rings" 
                             locale={router.locale}
                             className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200"
                           >
                             Bagues
                           </Link>
                           <Link 
-                            href="/collections?category=colliers" 
+                            href="/collections?category=necklaces" 
                             locale={router.locale}
                             className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200"
                           >
@@ -416,7 +416,7 @@ export default function Header() {
                             Bracelets
                           </Link>
                           <Link 
-                            href="/collections?category=boucles"
+                            href="/collections?category=earrings"
                             locale={router.locale}
                             className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200"
                           >
@@ -633,14 +633,14 @@ export default function Header() {
                     <div className={`absolute top-full left-1/2 transform -translate-x-1/2 w-48 bg-brandIvory shadow-luxury border border-brandGold/10 rounded py-2 mt-1 transition-all duration-300 ${collectionsOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'} z-50`}>
                       <div className="absolute -top-2 left-6 w-4 h-4 rotate-45 bg-brandIvory border-t border-l border-brandGold/10"></div>
                       <Link 
-                        href="/collections?category=bagues"
+                        href="/collections?category=rings"
                         locale={router.locale}
                         className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200"
                       >
                         Bagues
                       </Link>
                       <Link 
-                        href="/collections?category=colliers" 
+                        href="/collections?category=necklaces"
                         locale={router.locale}
                         className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200"
                       >
@@ -654,7 +654,7 @@ export default function Header() {
                         Bracelets
                       </Link>
                       <Link 
-                        href="/collections?category=boucles"
+                        href="/collections?category=earrings"
                         locale={router.locale}
                         className="block px-4 py-2 text-sm hover:bg-brandGold/5 hover:text-brandGold transition-colors duration-200"
                       >

@@ -65,12 +65,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const locationLabel = location === 'casablanca' ? 'Showroom Casablanca' : 'Consultation Virtuelle';
 
     // Create appointment in database
+    // Convert date string to proper DateTime format
+    // If the appointmentDate is just a date string like '2025-05-21', convert it to a proper DateTime
+    const dateObj = typeof appointmentDate === 'string' 
+      ? new Date(appointmentDate + (appointmentTime ? `T${appointmentTime}:00` : 'T12:00:00'))
+      : appointmentDate;
+      
     const appointment = await prisma.appointment.create({
       data: {
-        clientName: user.name || user.email.split('@')[0], // Use name if available, or extract from email
         clientEmail: user.email,
         clientPhone: user.phoneNumber || '',
-        appointmentDate,
+        appointmentDate: dateObj,
         appointmentTime,
         duration: typeDetails[appointmentTypeKey]?.duration || "90",
         status: 'PENDING',
@@ -96,7 +101,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
   } catch (error) {
-    console.error('Error creating appointment:', error);
+    console.error('Error creating appointment:', error instanceof Error ? error.message : 'Unknown error');
     return res.status(500).json({ error: 'An error occurred while creating the appointment' });
   }
-} 
+}

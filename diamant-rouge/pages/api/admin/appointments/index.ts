@@ -1,12 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
-import { getSession } from 'next-auth/react';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../../auth/[...nextauth]';
 
 const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Check authentication
-  const session = await getSession({ req });
+  const session = await getServerSession(req, res, authOptions);
   
   if (!session || session.user.role !== 'admin') {
     return res.status(401).json({ error: 'Unauthorized' });
@@ -47,7 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       
       return res.status(200).json(appointments);
     } catch (error) {
-      console.error('Error fetching appointments:', error);
+      console.error('Error fetching appointments:', error instanceof Error ? error.message : 'Unknown error');
       return res.status(500).json({ error: 'An error occurred while fetching appointments' });
     }
   }
@@ -69,7 +70,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       
       return res.status(201).json(appointment);
     } catch (error) {
-      console.error('Error creating appointment:', error);
+      console.error('Error creating appointment:', error instanceof Error ? error.message : 'Unknown error');
       return res.status(500).json({ error: 'An error occurred while creating the appointment' });
     }
   }
