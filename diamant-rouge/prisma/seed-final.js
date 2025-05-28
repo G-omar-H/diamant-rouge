@@ -142,9 +142,85 @@ async function seedProducts(categoryMap) {
   
   const productImages = getProductImagesFromFolders();
   let productsCreated = 0;
+  const usedNames = new Set(); // Track used names to ensure uniqueness
   
-  // Process each category's images and create corresponding products
-  for (const category in productImages) {
+  // Calculate featured product limits per category (15% of products per category)
+  const featuredLimits = {
+    rings: 3,
+    necklaces: 2,
+    bracelets: 2,
+    earrings: 2
+  };
+  
+  const featuredCount = {
+    rings: 0,
+    necklaces: 0,
+    bracelets: 0,
+    earrings: 0
+  };
+  
+  // Helper function to determine if a product should be featured
+  const shouldFeatureProduct = (category, features) => {
+    if (featuredCount[category] >= featuredLimits[category]) {
+      return false;
+    }
+    
+    // Feature products with premium materials or designs
+    const isPremiumProduct = category === 'bracelets' ? 
+      // Special criteria for bracelets
+      (features.includes('diamond') || 
+       features.includes('sapphire') || 
+       features.includes('emerald') || 
+       features.includes('ruby') ||
+       features.includes('chain') ||
+       features.includes('baguette') ||
+       features.includes('tennis') ||
+       features.includes('medallion')) :
+      // Criteria for other categories
+      ((features.includes('diamond') && (features.includes('halo') || features.includes('cluster'))) ||
+       features.includes('sapphire') ||
+       features.includes('emerald') ||
+       features.includes('ruby') ||
+       features.includes('platinum') ||
+       features.includes('three stone') ||
+       (features.includes('solitaire') && features.includes('diamond')));
+    
+    if (isPremiumProduct) {
+      featuredCount[category]++;
+      return true;
+    }
+    
+    return false;
+  };
+  
+  // Generate unique product name
+  const generateUniqueProductName = (category, metal, design, features, attempt = 0, language = 'en') => {
+    let name;
+    switch (language) {
+      case 'fr':
+        name = generateProductNameFrench(category, metal, design, features);
+        break;
+      case 'ar':
+        name = generateProductNameArabic(category, metal, design, features);
+        break;
+      default:
+        name = generateProductName(category, metal, design, features);
+    }
+    
+    if (attempt > 0) {
+      name = `${name} ${attempt}`;
+    }
+    
+    const nameKey = `${name}_${language}`; // Track uniqueness per language
+    if (!usedNames.has(nameKey)) {
+      usedNames.add(nameKey);
+      return name;
+    }
+    
+    return generateUniqueProductName(category, metal, design, features, attempt + 1, language);
+  };
+  
+  for (const [category, images] of Object.entries(productImages)) {
     const categoryId = categoryMap[category];
     
     if (!categoryId) {
@@ -152,167 +228,295 @@ async function seedProducts(categoryMap) {
       continue;
     }
     
-    for (const image of productImages[category]) {
+    for (const image of images) {
       try {
         // Extract product details from filename
         const { metal, design, features, sku } = parseImageFilename(image.filename, category);
         
-        // Create appropriate variations based on category
-        const variations = createVariationsForCategory(category);
-        
-        // Generate price based on category and features (some randomness)
+        // Generate base price based on category and features
         const basePrice = generatePriceForProduct(category, features);
         
-        // Create product
-        await prisma.product.create({
+        // Generate unique names for each language
+        const englishName = generateUniqueProductName(category, metal, design, features, 0, 'en');
+        const frenchName = generateUniqueProductName(category, metal, design, features, 0, 'fr');
+        const arabicName = generateUniqueProductName(category, metal, design, features, 0, 'ar');
+        
+        // Create product with all required fields from schema
+        const product = await prisma.product.create({
           data: {
             sku,
             basePrice,
             categoryId,
-            featured: Math.random() > 0.7, // 30% chance to be featured
+            featured: shouldFeatureProduct(category, features),
             images: [`/images/products/${category}/${image.filename}`],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            
+            // Create translations with proper schema fields
             translations: {
               create: [
                 { 
                   language: 'en', 
-                  name: generateProductName(category, metal, design, features),
+                  name: englishName,
                   description: generateProductDescription(category, metal, design, features)
                 },
                 { 
                   language: 'fr', 
-                  name: generateProductNameFrench(category, metal, design, features),
+                  name: frenchName,
                   description: generateProductDescriptionFrench(category, metal, design, features)
                 },
                 { 
                   language: 'ar', 
-                  name: generateProductNameArabic(category, metal, design, features),
+                  name: arabicName,
                   description: generateProductDescriptionArabic(category, metal, design, features)
                 }
               ]
             },
+            
+            // Create variations with proper schema fields
             variations: {
-              create: variations
+              create: generateVariationsForCategory(category, metal)
             }
+          },
+          include: {
+            translations: true,
+            variations: true,
+            category: true
           }
         });
         
         productsCreated++;
+        console.log(`✓ Created product: ${product.sku} in category: ${category}${product.featured ? ' (Featured)' : ''}`);
       } catch (error) {
         console.error(`⚠️ Error creating product from ${image.filename}:`, error);
       }
     }
   }
   
-  console.log(`✅ Created ${productsCreated} products`);
+  // Log featured products distribution
+  console.log('\nFeatured products distribution:');
+  Object.entries(featuredCount).forEach(([category, count]) => {
+    console.log(`${category}: ${count} featured products`);
+  });
+  
+  console.log(`\n✅ Created ${productsCreated} products total`);
 }
 
 // Helper function to get all product images from the organized folders
 function getProductImagesFromFolders() {
-  const productImages = {};
+  const productImages = {
+    rings: [],
+    bracelets: [],
+    necklaces: [],
+    earrings: []
+  };
   const productsFolderPath = path.join(process.cwd(), 'public', 'images', 'products');
   
   try {
-    // Read category folders
+    // Read all category folders
     const categoryFolders = fs.readdirSync(productsFolderPath).filter(folder => 
       fs.statSync(path.join(productsFolderPath, folder)).isDirectory()
     );
     
-    for (const category of categoryFolders) {
-      const categoryPath = path.join(productsFolderPath, category);
-      try {
-        const files = fs.readdirSync(categoryPath)
+    for (const folder of categoryFolders) {
+      const folderPath = path.join(productsFolderPath, folder);
+      const files = fs.readdirSync(folderPath)
           .filter(file => file.endsWith('.png') || file.endsWith('.jpg'))
           .map(filename => ({ 
             filename,
-            path: path.join(categoryPath, filename)
-          }));
+          path: path.join(folderPath, filename)
+        }));
         
-        productImages[category] = files;
-      } catch (error) {
-        console.error(`Error reading category folder ${category}:`, error);
-        productImages[category] = [];
-      }
+      // Parse each filename to determine its true category
+      files.forEach(file => {
+        const actualCategory = getActualCategoryFromFilename(file.filename);
+        if (actualCategory && productImages[actualCategory]) {
+          productImages[actualCategory].push({
+            filename: file.filename,
+            path: file.path,
+            originalFolder: folder
+          });
+        }
+      });
     }
     
     return productImages;
   } catch (error) {
     console.error('Error reading product folders:', error);
-    return {};
+    return productImages;
   }
+}
+
+// Helper function to determine actual category from filename
+function getActualCategoryFromFilename(filename) {
+  const prefix = filename.split('_')[0].toLowerCase();
+  if (['rings', 'bracelets', 'necklaces', 'earrings'].includes(prefix)) {
+    return prefix;
+  }
+  return null;
 }
 
 // Helper function to parse product details from filename
 function parseImageFilename(filename, category) {
-  // Expected format: category_metal_design_features_SKU.png
+  // Format: category_metal_design_features_SKU.png
   const parts = filename.split('_');
-  const sku = parts[parts.length - 1].split('.')[0];
+  
+  // Remove file extension from last part
+  const skuWithExt = parts[parts.length - 1];
+  const sku = skuWithExt.split('.')[0];
+  
+  // Extract metal type (second part)
+  const metal = parts[1] || '';
+  
+  // Extract design elements (third part onwards, excluding SKU)
+  const designElements = parts.slice(2, -1);
+  
+  // Combine design elements for features, excluding common words
+  const features = designElements
+    .filter(word => !['and', 'with', 'in', 'of'].includes(word.toLowerCase()))
+    .join(' ');
+  
+  // Get the main design description
+  const design = designElements[0] || 'classic';
   
   return {
-    metal: parts[1] || 'gold',
-    design: parts[2] || 'classic',
-    features: parts.slice(3, -1).join(' ') || 'elegant',
+    metal: formatMetalType(metal),
+    design: formatDesignType(design),
+    features: formatFeatures(features),
     sku
   };
 }
 
-// Helper function to create variations based on category
-function createVariationsForCategory(category) {
+// Helper functions to format product details
+function formatMetalType(metal) {
+  const metalMap = {
+    'white': 'white gold',
+    'rose': 'rose gold',
+    'yellow': 'yellow gold'
+  };
+  
+  const baseMetal = metal.toLowerCase().split('_')[0];
+  return metalMap[baseMetal] || baseMetal;
+}
+
+function formatDesignType(design) {
+  return design.toLowerCase()
+    .replace(/_/g, ' ')
+    .trim();
+}
+
+function formatFeatures(features) {
+  return features.toLowerCase()
+    .replace(/_/g, ' ')
+    .trim();
+}
+
+// Helper function to generate variations based on category and metal type
+function generateVariationsForCategory(category, metalType) {
+  const variations = [];
+  
   switch (category) {
     case 'rings':
-      return [
-        { variationType: 'Size', variationValue: '48', additionalPrice: 0, inventory: Math.floor(Math.random() * 5) + 2 },
-        { variationType: 'Size', variationValue: '50', additionalPrice: 0, inventory: Math.floor(Math.random() * 5) + 3 },
-        { variationType: 'Size', variationValue: '52', additionalPrice: 0, inventory: Math.floor(Math.random() * 5) + 5 },
-        { variationType: 'Size', variationValue: '54', additionalPrice: 0, inventory: Math.floor(Math.random() * 5) + 4 },
-        { variationType: 'Size', variationValue: '56', additionalPrice: 0, inventory: Math.floor(Math.random() * 5) + 2 },
-      ];
+      // Ring sizes with proper schema fields
+      ['48', '50', '52', '54', '56'].forEach(size => {
+        variations.push({
+          variationType: 'Size',
+          variationValue: size,
+          additionalPrice: 0,
+          inventory: Math.floor(Math.random() * 5) + 2
+        });
+      });
+      break;
+      
     case 'bracelets':
-      return [
-        { variationType: 'Length', variationValue: '16cm', additionalPrice: 0, inventory: Math.floor(Math.random() * 5) + 5 },
-        { variationType: 'Length', variationValue: '18cm', additionalPrice: 0, inventory: Math.floor(Math.random() * 5) + 7 },
-        { variationType: 'Length', variationValue: '20cm', additionalPrice: 100, inventory: Math.floor(Math.random() * 5) + 3 },
-      ];
+      // Bracelet lengths with proper schema fields
+      ['16cm', '18cm', '20cm'].forEach((length, index) => {
+        variations.push({
+          variationType: 'Length',
+          variationValue: length,
+          additionalPrice: index === 2 ? 100 : 0, // Premium for longer length
+          inventory: Math.floor(Math.random() * 5) + 3
+        });
+      });
+      break;
+      
     case 'necklaces':
-      return [
-        { variationType: 'Length', variationValue: '42cm', additionalPrice: 0, inventory: Math.floor(Math.random() * 5) + 5 },
-        { variationType: 'Length', variationValue: '45cm', additionalPrice: 0, inventory: Math.floor(Math.random() * 5) + 7 },
-        { variationType: 'Length', variationValue: '50cm', additionalPrice: 200, inventory: Math.floor(Math.random() * 5) + 3 },
-      ];
+      // Necklace lengths with proper schema fields
+      ['42cm', '45cm', '50cm'].forEach((length, index) => {
+        variations.push({
+          variationType: 'Length',
+          variationValue: length,
+          additionalPrice: index === 2 ? 200 : 0, // Premium for longer length
+          inventory: Math.floor(Math.random() * 5) + 3
+        });
+      });
+      break;
+      
     case 'earrings':
-      return [
-        { variationType: 'Metal', variationValue: 'White Gold', additionalPrice: 0, inventory: Math.floor(Math.random() * 5) + 5 },
-        { variationType: 'Metal', variationValue: 'Rose Gold', additionalPrice: 150, inventory: Math.floor(Math.random() * 5) + 3 },
-        { variationType: 'Metal', variationValue: 'Yellow Gold', additionalPrice: 120, inventory: Math.floor(Math.random() * 5) + 4 },
-      ];
+      // Metal variations with proper schema fields
+      const metals = ['White Gold', 'Rose Gold', 'Yellow Gold'];
+      metals.forEach((metal, index) => {
+        variations.push({
+          variationType: 'Metal',
+          variationValue: metal,
+          additionalPrice: index > 0 ? (index === 1 ? 150 : 120) : 0,
+          inventory: Math.floor(Math.random() * 5) + 3
+        });
+      });
+      break;
+      
     default:
-      return [
-        { variationType: 'Size', variationValue: 'Standard', additionalPrice: 0, inventory: Math.floor(Math.random() * 10) + 5 },
-      ];
+      // Default variation with proper schema fields
+      variations.push({
+        variationType: 'Standard',
+        variationValue: 'One Size',
+        additionalPrice: 0,
+        inventory: Math.floor(Math.random() * 10) + 5
+      });
   }
+  
+  return variations;
 }
 
 // Generate price based on category and features
 function generatePriceForProduct(category, features) {
   const baseRanges = {
-    'rings': { min: 1500, max: 8000 },
-    'bracelets': { min: 2000, max: 6000 },
-    'necklaces': { min: 2500, max: 9000 },
-    'earrings': { min: 1200, max: 5000 }
+    'rings': { min: 2500, max: 12000 },
+    'bracelets': { min: 3000, max: 15000 },
+    'necklaces': { min: 3500, max: 18000 },
+    'earrings': { min: 2000, max: 10000 }
   };
   
-  // Add premium for certain features
+  // Add premium for materials and features
   let premium = 0;
-  if (features.includes('diamond')) premium += 1500;
-  if (features.includes('sapphire')) premium += 1200;
-  if (features.includes('emerald')) premium += 1300;
-  if (features.includes('ruby')) premium += 1400;
-  if (features.includes('platinum')) premium += 1000;
   
-  const range = baseRanges[category] || { min: 1000, max: 5000 };
+  // Gemstone premiums
+  if (features.includes('diamond')) {
+    if (features.includes('cluster')) premium += 3000;
+    else if (features.includes('halo')) premium += 2500;
+    else premium += 2000;
+  }
+  if (features.includes('sapphire')) premium += 2200;
+  if (features.includes('emerald')) premium += 2500;
+  if (features.includes('ruby')) premium += 2300;
+  
+  // Metal type premiums
+  if (features.includes('platinum')) premium += 1500;
+  if (features.includes('white gold')) premium += 800;
+  if (features.includes('rose gold')) premium += 600;
+  
+  // Design complexity premiums
+  if (features.includes('pave')) premium += 1000;
+  if (features.includes('baguette')) premium += 1200;
+  if (features.includes('eternity')) premium += 1500;
+  if (features.includes('three stone')) premium += 2000;
+  if (features.includes('solitaire')) premium += 1000;
+  
+  const range = baseRanges[category] || { min: 2000, max: 10000 };
   const baseAmount = Math.random() * (range.max - range.min) + range.min;
   
-  // Round to 2 decimal places
-  return Number((baseAmount + premium).toFixed(2));
+  // Round to nearest hundred
+  return Math.round((baseAmount + premium) / 100) * 100;
 }
 
 // Generate product names and descriptions
@@ -419,7 +623,10 @@ async function seedOrders() {
   
   const users = await prisma.user.findMany();
   const products = await prisma.product.findMany({
-    include: { variations: true }
+    include: {
+      variations: true,
+      category: true
+    }
   });
   
   if (!users.length || !products.length) {
@@ -429,7 +636,6 @@ async function seedOrders() {
   
   const orderStatuses = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
   const paymentMethods = ['CREDIT_CARD', 'BANK_TRANSFER', 'PAYPAL'];
-  
   const orders = [];
   
   // Create 1-3 orders for each user
@@ -437,7 +643,6 @@ async function seedOrders() {
     const numOrders = Math.floor(Math.random() * 3) + 1;
     
     for (let i = 0; i < numOrders; i++) {
-      // For each order, add 1-4 products
       const numOrderItems = Math.floor(Math.random() * 4) + 1;
       const orderItems = [];
       let totalAmount = 0;
@@ -448,38 +653,45 @@ async function seedOrders() {
       
       for (const product of selectedProducts) {
         const quantity = Math.floor(Math.random() * 2) + 1;
-        const price = parseFloat(product.basePrice);
+        const variation = product.variations[Math.floor(Math.random() * product.variations.length)];
+        const basePrice = parseFloat(product.basePrice);
+        const additionalPrice = parseFloat(variation?.additionalPrice || 0);
+        const finalPrice = basePrice + additionalPrice;
         
         orderItems.push({
           productId: product.id,
           quantity,
-          price
+          price: finalPrice
         });
         
-        totalAmount += price * quantity;
+        totalAmount += finalPrice * quantity;
       }
       
-      // Create the order
-      const orderData = {
+      // Create order with all required schema fields
+      const order = await prisma.order.create({
+        data: {
         userId: user.id,
         status: orderStatuses[Math.floor(Math.random() * orderStatuses.length)],
         totalAmount,
         paymentMethod: paymentMethods[Math.floor(Math.random() * paymentMethods.length)],
-        shippingAddress: user.address,
-        city: user.city,
-        country: user.country,
-        postalCode: user.postalCode,
-        createdAt: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000), // Random date within last 30 days
+          shippingAddress: user.address || 'Default Address',
+          city: user.city || 'Default City',
+          country: user.country || 'Default Country',
+          postalCode: user.postalCode || '00000',
+          createdAt: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000),
+          updatedAt: new Date(),
         orderItems: {
           create: orderItems
+          }
+        },
+        include: {
+          orderItems: true,
+          user: true
         }
-      };
-      
-      const order = await prisma.order.create({
-        data: orderData
       });
       
       orders.push(order);
+      console.log(`✓ Created order: ${order.id} for user: ${user.email}`);
     }
   }
   
