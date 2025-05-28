@@ -736,6 +736,7 @@ async function seedAppointments() {
     await prisma.appointment.create({
       data: {
         userId: user.id,
+        clientName: user.name || user.email.split('@')[0], // Use name if available or extract from email
         clientEmail: user.email,
         clientPhone: user.phoneNumber || '+1234567890',
         appointmentDate: date,

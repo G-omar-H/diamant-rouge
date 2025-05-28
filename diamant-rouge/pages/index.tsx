@@ -255,7 +255,7 @@ export default function HomePage({
 
     // Define jewelry categories
     const jewelryCategories = ["Tous", ...categories.map(cat => 
-        cat.translations.find(t => t.language === currentLocale)?.name || cat.slug
+        cat.translations.find(t => t.language === currentLocale)?.name || cat.slug || "Category"
     )];
 
     // Updated filtered products logic
