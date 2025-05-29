@@ -193,9 +193,10 @@ export default function Header() {
 
   // Handle product click - navigate to product and close search
   const handleProductClick = (category: string, id: number) => {
-    router.push(`/collections/${category}/${id}`);
-      setSearchOpen(false);
-      setSearchQuery("");
+    // Fix: Route directly to product page instead of collections/category/id
+    router.push(`/products/${id}`);
+    setSearchOpen(false);
+    setSearchQuery("");
     setSearchResults([]);
   };
 
@@ -950,7 +951,9 @@ export default function Header() {
                           <div className="flex-grow">
                             <div className="flex justify-between items-start">
                               <h4 className="text-brandIvory font-medium">{result.name}</h4>
-                              <p className="text-brandGold font-serif ml-2">{(typeof result.price === 'number' ? result.price : 0).toLocaleString('fr-FR')} €</p>
+                              <p className="text-brandGold font-serif ml-2">
+                                {(parseFloat(result.price?.toString() || "0")).toLocaleString('fr-FR')} MAD
+                              </p>
                             </div>
                             <div className="flex items-center mt-1">
                               <span className="text-brandIvory/60 text-xs">
