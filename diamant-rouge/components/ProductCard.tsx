@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Heart } from "lucide-react";
@@ -28,10 +28,16 @@ type ProductCardProps = {
 };
 
 export default function ProductCard({ product, locale, isWishlisted = false }: ProductCardProps) {
-    const { addToWishlist, removeFromWishlist } = useWishlist();
+    const { addToWishlist, removeFromWishlist, wishlist } = useWishlist();
     const { showToast } = useToast();
     const [hovered, setHovered] = useState(false);
     const [isInWishlist, setIsInWishlist] = useState(isWishlisted);
+    
+    // Update local wishlist state when global wishlist changes
+    useEffect(() => {
+        const isProductInWishlist = wishlist.some(item => item.productId === product.id);
+        setIsInWishlist(isProductInWishlist);
+    }, [wishlist, product.id]);
 
     // Get product name based on current locale with French fallback
     const getProductName = () => {
