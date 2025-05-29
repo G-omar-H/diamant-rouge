@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import { prisma } from "../../lib/prisma";
 import Image from "next/image";
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef, useEffect, MouseEvent, TouchEvent } from "react";
 import { useCart } from "../../contexts/CartContext";
 import { useToast } from "../../contexts/ToastContext";
 import { NextSeo } from "next-seo";
@@ -155,6 +155,8 @@ export default function ProductPage({
       productData.images[0] || "/images/placeholder.jpg"
     );
     const [isZoomed, setIsZoomed] = useState(false);
+    const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+    const [touchZooming, setTouchZooming] = useState(false);
     const [showCertificateModal, setShowCertificateModal] = useState(false);
     const [showExpertAuthenticationModal, setShowExpertAuthenticationModal] = useState(false); // Add missing state
     const [activeTab, setActiveTab] = useState("description");
@@ -202,23 +204,59 @@ export default function ProductPage({
     .map((v) => `${getVariationLabel(v.variationType)}: ${v.variationValue}`)
     .join(" • ");
 
-  // Handle zoom functionality
-  const handleImageZoom = (e: React.MouseEvent) => {
-    if (!mainImageRef.current || isZoomed) return;
+  // Enhanced zoom functionality
+  const handleImageZoom = (e: MouseEvent<HTMLDivElement>) => {
+    if (!mainImageRef.current) return;
     
     const {left, top, width, height} = mainImageRef.current.getBoundingClientRect();
-    const x = ((e.clientX - left) / width) * 100;
-    const y = ((e.clientY - top) / height) * 100;
+    const x = Math.max(0, Math.min(100, ((e.clientX - left) / width) * 100));
+    const y = Math.max(0, Math.min(100, ((e.clientY - top) / height) * 100));
     
-    mainImageRef.current.style.transformOrigin = `${x}% ${y}%`;
+    setZoomPosition({ x, y });
     setIsZoomed(true);
+  };
+  
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (!isZoomed || !mainImageRef.current) return;
+    
+    const {left, top, width, height} = mainImageRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(100, ((e.clientX - left) / width) * 100));
+    const y = Math.max(0, Math.min(100, ((e.clientY - top) / height) * 100));
+    
+    setZoomPosition({ x, y });
+  };
+  
+  // Touch-based zoom for mobile
+  const handleTouchStart = (e: TouchEvent<HTMLDivElement>) => {
+    if (!mainImageRef.current || e.touches.length !== 1) return;
+    
+    const touch = e.touches[0];
+    const {left, top, width, height} = mainImageRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(100, ((touch.clientX - left) / width) * 100));
+    const y = Math.max(0, Math.min(100, ((touch.clientY - top) / height) * 100));
+    
+    setZoomPosition({ x, y });
+    setTouchZooming(true);
+    setIsZoomed(true);
+  };
+  
+  const handleTouchMove = (e: TouchEvent<HTMLDivElement>) => {
+    if (!touchZooming || !mainImageRef.current || e.touches.length !== 1) return;
+    
+    // Prevent default to stop page scrolling
+    e.preventDefault();
+    
+    const touch = e.touches[0];
+    const {left, top, width, height} = mainImageRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(100, ((touch.clientX - left) / width) * 100));
+    const y = Math.max(0, Math.min(100, ((touch.clientY - top) / height) * 100));
+    
+    setZoomPosition({ x, y });
   };
   
   const handleZoomEnd = () => {
     setIsZoomed(false);
-    if (mainImageRef.current) {
-      mainImageRef.current.style.transform = 'scale(1)';
-    }
+    setTouchZooming(false);
   };
 
   // Add to Cart
@@ -303,16 +341,16 @@ export default function ProductPage({
             
             {/* LEFT COLUMN: Product Gallery - refined for all devices */}
             <div className="space-y-4 md:space-y-5">
-              {/* Main Image with Zoom - refined aspect ratio and smoother transitions */}
+              {/* Enhanced Main Image with Magnifying Glass Zoom */}
               <div 
                 className="relative overflow-hidden rounded-md md:rounded-lg shadow-luxury cursor-zoom-in aspect-square md:aspect-[4/3]"
                 ref={mainImageRef}
                 onClick={handleImageZoom}
+                onMouseMove={handleMouseMove}
                 onMouseLeave={handleZoomEnd}
-                style={{
-                  transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)', // Elegant easing
-                  transform: isZoomed ? 'scale(1.75)' : 'scale(1)'
-                }}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleZoomEnd}
               >
                 <Image
                   src={selectedImage}
@@ -322,6 +360,26 @@ export default function ProductPage({
                   className="w-full h-full object-cover"
                   priority
                 />
+                
+                {/* Magnifying Glass Overlay */}
+                {isZoomed && (
+                  <div className="absolute inset-0 pointer-events-none">
+                    <div 
+                      className="absolute w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden shadow-xl border-2 border-white/80 pointer-events-none"
+                      style={{
+                        top: `calc(${zoomPosition.y}% - 18px)`,
+                        left: `calc(${zoomPosition.x}% - 18px)`,
+                        backgroundImage: `url(${selectedImage})`,
+                        backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
+                        backgroundSize: '300% 300%',
+                        backgroundRepeat: 'no-repeat',
+                        transform: 'scale(1.0)',
+                        zIndex: 10
+                      }}
+                    />
+                  </div>
+                )}
+                
                 {!isZoomed && (
                   <motion.button 
                     initial={{ opacity: 0.8 }}
