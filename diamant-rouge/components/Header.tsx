@@ -1075,6 +1075,14 @@ export default function Header() {
                       <MobileLink href="/profile" locale={router.locale} onClick={() => setNavOpen(false)}>Mon Compte</MobileLink>
                       <MobileLink href="/orders" locale={router.locale} onClick={() => setNavOpen(false)}>Mes Commandes</MobileLink>
                       <MobileLink href="/wishlist" locale={router.locale} onClick={() => setNavOpen(false)}>Mes Favoris</MobileLink>
+                      {session.user?.role === "admin" && (
+                        <MobileLink href="/admin" locale={router.locale} onClick={() => setNavOpen(false)}>
+                          <div className="flex items-center">
+                            <ShieldCheck size={18} className="text-brandGold mr-2" />
+                            <span>Administration</span>
+                          </div>
+                        </MobileLink>
+                      )}
                       <button
                         onClick={() => {
                           signOut();
