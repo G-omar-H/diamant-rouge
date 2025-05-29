@@ -176,7 +176,7 @@ export default function Authentication() {
         <div className="hidden lg:flex lg:w-1/2 relative animate-fadeIn">
           <div className="absolute inset-0 bg-gold-gradient opacity-20"></div>
           <Image 
-            src="/images/auth-luxury-image.jpg" 
+            src="/images/close-up-texture-cream.jpg" 
             alt="Diamant Rouge Luxe" 
             layout="fill"
             objectFit="cover"
@@ -213,7 +213,7 @@ export default function Authentication() {
             <div className="text-center mb-10">
               <div className="block lg:hidden mb-8">
                 <Image 
-                  src="/images/logo.png" 
+                  src="/images/1/diamant-rouge-logo-full.svg" 
                   alt="Diamant Rouge" 
                   width={180} 
                   height={90} 
