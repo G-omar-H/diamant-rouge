@@ -275,6 +275,81 @@ export default function Header() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [searchOpen]);
 
+  // Effect to handle keyboard navigation in search results
+  useEffect(() => {
+    // Convert React keyboard event handler to DOM event handler
+    const handleSearchKeyboardNavigation = (e: KeyboardEvent) => {
+      if (!searchResults.length) return;
+      
+      // Handle keyboard navigation
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedResultIndex(prev => {
+          const newIndex = prev < searchResults.length - 1 ? prev + 1 : 0;
+          // Scroll to the selected item if needed
+          const resultItem = searchResultsRef.current?.children[newIndex] as HTMLElement;
+          resultItem?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          return newIndex;
+        });
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedResultIndex(prev => {
+          const newIndex = prev > 0 ? prev - 1 : searchResults.length - 1;
+          // Scroll to the selected item if needed
+          const resultItem = searchResultsRef.current?.children[newIndex] as HTMLElement;
+          resultItem?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          return newIndex;
+        });
+      } else if (e.key === 'Enter' && selectedResultIndex >= 0) {
+        e.preventDefault();
+        // Navigate to the selected product
+        const selected = searchResults[selectedResultIndex];
+        if (selected) {
+          router.push(`/products/${selected.id}`);
+          setSearchOpen(false);
+          setSearchQuery("");
+          setSearchResults([]);
+        }
+      }
+    };
+    
+    if (searchOpen) {
+      document.addEventListener('keydown', handleSearchKeyboardNavigation);
+    }
+    
+    return () => {
+      document.removeEventListener('keydown', handleSearchKeyboardNavigation);
+    };
+  }, [searchResults, searchOpen, selectedResultIndex, router]);
+
+  // Disable body scroll when search or mobile menu is open
+  useEffect(() => {
+    if (searchOpen || navOpen) {
+      // Save current scroll position
+      const scrollY = window.scrollY;
+      // Add styles to prevent scrolling while maintaining position
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+    } else {
+      // Restore scrolling and position
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
+      }
+    }
+    
+    return () => {
+      // Cleanup in case component unmounts while menu is open
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+    };
+  }, [searchOpen, navOpen]);
+
   // Reset search when closed
   useEffect(() => {
     if (!searchOpen) {
@@ -732,7 +807,7 @@ export default function Header() {
             animate={{ opacity: 1, backdropFilter: "blur(5px)" }}
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
-            className="fixed inset-0 bg-richEbony/80 z-50 flex items-start justify-center pt-28 md:pt-28 px-4 md:px-0"
+            className="fixed inset-0 bg-richEbony/80 z-50 flex items-start justify-center pt-28 md:pt-28 px-4 md:px-0 overflow-hidden"
             onClick={(e) => {
               if ((e.target as HTMLElement).classList.contains('fixed')) {
                 setSearchOpen(false);
@@ -1008,7 +1083,7 @@ export default function Header() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex"
+            className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex overflow-hidden"
           >
             <motion.div
               initial={{ x: '100%' }}
@@ -1076,8 +1151,20 @@ export default function Header() {
                   {session ? (
                     <>
                       <MobileLink href="/profile" locale={router.locale} onClick={() => setNavOpen(false)}>Mon Compte</MobileLink>
-                      <MobileLink href="/orders" locale={router.locale} onClick={() => setNavOpen(false)}>Mes Commandes</MobileLink>
-                      <MobileLink href="/wishlist" locale={router.locale} onClick={() => setNavOpen(false)}>Mes Favoris</MobileLink>
+                      <div onClick={() => {
+                        setNavOpen(false);
+                        router.push('/cart');
+                      }} className="flex items-center justify-between text-left py-3 px-1 text-platinumGray cursor-pointer hover:text-brandGold transition-colors duration-200 border-b border-brandGold/10">
+                        <span className="font-medium">Mon Panier</span>
+                        <ShoppingBag size={18} />
+                      </div>
+                      <div onClick={() => {
+                        setNavOpen(false);
+                        toggleWishlist();
+                      }} className="flex items-center justify-between text-left py-3 px-1 text-platinumGray cursor-pointer hover:text-brandGold transition-colors duration-200 border-b border-brandGold/10">
+                        <span className="font-medium">Mes Favoris</span>
+                        <Heart size={18} />
+                      </div>
                       {session.user?.role === "admin" && (
                         <MobileLink href="/admin" locale={router.locale} onClick={() => setNavOpen(false)}>
                           <div className="flex items-center">
