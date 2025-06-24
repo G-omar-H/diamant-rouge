@@ -274,21 +274,21 @@ export default function ChatBot() {
             {isOpen ? (
               <motion.div
                 key="close"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="absolute inset-0 bg-burgundy/90 flex items-center justify-center rounded-full"
+                initial={{ scale: 0, opacity: 0, rotate: -90 }}
+                animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                exit={{ scale: 0, opacity: 0, rotate: 90 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="absolute inset-0 bg-burgundy flex items-center justify-center rounded-full"
               >
-                <X size={isMobile ? 20 : 24} className="text-brandIvory" />
+                <X size={isMobile ? 22 : 24} className="text-brandIvory font-bold" strokeWidth={3} />
               </motion.div>
             ) : (
               <motion.div
                 key="diamond"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
+                initial={{ scale: 0, opacity: 0, rotate: -90 }}
+                animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                exit={{ scale: 0, opacity: 0, rotate: 90 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
                 className="absolute inset-0 flex items-center justify-center rounded-full overflow-hidden"
               >
                 <Image 
