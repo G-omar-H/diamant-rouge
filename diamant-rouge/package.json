@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "type-check": "npx tsc --noEmit",
     "seed": "node prisma/seed-final.js",
     "postbuild": "next-sitemap",
     "dev_mobile": "next dev -H 0.0.0.0 -p 3000"

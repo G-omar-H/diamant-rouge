@@ -10,14 +10,24 @@ declare module 'framer-motion' {
     onClick?: React.MouseEventHandler;
     children?: React.ReactNode;
     layout?: boolean;
+    layoutId?: string;
     onKeyDown?: React.KeyboardEventHandler;
     whileHover?: any;
     whileTap?: any;
+    variants?: any;
+    whileInView?: any;
+    viewport?: any;
   }
 
   export const motion: {
     div: React.ForwardRefExoticComponent<MotionProps & React.HTMLAttributes<HTMLDivElement>>;
     button: React.ForwardRefExoticComponent<MotionProps & React.ButtonHTMLAttributes<HTMLButtonElement>>;
+    header: React.ForwardRefExoticComponent<MotionProps & React.HTMLAttributes<HTMLElement>>;
+    section: React.ForwardRefExoticComponent<MotionProps & React.HTMLAttributes<HTMLElement>>;
+    form: React.ForwardRefExoticComponent<MotionProps & React.FormHTMLAttributes<HTMLFormElement>>;
+    input: React.ForwardRefExoticComponent<MotionProps & React.InputHTMLAttributes<HTMLInputElement>>;
+    h2: React.ForwardRefExoticComponent<MotionProps & React.HTMLAttributes<HTMLHeadingElement>>;
+    p: React.ForwardRefExoticComponent<MotionProps & React.HTMLAttributes<HTMLParagraphElement>>;
   };
 
   export const AnimatePresence: React.FC<{
@@ -31,6 +41,7 @@ declare module 'lucide-react' {
     size?: number | string;
     className?: string;
     color?: string;
+    strokeWidth?: number | string;
   }
 
   export const X: React.FC<LucideIconProps>;
@@ -76,6 +87,18 @@ declare module 'lucide-react' {
   export const GlassWater: React.FC<LucideIconProps>;
   export const Utensils: React.FC<LucideIconProps>;
   export const EyeOff: React.FC<LucideIconProps>;
+  export const GiftIcon: React.FC<LucideIconProps>;
+  export const HelpCircle: React.FC<LucideIconProps>;
+  export const Info: React.FC<LucideIconProps>;
+  export const Truck: React.FC<LucideIconProps>;
+  export const Award: React.FC<LucideIconProps>;
+  export const ArrowLeft: React.FC<LucideIconProps>;
+  export const ChevronUp: React.FC<LucideIconProps>;
+  export const AlertCircle: React.FC<LucideIconProps>;
+  export const BadgeCheck: React.FC<LucideIconProps>;
+  export const ZoomIn: React.FC<LucideIconProps>;
+  export const Star: React.FC<LucideIconProps>;
+  export const RefreshCw: React.FC<LucideIconProps>;
 }
 
 declare module 'next/image' {
@@ -92,6 +115,9 @@ declare module 'next/image' {
     sizes?: string;
     quality?: number;
     fill?: boolean;
+    layout?: string;
+    objectFit?: string;
+    objectPosition?: string;
   }
 
   const Image: React.FC<ImageProps>;
