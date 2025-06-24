@@ -248,45 +248,40 @@ export default function ChatBot() {
 
   return (
     <>
-      {/* Perfect Circle Mobile-Responsive Toggle Button */}
-      <motion.button
+      {/* Perfect Circle Mobile-Responsive Toggle Button with Smart Positioning */}
+      <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed transition-all duration-500 ${getZIndex()} ${isMobileMenuOpen ? 'opacity-50' : 'opacity-100'} ${
-          !isOpen ? (isMobile ? '' : 'bottom-6 right-6') : ''
+        className={`fixed transition-all duration-500 ${getZIndex()} ${
+          isMobileMenuOpen ? 'opacity-50' : 'opacity-100'
+        } ${
+          // Smart positioning: when open on mobile, move to top-right of screen
+          isOpen && isMobile 
+            ? 'top-safe-4 right-safe-4' 
+            : isMobile 
+              ? 'bottom-safe-4 right-safe-4' 
+              : 'bottom-6 right-6'
         }`}
-        style={
-          isMobile ? { 
-            bottom: isOpen ? 'auto' : 'calc(1rem + env(safe-area-inset-bottom))',
-            right: isOpen ? 'calc(1rem + env(safe-area-inset-right))' : 'calc(1rem + env(safe-area-inset-right))',
-            top: isOpen ? 'calc(1rem + env(safe-area-inset-top))' : 'auto'
-          } : isOpen ? {
-            top: '1rem',
-            right: '2rem',
-            bottom: 'auto'
-          } : {}
-        }
-        animate={{
-          x: isOpen ? (isMobile ? -8 : -12) : 0,
-          y: isOpen ? (isMobile ? 8 : 12) : 0,
-          scale: isOpen ? 0.9 : 1,
-        }}
-        transition={{ 
-          duration: 0.5, 
-          ease: "easeInOut",
-          type: "spring",
-          stiffness: 200,
-          damping: 25
-        }}
-        initial={false}
+        style={isMobile ? {
+          ...(isOpen ? {
+            top: 'calc(1rem + env(safe-area-inset-top))',
+            right: 'calc(1rem + env(safe-area-inset-right))'
+          } : {
+            bottom: 'calc(1rem + env(safe-area-inset-bottom))',
+            right: 'calc(1rem + env(safe-area-inset-right))'
+          })
+        } : {}}
         aria-label="Concierge Diamant Rouge"
       >
         <motion.div
           initial={{ rotate: 0 }}
-          animate={{ rotate: isOpen ? 180 : 0 }}
+          animate={{ 
+            rotate: isOpen ? 180 : 0,
+            scale: isOpen && isMobile ? 0.9 : 1 // Slightly smaller when open on mobile
+          }}
           transition={{ duration: 0.4, ease: "easeInOut" }}
           className={`relative bg-white rounded-full shadow-luxury border-2 border-brandGold hover:bg-brandGold/5 transition-all duration-300 overflow-hidden flex items-center justify-center ${
             isMobile ? 'w-12 h-12' : 'w-14 h-14'
-          } ${isOpen ? 'shadow-2xl ring-2 ring-brandGold/30' : ''}`}
+          } ${isOpen && isMobile ? 'shadow-2xl border-burgundy' : ''}`}
         >
           <AnimatePresence mode="wait">
             {isOpen ? (
@@ -325,7 +320,7 @@ export default function ChatBot() {
             )}
           </AnimatePresence>
         </motion.div>
-      </motion.button>
+      </button>
 
       <AnimatePresence>
         {isOpen && (
@@ -357,10 +352,12 @@ export default function ChatBot() {
                 </div>
                 <button 
                   onClick={() => setIsOpen(false)} 
-                  className="text-brandIvory/80 hover:text-brandIvory transition-colors p-1 rounded-full hover:bg-brandIvory/10"
+                  className={`text-brandIvory/80 hover:text-brandIvory transition-all duration-300 rounded-full hover:bg-brandIvory/10 ${
+                    isMobile ? 'p-2' : 'p-1'
+                  }`}
                   aria-label="Close Chat"
                 >
-                  <X size={isMobile ? 16 : 18} />
+                  <X size={isMobile ? 18 : 18} strokeWidth={2} className="font-medium" />
                 </button>
               </div>
               <p className={`text-brandIvory/80 font-light ${isMobile ? 'text-xs' : 'text-sm'}`}>
