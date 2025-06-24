@@ -459,16 +459,15 @@ export default function CollectionsPage({ products, categories, productTypes }: 
             <div className="hero-section">
             <div className="min-h-screen bg-white">
                 {/* HERO SECTION */}
-                <div className="relative h-72 md:h-96 overflow-hidden">
+                <div className="relative h-60 sm:h-72 md:h-80 lg:h-96 overflow-hidden">
                     <div className="absolute inset-0">
                         <Image 
                             src="/images/home/about-sourcing-01.jpg" 
                             alt="Collections Diamant Rouge" 
-                            layout="fill"
-                            objectFit="cover"
-                            objectPosition="center"
+                            fill
+                            sizes="100vw"
+                            className="object-cover object-center opacity-100"
                             priority
-                            className="opacity-100"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
                     </div>

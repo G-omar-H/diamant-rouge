@@ -657,6 +657,25 @@ p {
     box-shadow: 0 4px 20px rgba(212, 175, 55, 0.6);
 }
 
+/* Remove default button focus outline and provide subtle custom focus */
+button:focus {
+    outline: none;
+}
+
+/* Custom focus for interactive elements (excluding chatbot which has its own handling) */
+button:focus-visible:not(.chatbot-button) {
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.3);
+}
+
+/* Chatbot specific focus handling */
+.chatbot-button:focus {
+    outline: none;
+}
+
+.chatbot-button:focus-visible {
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.4);
+}
+
 /* Perfect circular overlay for close state */
 .chatbot-close-overlay {
     position: absolute;
@@ -702,5 +721,114 @@ p {
     
     .chatbot-touch-feedback:active {
         transform: scale(0.95);
+    }
+}
+
+/* ==========================================================
+   🖼️ Hero Image Mobile Optimizations
+   ========================================================== */
+
+/* Hero container responsive heights */
+.hero-responsive {
+    height: 50vh;
+}
+
+@media (min-width: 640px) {
+    .hero-responsive {
+        height: 60vh;
+    }
+}
+
+@media (min-width: 768px) {
+    .hero-responsive {
+        height: 70vh;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero-responsive {
+        height: 80vh;
+    }
+}
+
+/* Hero image optimal positioning */
+.hero-image-optimal {
+    object-fit: cover;
+    object-position: center;
+}
+
+/* For hero images that need special mobile positioning */
+.hero-image-mobile-center {
+    object-position: center center;
+}
+
+@media (max-width: 767px) {
+    .hero-image-mobile-center {
+        object-position: center 40%; /* Show upper portion on mobile */
+    }
+}
+
+/* Hero text responsive sizing */
+.hero-text-responsive {
+    font-size: 1.875rem; /* text-3xl */
+    line-height: 2.25rem;
+    margin-bottom: 0.5rem;
+}
+
+@media (min-width: 640px) {
+    .hero-text-responsive {
+        font-size: 2.25rem; /* text-4xl */
+        line-height: 2.5rem;
+        margin-bottom: 1rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .hero-text-responsive {
+        font-size: 3rem; /* text-5xl */
+        line-height: 1;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero-text-responsive {
+        font-size: 3.75rem; /* text-6xl */
+        line-height: 1;
+    }
+}
+
+/* Hero subtitle responsive sizing */
+.hero-subtitle-responsive {
+    font-size: 1rem; /* text-base */
+}
+
+@media (min-width: 640px) {
+    .hero-subtitle-responsive {
+        font-size: 1.125rem; /* text-lg */
+    }
+}
+
+@media (min-width: 768px) {
+    .hero-subtitle-responsive {
+        font-size: 1.25rem; /* text-xl */
+    }
+}
+
+/* Hero decorative line responsive */
+.hero-line-responsive {
+    width: 7rem; /* w-28 */
+    margin: 0.75rem auto; /* my-3 */
+}
+
+@media (min-width: 640px) {
+    .hero-line-responsive {
+        width: 8rem; /* w-32 */
+        margin: 1rem auto; /* my-4 */
+    }
+}
+
+@media (min-width: 768px) {
+    .hero-line-responsive {
+        width: 10rem; /* w-40 */
     }
 }

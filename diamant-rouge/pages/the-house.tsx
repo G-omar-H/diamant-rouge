@@ -16,11 +16,10 @@ export default function LaMaisonPage() {
         <Image 
           src="/images/home/find-my-harry-winston.avif" 
           alt="La Maison Diamant Rouge" 
-          layout="fill"
-          objectFit="cover"
-          objectPosition="center bottom"
+          fill
+          sizes="100vw"
+          className="object-cover object-center brightness-[0.85]"
           priority
-          className="brightness-[0.85]"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent"></div>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">

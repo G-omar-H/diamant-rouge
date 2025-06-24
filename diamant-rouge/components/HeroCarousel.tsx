@@ -93,7 +93,7 @@ export default function HeroCarousel({
 
   return (
     <section 
-      className="relative w-full h-[90vh] md:h-[100vh] overflow-hidden bg-richEbony home-hero-section"
+      className="relative w-full h-[70vh] sm:h-[80vh] md:h-[90vh] lg:h-[100vh] overflow-hidden bg-richEbony home-hero-section"
       style={{ marginTop: 'calc(-1 * var(--current-header-height))' }}
       onMouseEnter={pauseAutoplay}
       onMouseLeave={resumeAutoplay}
@@ -112,14 +112,14 @@ export default function HeroCarousel({
             transition={{ duration: 1, ease: "easeInOut" }}
             className="w-full h-full relative"
           >
-            {/* Main image - full width, no cropping */}
+            {/* Main image - full width, optimized positioning for mobile */}
             <Image
               src={slides[currentSlide].imageSrc}
               alt={slides[currentSlide].heading}
               fill
               priority
               sizes="(max-width: 768px) 100vw, 100vw"
-              className="object-cover object-center" 
+              className="object-cover object-center sm:object-center md:object-center" 
             />
             {/* Mobile-friendly subtle gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-richEbony/60 via-transparent to-transparent md:bg-none"></div>

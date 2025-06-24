@@ -251,7 +251,7 @@ export default function ChatBot() {
       {/* Perfect Circle Mobile-Responsive Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed transition-all duration-500 ease-in-out ${
+        className={`fixed transition-all duration-500 ease-in-out focus:outline-none chatbot-button ${
           isMobileMenuOpen ? 'opacity-50 z-30' : 'opacity-100'
         } ${isOpen ? 'z-[60]' : getZIndex()}`}
         style={isMobile ? { 

@@ -442,15 +442,14 @@ export default function AppointmentPage() {
             />
 
     {/* Hero Section - Preserving the central diamond with bottom-left positioning */}
-<section className="relative h-[80vh] flex items-end">
+<section className="relative h-[60vh] sm:h-[70vh] md:h-[80vh] lg:h-[85vh] flex items-end">
   {/* Background Image - No overlay */}
-                                    <Image
+  <Image
     src="/images/showroom.jpg"
-    layout="fill"
-    objectFit="cover"
-    objectPosition="center"
+    fill
+    sizes="100vw"
+    className="object-cover object-center z-0"
     alt="Diamant Rouge Showroom"
-    className="z-0"
     priority
   />
   

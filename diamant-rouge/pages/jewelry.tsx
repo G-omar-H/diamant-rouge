@@ -12,20 +12,20 @@ export default function HauteJoailleriePage() {
       </Head>
       
       {/* Hero Section */}
-      <section className="relative h-[70vh] w-full overflow-hidden">
+      <section className="relative h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[80vh] w-full overflow-hidden">
         <Image 
           src="/images/home/herolarged_icons.avif" 
           alt="Haute Joaillerie Diamant Rouge" 
           fill
           sizes="100vw"
           priority
-          className="brightness-[0.85] object-cover"
+          className="brightness-[0.85] object-cover object-center sm:object-center md:object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent"></div>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-4">Haute Joaillerie</h1>
-          <div className="h-[1px] w-40 bg-gradient-to-r from-transparent via-brandGold to-transparent my-4"></div>
-          <p className="text-lg md:text-xl text-white/90 max-w-2xl">L'art d'excellence selon la tradition marocaine</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-2 sm:mb-4">Haute Joaillerie</h1>
+          <div className="h-[1px] w-28 sm:w-32 md:w-40 bg-gradient-to-r from-transparent via-brandGold to-transparent my-3 sm:my-4"></div>
+          <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-2xl">L'art d'excellence selon la tradition marocaine</p>
         </div>
       </section>
       
