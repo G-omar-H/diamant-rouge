@@ -76,6 +76,17 @@ declare module 'next/image' {
 }
 
 declare module 'bcryptjs' {
+  interface BcryptJSInterface {
+    hash(data: string | Buffer, saltOrRounds: string | number): Promise<string>;
+    hashSync(data: string | Buffer, saltOrRounds: string | number): string;
+    compare(data: string | Buffer, encrypted: string): Promise<boolean>;
+    compareSync(data: string | Buffer, encrypted: string): boolean;
+    genSalt(rounds?: number): Promise<string>;
+    genSaltSync(rounds?: number): string;
+    getRounds(encrypted: string): number;
+  }
+
+  // Named exports
   export function hash(data: string | Buffer, saltOrRounds: string | number): Promise<string>;
   export function hashSync(data: string | Buffer, saltOrRounds: string | number): string;
   export function compare(data: string | Buffer, encrypted: string): Promise<boolean>;
@@ -83,4 +94,8 @@ declare module 'bcryptjs' {
   export function genSalt(rounds?: number): Promise<string>;
   export function genSaltSync(rounds?: number): string;
   export function getRounds(encrypted: string): number;
+
+  // Default export (for import bcrypt from 'bcryptjs')
+  const bcrypt: BcryptJSInterface;
+  export default bcrypt;
 } 
