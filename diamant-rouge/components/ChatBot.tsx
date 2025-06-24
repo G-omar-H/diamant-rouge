@@ -251,9 +251,9 @@ export default function ChatBot() {
       {/* Perfect Circle Mobile-Responsive Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed transition-all duration-500 ease-in-out ${getZIndex()} ${
-          isMobileMenuOpen ? 'opacity-50' : 'opacity-100'
-        }`}
+        className={`fixed transition-all duration-500 ease-in-out ${
+          isMobileMenuOpen ? 'opacity-50 z-30' : 'opacity-100'
+        } ${isOpen ? 'z-[60]' : getZIndex()}`}
         style={isMobile ? { 
           // Creative mobile positioning: moves to top-right when open
           bottom: isOpen ? 'auto' : 'calc(1rem + env(safe-area-inset-bottom))',
@@ -326,11 +326,11 @@ export default function ChatBot() {
             transition={{ duration: 0.3, ease: "easeOut" }}
             className={`fixed overflow-hidden shadow-luxury flex flex-col ${getZIndex()} ${
               isMobile 
-                ? 'inset-4 rounded-2xl safe-area-inset'
+                ? 'rounded-2xl safe-area-inset'
                 : 'bottom-24 right-6 w-96 max-h-[80vh] rounded-lg'
             }`}
             style={isMobile ? {
-              top: 'calc(1rem + env(safe-area-inset-top))',
+              top: 'calc(4rem + env(safe-area-inset-top))', // Leave space for button
               bottom: 'calc(1rem + env(safe-area-inset-bottom))',
               left: 'calc(1rem + env(safe-area-inset-left))',
               right: 'calc(1rem + env(safe-area-inset-right))'
