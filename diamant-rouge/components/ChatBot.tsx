@@ -304,7 +304,7 @@ export default function ChatBot() {
                 }
               }}
             >
-              <div className={`space-y-${isMobile ? '3' : '4'}`}>
+              <div className={isMobile ? 'space-y-3' : 'space-y-4'}>
                 {messages.map((msg, index) => (
                   <motion.div
                     key={index}
@@ -332,4 +332,160 @@ export default function ChatBot() {
                       } ${
                         msg.sender === "user" 
                           ? "bg-brandGold/10 text-richEbony border border-brandGold/30" 
-                  
+                          : "bg-white text-richEbony border border-brandGold/10 shadow-sm"
+                      }`}
+                    >
+                      <p className={isMobile ? 'text-xs leading-relaxed' : 'text-sm'}>{msg.text}</p>
+                    </div>
+                    {msg.sender === "user" && (
+                      <div className={`rounded-full bg-burgundy/10 flex items-center justify-center flex-shrink-0 ${
+                        isMobile ? 'w-6 h-6 ml-2' : 'w-8 h-8 ml-3'
+                      }`}>
+                        <div className={`rounded-full bg-burgundy/30 ${
+                          isMobile ? 'w-2.5 h-2.5' : 'w-4 h-4'
+                        }`}></div>
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
+
+                {/* Enhanced Typing indicator */}
+                {isTyping && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex justify-start"
+                  >
+                    <div className={`rounded-full overflow-hidden flex-shrink-0 border border-brandGold/20 ${
+                      isMobile ? 'w-6 h-6 mr-2' : 'w-8 h-8 mr-3'
+                    }`}>
+                      <Image 
+                        src="/images/icons/Diamond-spark-rotation-HD-BLACK-new-1.gif" 
+                        alt="Diamant Rouge Concierge" 
+                        width={isMobile ? 24 : 32} 
+                        height={isMobile ? 24 : 32}
+                        className="object-cover w-full h-full"
+                      />
+                    </div>
+                    <div className={`bg-white rounded-lg border border-brandGold/10 shadow-sm ${
+                      isMobile ? 'p-3' : 'p-4'
+                    }`}>
+                      <div className="flex space-x-1">
+                        <motion.div
+                          animate={{ y: [0, -5, 0] }}
+                          transition={{ repeat: Infinity, duration: 1, delay: 0 }}
+                          className={`bg-brandGold rounded-full ${isMobile ? 'w-1.5 h-1.5' : 'w-2 h-2'}`}
+                        />
+                        <motion.div
+                          animate={{ y: [0, -5, 0] }}
+                          transition={{ repeat: Infinity, duration: 1, delay: 0.2 }}
+                          className={`bg-brandGold rounded-full ${isMobile ? 'w-1.5 h-1.5' : 'w-2 h-2'}`}
+                        />
+                        <motion.div
+                          animate={{ y: [0, -5, 0] }}
+                          transition={{ repeat: Infinity, duration: 1, delay: 0.4 }}
+                          className={`bg-brandGold rounded-full ${isMobile ? 'w-1.5 h-1.5' : 'w-2 h-2'}`}
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                <div ref={messagesEndRef} />
+              </div>
+              
+              {/* Enhanced Mobile-Optimized Suggested topics */}
+              {showTopics && messages.length === 1 && (
+                <div className={isMobile ? 'mt-3' : 'mt-4'}>
+                  <p className={`text-platinumGray font-medium flex items-center ${
+                    isMobile ? 'text-xs mb-2' : 'text-sm mb-2'
+                  }`}>
+                    <Diamond size={isMobile ? 10 : 12} className="text-brandGold mr-2" />
+                    Explorer nos services:
+                  </p>
+                  <div className={`grid grid-cols-1 overflow-y-auto pr-1 ${
+                    isMobile ? 'gap-1.5 max-h-[40vh]' : 'gap-2 max-h-[30vh]'
+                  }`}>
+                    {suggestedTopics.map((topic) => (
+                      <motion.div
+                        key={topic.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="border border-brandGold/20 rounded-md overflow-hidden"
+                      >
+                        <div className={`bg-brandGold/5 ${isMobile ? 'p-2' : 'p-2.5'}`}>
+                          <h4 className={`font-medium text-richEbony flex items-center ${
+                            isMobile ? 'text-xs' : 'text-sm'
+                          }`}>
+                            <Diamond size={isMobile ? 10 : 12} className="text-brandGold mr-1.5" />
+                            {topic.title}
+                          </h4>
+                        </div>
+                        <div className={isMobile ? 'p-0.5' : 'p-1'}>
+                          {topic.questions.map((question, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => handleSuggestedQuestion(question)}
+                              className={`w-full text-left text-platinumGray hover:bg-brandGold/5 transition-colors rounded flex items-center justify-between ${
+                                isMobile ? 'p-1.5 text-[10px] min-h-[36px]' : 'p-2 text-xs'
+                              }`}
+                              disabled={processingQuestion}
+                            >
+                              <span className="line-clamp-1 flex-1">{question}</span>
+                              <ChevronRight size={isMobile ? 10 : 12} className="text-brandGold/60 flex-shrink-0 ml-1" />
+                            </button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Enhanced Mobile-Optimized Input Area */}
+            <div className={`bg-white border-t border-brandGold/10 ${isMobile ? 'p-3' : 'p-4'}`}>
+              <div className={`flex items-center bg-brandIvory/50 rounded-lg border border-brandGold/20 focus-within:border-brandGold/50 transition-all ${
+                isMobile ? 'px-2 py-2' : 'px-3 py-2'
+              }`}>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  onFocus={handleInputFocus}
+                  placeholder="Posez votre question..."
+                  className={`flex-1 bg-transparent border-none outline-none placeholder-platinumGray/70 text-richEbony ${
+                    isMobile ? 'text-sm py-1' : 'text-sm'
+                  }`}
+                  style={isMobile ? { minHeight: '36px' } : {}}
+                />
+                <button 
+                  onClick={handleSend} 
+                  disabled={!input.trim() || processingQuestion}
+                  className={`rounded-full transition-all ${
+                    isMobile ? 'ml-1 p-1.5' : 'ml-2 p-2'
+                  } ${
+                    input.trim() && !processingQuestion
+                      ? 'bg-brandGold text-white hover:bg-brandGold/90' 
+                      : 'bg-gray-100 text-gray-400'
+                  }`}
+                >
+                  <Send size={isMobile ? 14 : 16} className="transform -rotate-45" />
+                </button>
+              </div>
+              <p className={`text-platinumGray/70 text-center flex items-center justify-center ${
+                isMobile ? 'mt-1.5 text-[10px]' : 'mt-2 text-xs'
+              }`}>
+                <Clock size={isMobile ? 10 : 12} className="inline mr-1" />
+                Réponses inspirées par notre expertise depuis 1987
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
