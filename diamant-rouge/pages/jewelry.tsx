@@ -100,7 +100,7 @@ export default function HauteJoailleriePage() {
             <div className="group">
               <div className="relative h-80 overflow-hidden mb-4">
                 <Image 
-                  src="/images/products/Collections/Fes/fes.jpg" 
+                  src="/images/Collections/Fes/fes.jpg" 
                   alt="Collection Fès" 
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
