@@ -14,6 +14,12 @@
 
     --platinum-gray: #B0B0B0;
     --diamond-white: #FCFCFC;
+    
+    /* Safe area insets for mobile devices */
+    --safe-area-inset-top: env(safe-area-inset-top);
+    --safe-area-inset-right: env(safe-area-inset-right);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
+    --safe-area-inset-left: env(safe-area-inset-left);
 }
 
 @media (max-width: 768px) {
@@ -35,6 +41,16 @@ body {
     @apply bg-brandIvory text-richEbony font-serif tracking-wide leading-relaxed;
     /* Enhanced touch experience for mobile */
     -webkit-tap-highlight-color: transparent;
+    /* Prevent pull-to-refresh on mobile browsers */
+    overscroll-behavior-y: contain;
+    /* Improve text rendering on mobile */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Support for safe areas on mobile devices */
+    padding-top: var(--safe-area-inset-top);
+    padding-left: var(--safe-area-inset-left);
+    padding-right: var(--safe-area-inset-right);
+    padding-bottom: var(--safe-area-inset-bottom);
 }
 
 /* Headings - Gold to mirror the logo lines */
@@ -126,17 +142,45 @@ p {
         letter-spacing: 0.01em;
     }
 
+    /* Safe area inset utilities */
+    .safe-area-inset {
+        padding-top: var(--safe-area-inset-top);
+        padding-left: var(--safe-area-inset-left);
+        padding-right: var(--safe-area-inset-right);
+        padding-bottom: var(--safe-area-inset-bottom);
+    }
+    
+    .safe-area-inset-top {
+        padding-top: var(--safe-area-inset-top);
+    }
+    
+    .safe-area-inset-bottom {
+        padding-bottom: var(--safe-area-inset-bottom);
+    }
+    
+    .safe-area-inset-left {
+        padding-left: var(--safe-area-inset-left);
+    }
+    
+    .safe-area-inset-right {
+        padding-right: var(--safe-area-inset-right);
+    }
+
     /* 🎭 Primary Action Button */
     .button-primary {
         @apply bg-brandGold text-richEbony px-6 py-3 rounded-full font-medium
         hover:bg-burgundy hover:text-brandIvory transition duration-300
         shadow-luxury focus:ring-2 focus:ring-brandGold;
+        /* Enhanced touch targets for mobile */
+        min-height: 44px;
+        min-width: 44px;
     }
 
     /* Enhanced mobile touch target for buttons */
     @media (max-width: 768px) {
         .button-primary {
             @apply px-5 py-2.5 text-sm;
+            min-height: 48px;
         }
     }
 
@@ -145,12 +189,16 @@ p {
         @apply bg-transparent border border-brandGold text-brandGold px-6 py-3
         rounded-full font-medium hover:bg-brandGold hover:text-richEbony
         transition duration-300;
+        /* Enhanced touch targets for mobile */
+        min-height: 44px;
+        min-width: 44px;
     }
 
     /* Enhanced mobile touch target for buttons */
     @media (max-width: 768px) {
         .button-secondary {
             @apply px-5 py-2.5 text-sm;
+            min-height: 48px;
         }
     }
 
@@ -198,12 +246,16 @@ p {
     .input-field {
         @apply bg-transparent border border-brandGold text-richEbony px-4 py-2 rounded-lg
         focus:border-brandGold focus:ring focus:ring-brandGold transition duration-300;
+        /* Enhanced touch targets for mobile */
+        min-height: 44px;
     }
 
     /* Mobile optimized input fields with larger tap targets */
     @media (max-width: 768px) {
         .input-field {
             @apply py-3;
+            min-height: 48px;
+            font-size: 16px; /* Prevent zoom on iOS */
         }
     }
 
@@ -255,6 +307,9 @@ p {
     .mobile-nav-link {
         @apply relative block w-full text-left py-3 px-1 font-medium text-richEbony 
         hover:text-brandGold transition-colors duration-200 border-b border-brandGold/10;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
     }
     
     .mobile-nav-link::after {
@@ -291,11 +346,95 @@ p {
     .mobile-optimized-form textarea {
         @apply py-3 px-4 text-base;
         min-height: 48px; /* Minimum touch target size */
+        font-size: 16px; /* Prevent zoom on iOS */
     }
 
     /* Product cards refined for mobile */
     .product-card-mobile {
         @apply rounded-lg overflow-hidden shadow-subtle transition-all duration-300;
+    }
+
+    /* Mobile-specific touch improvements */
+    @media (max-width: 768px) {
+        /* Improve tap highlighting */
+        button, 
+        a, 
+        [role="button"],
+        input[type="submit"],
+        input[type="button"] {
+            -webkit-tap-highlight-color: rgba(212, 175, 55, 0.3);
+            touch-action: manipulation;
+        }
+
+        /* Improve scroll performance on mobile */
+        .overflow-auto,
+        .overflow-y-auto,
+        .overflow-x-auto {
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Enhanced mobile scrollbars */
+        .mobile-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: var(--brand-gold) transparent;
+        }
+
+        .mobile-scroll::-webkit-scrollbar {
+            width: 3px;
+            height: 3px;
+        }
+
+        .mobile-scroll::-webkit-scrollbar-track {
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .mobile-scroll::-webkit-scrollbar-thumb {
+            background-color: var(--brand-gold);
+            border-radius: 3px;
+        }
+    }
+
+    /* Mobile-specific spacing utilities */
+    .mobile-spacing {
+        @apply px-4 py-6;
+    }
+
+    @media (min-width: 768px) {
+        .mobile-spacing {
+            @apply px-8 py-12;
+        }
+    }
+
+    /* Enhanced mobile grid layouts */
+    .mobile-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    @media (min-width: 640px) {
+        .mobile-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .mobile-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+    }
+
+    /* Mobile-optimized text selection */
+    ::selection {
+        background-color: rgba(212, 175, 55, 0.3);
+        color: var(--brand-burgundy);
+    }
+
+    ::-moz-selection {
+        background-color: rgba(212, 175, 55, 0.3);
+        color: var(--brand-burgundy);
     }
 }
 
@@ -373,4 +512,51 @@ p {
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background-color: rgba(212, 175, 55, 0.8);
+}
+
+/* ==========================================================
+   📱 Mobile-Specific Enhancements
+   ========================================================== */
+@media (max-width: 768px) {
+    /* Improve mobile viewport handling */
+    .mobile-viewport {
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+    }
+
+    /* Mobile-specific animations */
+    @keyframes mobileSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .mobile-slide-in {
+        animation: mobileSlideIn 0.3s ease-out forwards;
+    }
+
+    /* Enhanced mobile focus styles */
+    input:focus,
+    textarea:focus,
+    select:focus,
+    button:focus {
+        outline: 2px solid var(--brand-gold);
+        outline-offset: 2px;
+    }
+
+    /* Mobile-specific typography adjustments */
+    .mobile-text-balance {
+        text-wrap: balance;
+    }
+
+    /* Prevent text size adjust on orientation change */
+    body {
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+    }
 }
