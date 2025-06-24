@@ -62,7 +62,7 @@ export default function HauteJoailleriePage() {
             <div className="group">
               <div className="relative h-80 overflow-hidden mb-4">
                 <Image 
-                  src="/images/products/Collections/Royale/royale.jpg" 
+                  src="/images/Collections/Royale/royale.jpg" 
                   alt="Collection Royale" 
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
@@ -81,7 +81,7 @@ export default function HauteJoailleriePage() {
             <div className="group">
               <div className="relative h-80 overflow-hidden mb-4">
                 <Image 
-                  src="/images/products/Collections/Sahara/Multi-COLOUR-JEWELLERY-BANNER_7.jpg" 
+                  src="/images/Collections/Sahara/Multi-COLOUR-JEWELLERY-BANNER_7.jpg" 
                   alt="Collection Sahara" 
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
