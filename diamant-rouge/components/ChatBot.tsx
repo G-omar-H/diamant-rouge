@@ -255,11 +255,9 @@ export default function ChatBot() {
           isMobileMenuOpen ? 'opacity-50 z-30' : 'opacity-100'
         } ${isOpen ? 'z-[60]' : getZIndex()}`}
         style={isMobile ? { 
-          // Creative mobile positioning: moves to top-right when open
-          bottom: isOpen ? 'auto' : 'calc(1rem + env(safe-area-inset-bottom))',
-          top: isOpen ? 'calc(1rem + env(safe-area-inset-top))' : 'auto',
+          // Keep icon in original bottom-right position on mobile
+          bottom: 'calc(1rem + env(safe-area-inset-bottom))',
           right: 'calc(1rem + env(safe-area-inset-right))',
-          transform: isOpen ? 'translateY(0)' : 'translateY(0)',
         } : {
           // Desktop positioning unchanged
           bottom: '1.5rem',
@@ -271,12 +269,12 @@ export default function ChatBot() {
           initial={{ rotate: 0 }}
           animate={{ 
             rotate: isOpen ? 180 : 0,
-            scale: isMobile && isOpen ? 0.9 : 1, // Slightly smaller when moved to top on mobile
+            scale: 1, // Remove mobile scaling when repositioned
           }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
           className={`relative bg-white rounded-full shadow-luxury border-2 border-brandGold hover:bg-brandGold/5 transition-all duration-300 overflow-hidden flex items-center justify-center ${
             isMobile ? 'w-12 h-12' : 'w-14 h-14'
-          } ${isMobile && isOpen ? 'chatbot-mobile-top' : ''}`}
+          }`}
         >
           <AnimatePresence mode="wait">
             {isOpen ? (
@@ -330,8 +328,8 @@ export default function ChatBot() {
                 : 'bottom-24 right-6 w-96 max-h-[80vh] rounded-lg'
             }`}
             style={isMobile ? {
-              top: 'calc(4rem + env(safe-area-inset-top))', // Leave space for button
-              bottom: 'calc(1rem + env(safe-area-inset-bottom))',
+              top: 'calc(1rem + env(safe-area-inset-top))', // Start from top
+              bottom: 'calc(5rem + env(safe-area-inset-bottom))', // Leave space for icon at bottom
               left: 'calc(1rem + env(safe-area-inset-left))',
               right: 'calc(1rem + env(safe-area-inset-right))'
             } : {}}
