@@ -137,6 +137,22 @@ module.exports = {
         '2xl': '1rem',
         '3xl': '1.5rem',
       },
+
+      // Safe area utilities for mobile ChatBot
+      padding: {
+        'safe-4': 'calc(1rem + env(safe-area-inset-bottom))',
+        'safe-6': 'calc(1.5rem + env(safe-area-inset-bottom))',
+      },
+
+      inset: {
+        'safe-4': 'calc(1rem + env(safe-area-inset-bottom))',
+        'safe-6': 'calc(1.5rem + env(safe-area-inset-bottom))',
+      },
+
+      // Perfect circle utilities
+      aspectRatio: {
+        'circle': '1 / 1',
+      },
     },
   },
 

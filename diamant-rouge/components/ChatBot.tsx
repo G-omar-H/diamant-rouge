@@ -25,6 +25,7 @@ export default function ChatBot() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [processingQuestion, setProcessingQuestion] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Detect mobile screen size
   useEffect(() => {
@@ -36,6 +37,33 @@ export default function ChatBot() {
     window.addEventListener('resize', checkIsMobile);
     
     return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
+  // Detect mobile menu state by checking for mobile menu backdrop
+  useEffect(() => {
+    const checkMobileMenu = () => {
+      // Look for the mobile menu backdrop in the Header component
+      const mobileMenuBackdrop = document.querySelector('.md\\:hidden.fixed.inset-0.bg-black\\/60');
+      setIsMobileMenuOpen(!!mobileMenuBackdrop);
+    };
+
+    // Create observer to watch for mobile menu changes
+    const observer = new MutationObserver(checkMobileMenu);
+    
+    // Watch for changes in the body
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    // Initial check
+    checkMobileMenu();
+
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
   // Same suggested topics as before
@@ -210,18 +238,27 @@ export default function ChatBot() {
     }
   };
 
+  // Calculate z-index based on mobile menu state
+  const getZIndex = () => {
+    if (isMobileMenuOpen) {
+      return 'z-30'; // Behind mobile menu (which is z-50)
+    }
+    return 'z-50'; // Normal z-index
+  };
+
   return (
     <>
-      {/* Enhanced Mobile-Responsive Toggle Button */}
+      {/* Perfect Circle Mobile-Responsive Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed z-50 bg-white rounded-full shadow-luxury border-2 border-brandGold hover:bg-brandGold/5 transition-all duration-300 ${
+        className={`fixed transition-all duration-300 ${getZIndex()} ${
           isMobile 
-            ? 'bottom-4 right-4 p-1 safe-area-inset-bottom' 
-            : 'bottom-6 right-6 p-0.5'
-        }`}
+            ? 'bottom-safe-4 right-safe-4' 
+            : 'bottom-6 right-6'
+        } ${isMobileMenuOpen ? 'opacity-50' : 'opacity-100'}`}
         style={isMobile ? { 
-          paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))' 
+          bottom: 'calc(1rem + env(safe-area-inset-bottom))',
+          right: 'calc(1rem + env(safe-area-inset-right))'
         } : {}}
         aria-label="Concierge Diamant Rouge"
       >
@@ -229,22 +266,27 @@ export default function ChatBot() {
           initial={{ rotate: 0 }}
           animate={{ rotate: isOpen ? 90 : 0 }}
           transition={{ duration: 0.3 }}
-          className={`relative rounded-full overflow-hidden flex items-center justify-center ${
-            isMobile ? 'w-12 h-12' : 'w-14 h-14'
+          className={`relative bg-white rounded-full shadow-luxury border-2 border-brandGold hover:bg-brandGold/5 transition-all duration-300 overflow-hidden flex items-center justify-center ${
+            isMobile ? 'w-10 h-10' : 'w-14 h-14'
           }`}
         >
           {isOpen ? (
-            <div className="absolute inset-0 bg-burgundy/80 flex items-center justify-center">
-              <X size={isMobile ? 18 : 22} className="text-brandIvory" />
+            <div className="absolute inset-0 bg-burgundy/80 flex items-center justify-center rounded-full">
+              <X size={isMobile ? 16 : 22} className="text-brandIvory" />
             </div>
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center rounded-full overflow-hidden">
               <Image 
                 src="/images/icons/Diamond-spark-rotation-HD-BLACK-new-1.gif" 
                 alt="Diamant Rouge Concierge" 
-                width={isMobile ? 48 : 56} 
-                height={isMobile ? 48 : 56} 
-                className="object-cover w-full h-full"
+                width={isMobile ? 40 : 56} 
+                height={isMobile ? 40 : 56} 
+                className="object-cover rounded-full"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '50%'
+                }}
               />
             </div>
           )}
@@ -258,7 +300,7 @@ export default function ChatBot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className={`fixed z-50 overflow-hidden shadow-luxury flex flex-col ${
+            className={`fixed overflow-hidden shadow-luxury flex flex-col ${getZIndex()} ${
               isMobile 
                 ? 'inset-4 rounded-2xl safe-area-inset'
                 : 'bottom-24 right-6 w-96 max-h-[80vh] rounded-lg'
@@ -322,7 +364,12 @@ export default function ChatBot() {
                           alt="Diamant Rouge Concierge" 
                           width={isMobile ? 24 : 32} 
                           height={isMobile ? 24 : 32} 
-                          className="object-cover w-full h-full"
+                          className="object-cover rounded-full"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            borderRadius: '50%'
+                          }}
                         />
                       </div>
                     )}
@@ -364,7 +411,12 @@ export default function ChatBot() {
                         alt="Diamant Rouge Concierge" 
                         width={isMobile ? 24 : 32} 
                         height={isMobile ? 24 : 32}
-                        className="object-cover w-full h-full"
+                        className="object-cover rounded-full"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          borderRadius: '50%'
+                        }}
                       />
                     </div>
                     <div className={`bg-white rounded-lg border border-brandGold/10 shadow-sm ${
