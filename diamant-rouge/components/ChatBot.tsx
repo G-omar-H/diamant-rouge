@@ -249,17 +249,35 @@ export default function ChatBot() {
   return (
     <>
       {/* Perfect Circle Mobile-Responsive Toggle Button */}
-      <button
+      <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed transition-all duration-300 ${getZIndex()} ${
-          isMobile 
-            ? 'bottom-safe-4 right-safe-4' 
-            : 'bottom-6 right-6'
-        } ${isMobileMenuOpen ? 'opacity-50' : 'opacity-100'}`}
-        style={isMobile ? { 
-          bottom: 'calc(1rem + env(safe-area-inset-bottom))',
-          right: 'calc(1rem + env(safe-area-inset-right))'
-        } : {}}
+        className={`fixed transition-all duration-500 ${getZIndex()} ${isMobileMenuOpen ? 'opacity-50' : 'opacity-100'} ${
+          !isOpen ? (isMobile ? '' : 'bottom-6 right-6') : ''
+        }`}
+        style={
+          isMobile ? { 
+            bottom: isOpen ? 'auto' : 'calc(1rem + env(safe-area-inset-bottom))',
+            right: isOpen ? 'calc(1rem + env(safe-area-inset-right))' : 'calc(1rem + env(safe-area-inset-right))',
+            top: isOpen ? 'calc(1rem + env(safe-area-inset-top))' : 'auto'
+          } : isOpen ? {
+            top: '1rem',
+            right: '2rem',
+            bottom: 'auto'
+          } : {}
+        }
+        animate={{
+          x: isOpen ? (isMobile ? -8 : -12) : 0,
+          y: isOpen ? (isMobile ? 8 : 12) : 0,
+          scale: isOpen ? 0.9 : 1,
+        }}
+        transition={{ 
+          duration: 0.5, 
+          ease: "easeInOut",
+          type: "spring",
+          stiffness: 200,
+          damping: 25
+        }}
+        initial={false}
         aria-label="Concierge Diamant Rouge"
       >
         <motion.div
@@ -268,7 +286,7 @@ export default function ChatBot() {
           transition={{ duration: 0.4, ease: "easeInOut" }}
           className={`relative bg-white rounded-full shadow-luxury border-2 border-brandGold hover:bg-brandGold/5 transition-all duration-300 overflow-hidden flex items-center justify-center ${
             isMobile ? 'w-12 h-12' : 'w-14 h-14'
-          }`}
+          } ${isOpen ? 'shadow-2xl ring-2 ring-brandGold/30' : ''}`}
         >
           <AnimatePresence mode="wait">
             {isOpen ? (
@@ -307,7 +325,7 @@ export default function ChatBot() {
             )}
           </AnimatePresence>
         </motion.div>
-      </button>
+      </motion.button>
 
       <AnimatePresence>
         {isOpen && (
