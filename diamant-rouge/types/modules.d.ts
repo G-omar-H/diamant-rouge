@@ -53,6 +53,29 @@ declare module 'lucide-react' {
   export const Twitter: React.FC<LucideIconProps>;
   export const Phone: React.FC<LucideIconProps>;
   export const ChevronLeft: React.FC<LucideIconProps>;
+  export const Linkedin: React.FC<LucideIconProps>;
+  export const ArrowRight: React.FC<LucideIconProps>;
+  export const MapPin: React.FC<LucideIconProps>;
+  export const Mail: React.FC<LucideIconProps>;
+  export const CheckCircle: React.FC<LucideIconProps>;
+  export const Package: React.FC<LucideIconProps>;
+  export const CreditCard: React.FC<LucideIconProps>;
+  export const Shield: React.FC<LucideIconProps>;
+  export const Edit: React.FC<LucideIconProps>;
+  export const ShoppingCart: React.FC<LucideIconProps>;
+  export const Check: React.FC<LucideIconProps>;
+  export const Eye: React.FC<LucideIconProps>;
+  export const HeartOff: React.FC<LucideIconProps>;
+  export const LogIn: React.FC<LucideIconProps>;
+  export const Lock: React.FC<LucideIconProps>;
+  export const Calendar: React.FC<LucideIconProps>;
+  export const Video: React.FC<LucideIconProps>;
+  export const Users: React.FC<LucideIconProps>;
+  export const Coffee: React.FC<LucideIconProps>;
+  export const UserPlus: React.FC<LucideIconProps>;
+  export const GlassWater: React.FC<LucideIconProps>;
+  export const Utensils: React.FC<LucideIconProps>;
+  export const EyeOff: React.FC<LucideIconProps>;
 }
 
 declare module 'next/image' {
