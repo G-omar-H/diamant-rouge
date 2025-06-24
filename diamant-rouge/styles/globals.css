@@ -622,6 +622,12 @@ p {
         min-width: 3rem;
         min-height: 3rem;
     }
+    
+    /* Enhanced mobile ChatBot when moved to top */
+    .chatbot-mobile-top {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(212, 175, 55, 0.3);
+        backdrop-filter: blur(10px);
+    }
 }
 
 /* Desktop ChatBot positioning */
