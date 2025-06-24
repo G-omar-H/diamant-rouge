@@ -264,32 +264,48 @@ export default function ChatBot() {
       >
         <motion.div
           initial={{ rotate: 0 }}
-          animate={{ rotate: isOpen ? 90 : 0 }}
-          transition={{ duration: 0.3 }}
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
           className={`relative bg-white rounded-full shadow-luxury border-2 border-brandGold hover:bg-brandGold/5 transition-all duration-300 overflow-hidden flex items-center justify-center ${
-            isMobile ? 'w-10 h-10' : 'w-14 h-14'
+            isMobile ? 'w-12 h-12' : 'w-14 h-14'
           }`}
         >
-          {isOpen ? (
-            <div className="absolute inset-0 bg-burgundy/80 flex items-center justify-center rounded-full">
-              <X size={isMobile ? 16 : 22} className="text-brandIvory" />
-            </div>
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center rounded-full overflow-hidden">
-              <Image 
-                src="/images/icons/Diamond-spark-rotation-HD-BLACK-new-1.gif" 
-                alt="Diamant Rouge Concierge" 
-                width={isMobile ? 40 : 56} 
-                height={isMobile ? 40 : 56} 
-                className="object-cover rounded-full"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '50%'
-                }}
-              />
-            </div>
-          )}
+          <AnimatePresence mode="wait">
+            {isOpen ? (
+              <motion.div
+                key="close"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 bg-burgundy/90 flex items-center justify-center rounded-full"
+              >
+                <X size={isMobile ? 20 : 24} className="text-brandIvory" />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="diamond"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 flex items-center justify-center rounded-full overflow-hidden"
+              >
+                <Image 
+                  src="/images/icons/Diamond-spark-rotation-HD-BLACK-new-1.gif" 
+                  alt="Diamant Rouge Concierge" 
+                  width={isMobile ? 48 : 56} 
+                  height={isMobile ? 48 : 56} 
+                  className="object-cover rounded-full"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: '50%'
+                  }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       </button>
 
