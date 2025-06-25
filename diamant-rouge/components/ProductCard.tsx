@@ -129,18 +129,13 @@ export default function ProductCard({ product, locale, isWishlisted = false }: P
             transition={{ duration: 0.5 }}
         >
             {/* Product Image - with refined hover effect */}
-            <div className="relative overflow-hidden mb-4 md:mb-6 aspect-[4/5]">
+            <div className="relative overflow-hidden mb-4 md:mb-6 aspect-[4/5] flex items-center justify-center">
                 <Link 
                     href={`/products/${product.id}`} 
                     locale={locale}
                     className="block h-full w-full"
                 >
-                    <div className="relative h-full w-full">
-                        {/* Fallback div in case Image fails */}
-                        <div className="absolute inset-0 bg-brandIvory/50 flex items-center justify-center">
-                            <span className="text-platinumGray font-light italic">Image</span>
-                        </div>
-                        
+                    <div className="relative h-full w-full flex items-center justify-center">
                         {/* Main Product Image */}
                         <Image
                             src={imageSrc}
@@ -149,7 +144,9 @@ export default function ProductCard({ product, locale, isWishlisted = false }: P
                             sizes="(max-width: 768px) 100vw, 300px"
                             className="object-contain z-10 transition-transform duration-700 ease-out"
                             style={{
-                                transform: hovered ? 'scale(1.05)' : 'scale(1)'
+                                transform: hovered ? 'scale(1.05)' : 'scale(1)',
+                                maxWidth: '100%',
+                                maxHeight: '100%'
                             }}
                             priority
                         />
