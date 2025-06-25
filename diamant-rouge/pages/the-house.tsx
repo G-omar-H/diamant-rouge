@@ -18,14 +18,13 @@ export default function LaMaisonPage() {
           alt="La Maison Diamant Rouge" 
           fill
           sizes="100vw"
-          className="object-cover object-center brightness-[0.85]"
+          className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent"></div>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-2 sm:mb-4">La Maison</h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-2 sm:mb-4 text-shadow-strong">La Maison</h1>
           <div className="h-[1px] w-28 sm:w-40 bg-gradient-to-r from-transparent via-brandGold to-transparent my-3 sm:my-4"></div>
-          <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-2xl">Notre héritage d'excellence depuis 1957</p>
+          <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-2xl text-shadow-md">Notre héritage d'excellence depuis 1957</p>
         </div>
       </section>
       

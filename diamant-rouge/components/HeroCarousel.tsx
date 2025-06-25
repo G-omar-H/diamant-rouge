@@ -121,8 +121,6 @@ export default function HeroCarousel({
               sizes="(max-width: 768px) 100vw, 100vw"
               className="object-cover object-center sm:object-center md:object-center" 
             />
-            {/* Mobile-friendly subtle gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-richEbony/60 via-transparent to-transparent md:bg-none"></div>
           </motion.div>
         </AnimatePresence>
         

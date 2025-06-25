@@ -20,13 +20,11 @@ export default function HauteJoailleriePage() {
           objectFit="cover"
           objectPosition="center"
           priority
-          className="brightness-[0.85]"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent"></div>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-2 sm:mb-4">Haute Joaillerie</h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-2 sm:mb-4 text-shadow-strong">Haute Joaillerie</h1>
           <div className="h-[1px] w-28 sm:w-32 md:w-40 bg-gradient-to-r from-transparent via-brandGold to-transparent my-3 sm:my-4"></div>
-          <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-2xl">L'art de la joaillerie marocaine d'exception</p>
+          <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-2xl text-shadow-md">L'art de la joaillerie marocaine d'exception</p>
         </div>
       </section>
       
@@ -63,57 +61,54 @@ export default function HauteJoailleriePage() {
             <div className="group">
               <div className="relative h-80 overflow-hidden mb-4">
                 <Image 
-                  src="/images/haute-joaillerie-collection1.jpg" 
-                  alt="Collection Atlas" 
-                  layout="fill"
-                  objectFit="cover"
-                  className="transition-transform duration-700 group-hover:scale-105"
+                  src="/images/Collections/Royale/royale.jpg" 
+                  alt="Collection Royale" 
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="transition-transform duration-700 group-hover:scale-105 object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div className="absolute bottom-4 left-0 right-0 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   <span className="inline-block bg-brandGold/90 text-white px-4 py-2 text-sm tracking-wider">DÉCOUVRIR</span>
                 </div>
               </div>
-              <h4 className="text-xl font-serif text-richEbony text-center mb-1">Collection Atlas</h4>
-              <p className="text-sm text-platinumGray text-center">Inspirée par les montagnes majestueuses du Maroc</p>
+              <h4 className="text-xl font-serif text-richEbony text-center mb-1">Collection Royale</h4>
+              <p className="text-sm text-platinumGray text-center">Inspirée par l'héritage royal du Maroc</p>
             </div>
             
             {/* Collection 2 */}
             <div className="group">
               <div className="relative h-80 overflow-hidden mb-4">
                 <Image 
-                  src="/images/haute-joaillerie-collection2.jpg" 
-                  alt="Collection Zellige" 
-                  layout="fill"
-                  objectFit="cover"
-                  className="transition-transform duration-700 group-hover:scale-105"
+                  src="/images/Collections/Sahara/Multi-COLOUR-JEWELLERY-BANNER_7.jpg" 
+                  alt="Collection Sahara" 
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="transition-transform duration-700 group-hover:scale-105 object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div className="absolute bottom-4 left-0 right-0 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   <span className="inline-block bg-brandGold/90 text-white px-4 py-2 text-sm tracking-wider">DÉCOUVRIR</span>
                 </div>
               </div>
-              <h4 className="text-xl font-serif text-richEbony text-center mb-1">Collection Zellige</h4>
-              <p className="text-sm text-platinumGray text-center">L'art géométrique ancestral réinventé</p>
+              <h4 className="text-xl font-serif text-richEbony text-center mb-1">Collection Sahara</h4>
+              <p className="text-sm text-platinumGray text-center">Les motifs du désert marocain</p>
             </div>
             
             {/* Collection 3 */}
             <div className="group">
               <div className="relative h-80 overflow-hidden mb-4">
                 <Image 
-                  src="/images/haute-joaillerie-collection3.jpg" 
-                  alt="Collection Medina" 
-                  layout="fill"
-                  objectFit="cover"
-                  className="transition-transform duration-700 group-hover:scale-105"
+                  src="/images/Collections/Fes/fes.jpg" 
+                  alt="Collection Fès" 
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="transition-transform duration-700 group-hover:scale-105 object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div className="absolute bottom-4 left-0 right-0 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   <span className="inline-block bg-brandGold/90 text-white px-4 py-2 text-sm tracking-wider">DÉCOUVRIR</span>
                 </div>
               </div>
-              <h4 className="text-xl font-serif text-richEbony text-center mb-1">Collection Medina</h4>
-              <p className="text-sm text-platinumGray text-center">L'âme des villes anciennes du Maroc</p>
+              <h4 className="text-xl font-serif text-richEbony text-center mb-1">Collection Fès</h4>
+              <p className="text-sm text-platinumGray text-center">L'artisanat raffiné de la ville impériale</p>
             </div>
           </div>
         </div>

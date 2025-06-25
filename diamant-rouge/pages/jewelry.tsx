@@ -19,13 +19,12 @@ export default function HauteJoailleriePage() {
           fill
           sizes="100vw"
           priority
-          className="brightness-[0.85] object-cover object-center sm:object-center md:object-center"
+          className="object-cover object-center sm:object-center md:object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent"></div>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-2 sm:mb-4">Haute Joaillerie</h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-2 sm:mb-4 text-shadow-strong">Haute Joaillerie</h1>
           <div className="h-[1px] w-28 sm:w-32 md:w-40 bg-gradient-to-r from-transparent via-brandGold to-transparent my-3 sm:my-4"></div>
-          <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-2xl">L'art d'excellence selon la tradition marocaine</p>
+          <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-2xl text-shadow-md">L'art d'excellence selon la tradition marocaine</p>
         </div>
       </section>
       
@@ -68,7 +67,6 @@ export default function HauteJoailleriePage() {
                   sizes="(max-width: 768px) 100vw, 33vw"
                   className="transition-transform duration-700 group-hover:scale-105 object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div className="absolute bottom-4 left-0 right-0 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   <span className="inline-block bg-brandGold/90 text-white px-4 py-2 text-sm tracking-wider">DÉCOUVRIR</span>
                 </div>
@@ -87,7 +85,6 @@ export default function HauteJoailleriePage() {
                   sizes="(max-width: 768px) 100vw, 33vw"
                   className="transition-transform duration-700 group-hover:scale-105 object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div className="absolute bottom-4 left-0 right-0 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   <span className="inline-block bg-brandGold/90 text-white px-4 py-2 text-sm tracking-wider">DÉCOUVRIR</span>
                 </div>
@@ -106,7 +103,6 @@ export default function HauteJoailleriePage() {
                   sizes="(max-width: 768px) 100vw, 33vw"
                   className="transition-transform duration-700 group-hover:scale-105 object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div className="absolute bottom-4 left-0 right-0 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   <span className="inline-block bg-brandGold/90 text-white px-4 py-2 text-sm tracking-wider">DÉCOUVRIR</span>
                 </div>

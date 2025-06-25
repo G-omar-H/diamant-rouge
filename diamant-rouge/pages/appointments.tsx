@@ -464,8 +464,8 @@ export default function AppointmentPage() {
       >
         {/* Mobile: Minimalist version */}
         <div className="sm:hidden">
-          <div className="backdrop-blur-sm bg-richEbony/20 p-4 border border-brandGold/20 shadow-lg rounded-lg">
-            <h1 className="text-2xl font-serif text-brandIvory mb-2 leading-tight drop-shadow-md">
+          <div className="p-4 border border-brandGold/30 rounded-lg">
+            <h1 className="text-2xl font-serif text-white mb-2 leading-tight text-shadow-strong">
               Rendez-vous <span className="text-brandGold">Privé</span>
             </h1>
             <div className="h-[1px] w-16 bg-brandGold my-2"></div>
@@ -481,11 +481,11 @@ export default function AppointmentPage() {
 
         {/* Desktop: Full version */}
         <div className="hidden sm:block">
-          <div className="backdrop-blur-sm bg-richEbony/10 p-8 border border-brandGold/10 shadow-luxury">
-            <h1 className="text-4xl md:text-6xl font-serif text-brandIvory mb-4 leading-tight drop-shadow-md">
+          <div className="p-8 border border-brandGold/20">
+            <h1 className="text-4xl md:text-6xl font-serif text-white mb-4 leading-tight text-shadow-strong">
               Un Moment <span className="text-brandGold">d'Exception</span>
             </h1>
-            <p className="mt-4 text-lg text-brandIvory font-light drop-shadow-sm">
+            <p className="mt-4 text-lg text-white font-light text-shadow-md">
               Découvrez l'art de la haute joaillerie dans un cadre exclusif, où notre équipe d'experts vous accompagne dans votre quête de perfection.
             </p>
             <motion.div
@@ -496,7 +496,7 @@ export default function AppointmentPage() {
             >
               <a 
                 href="#booking" 
-                className="group inline-flex items-center border-2 border-brandGold px-7 py-3 bg-transparent hover:bg-brandGold/20 text-brandGold transition-all duration-500 shadow-sm"
+                className="group inline-flex items-center border-2 border-brandGold px-7 py-3 bg-transparent hover:bg-brandGold/20 text-brandGold transition-all duration-500"
               >
                 <span className="font-serif tracking-wider">Réserver votre rendez-vous</span>
                 <span className="ml-3 transform group-hover:translate-x-1 transition-transform duration-300">→</span>
