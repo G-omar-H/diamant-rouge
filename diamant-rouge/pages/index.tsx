@@ -415,7 +415,7 @@ export default function HomePage({
                     <div className="px-4 md:px-6">
                         <div 
                             ref={carouselRef}
-                            className="flex overflow-x-auto pb-10 pt-6 scrollbar-hide gap-6 md:gap-8 lg:gap-10 snap-x scroll-smooth"
+                            className="flex overflow-x-auto pb-10 pt-6 scrollbar-hide gap-4 md:gap-6 lg:gap-8 snap-x scroll-smooth"
                         >
                             {filteredProducts.length === 0 ? (
                                 <div className="flex justify-center items-center w-full h-48">
@@ -427,7 +427,7 @@ export default function HomePage({
                             ) : (
                                 filteredProducts.map((product) => (
                                     <div key={product.id} className="snap-start shrink-0">
-                                        <div className="w-72 sm:w-80 md:w-72 lg:w-80 xl:w-96">
+                                        <div className="w-56 sm:w-60 md:w-56 lg:w-60 xl:w-64">
                                             <ProductCard
                                                 product={product}
                                                 locale={currentLocale}
