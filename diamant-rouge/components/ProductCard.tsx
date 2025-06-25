@@ -167,35 +167,38 @@ export default function ProductCard({ product, locale, isWishlisted = false }: P
                         </div>
                     </div>
                 </Link>
-
-                {/* Wishlist button - Optimized for mobile (larger touch target, positioned better) */}
-                <button
-                    onClick={handleWishlistToggle}
-                    className="absolute top-2 right-2 p-2 rounded-full bg-brandIvory/80 backdrop-blur-sm shadow-sm z-30 transition-all duration-300 transform hover:scale-110"
-                    aria-label={isInWishlist ? "Retirer des favoris" : "Ajouter aux favoris"}
-                >
-                    <Heart 
-                        size={20} 
-                        className={`transition-all duration-300 ${
-                            isInWishlist 
-                                ? "fill-burgundy stroke-burgundy" 
-                                : "fill-transparent stroke-brandGold hover:stroke-burgundy"
-                        }`} 
-                    />
-                </button>
             </div>
 
             {/* Product Details - Refined typography and spacing */}
             <div className="px-1 text-left">
-                {/* Fancy Product Name with elegant styling */}
-                <Link 
-                    href={`/products/${product.id}`} 
-                    locale={locale}
-                >
-                    <h3 className="font-serif text-lg text-brandGold hover:text-burgundy transition-colors duration-300 mb-1.5">
-                        {getProductName()}
-                    </h3>
-                </Link>
+                {/* Product Name and Favorite Button Row */}
+                <div className="flex items-center justify-between mb-1.5">
+                    <Link 
+                        href={`/products/${product.id}`} 
+                        locale={locale}
+                        className="flex-1"
+                    >
+                        <h3 className="font-serif text-lg text-brandGold hover:text-burgundy transition-colors duration-300">
+                            {getProductName()}
+                        </h3>
+                    </Link>
+                    
+                    {/* Wishlist button - Clean minimal style */}
+                    <button
+                        onClick={handleWishlistToggle}
+                        className="p-1 transition-all duration-300 transform hover:scale-110 flex-shrink-0"
+                        aria-label={isInWishlist ? "Retirer des favoris" : "Ajouter aux favoris"}
+                    >
+                        <Heart 
+                            size={18} 
+                            className={`transition-all duration-300 ${
+                                isInWishlist 
+                                    ? "fill-burgundy stroke-burgundy" 
+                                    : "fill-transparent stroke-brandGold hover:stroke-burgundy"
+                            }`} 
+                        />
+                    </button>
+                </div>
                 
                 {/* Material Information */}
                 {materialInfo && (
