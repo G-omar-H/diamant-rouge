@@ -129,7 +129,7 @@ export default function ProductCard({ product, locale, isWishlisted = false }: P
             transition={{ duration: 0.5 }}
         >
             {/* Product Image - with refined hover effect */}
-            <div className="relative overflow-hidden mb-4 md:mb-6 aspect-[1/1] shadow-mobile-subtle rounded-md md:rounded-none">
+            <div className="relative overflow-hidden mb-4 md:mb-6 aspect-[1/1]">
                 <Link 
                     href={`/products/${product.id}`} 
                     locale={locale}

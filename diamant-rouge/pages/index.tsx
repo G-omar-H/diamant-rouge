@@ -364,18 +364,18 @@ export default function HomePage({
             ----------------------------------------------------
             */}
             <motion.section
-                className="py-14 md:py-20 bg-white w-full overflow-hidden"
+                className="py-16 md:py-24 bg-white w-full overflow-hidden"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
             >
                 {/* Section title */}
-                <div className="text-center mb-10 md:mb-12 px-4">
+                <div className="text-center mb-12 md:mb-16 px-4">
                     <h2 className="text-2xl md:text-4xl lg:text-5xl font-serif text-brandGold mb-3 md:mb-4">
                         Collections Prestigieuses
                     </h2>
-                    <div className="h-0.5 w-16 md:w-24 bg-brandGold/40 mx-auto mb-4 md:mb-6"></div>
+                    <div className="h-0.5 w-16 md:w-24 bg-brandGold/40 mx-auto mb-6 md:mb-8"></div>
                     <p className="text-platinumGray max-w-2xl mx-auto text-sm md:text-base px-2">
                         Des créations d'exception qui révèlent votre élégance naturelle. 
                         Chaque pièce est une déclaration d'art et de raffinement.
@@ -412,37 +412,41 @@ export default function HomePage({
                 </div>
 
                         {/* Products Display */}
-                    <div 
-                        ref={carouselRef}
-                        className="flex overflow-x-auto pb-8 pt-4 scrollbar-hide gap-4 md:gap-6 snap-x"
-                    >
-                        {filteredProducts.length === 0 ? (
-                            <div className="flex justify-center items-center w-full h-48">
-                                <p className="text-platinumGray text-center">
-                                        Aucun produit ne correspond à cette catégorie. <br />
-                                        Veuillez essayer une autre catégorie.
-                                </p>
-                            </div>
-                        ) : (
-                            filteredProducts.map((product) => (
-                                <div key={product.id} className="snap-start shrink-0">
-                                    <ProductCard
-                                        product={product}
-                                        locale={currentLocale}
-                                        isWishlisted={wishlist.includes(product.id)}
-                                    />
+                    <div className="px-4 md:px-6">
+                        <div 
+                            ref={carouselRef}
+                            className="flex overflow-x-auto pb-10 pt-6 scrollbar-hide gap-6 md:gap-8 lg:gap-10 snap-x scroll-smooth"
+                        >
+                            {filteredProducts.length === 0 ? (
+                                <div className="flex justify-center items-center w-full h-48">
+                                    <p className="text-platinumGray text-center">
+                                            Aucun produit ne correspond à cette catégorie. <br />
+                                            Veuillez essayer une autre catégorie.
+                                    </p>
                                 </div>
-                            ))
-                        )}
+                            ) : (
+                                filteredProducts.map((product) => (
+                                    <div key={product.id} className="snap-start shrink-0">
+                                        <div className="w-72 sm:w-80 md:w-72 lg:w-80 xl:w-96">
+                                            <ProductCard
+                                                product={product}
+                                                locale={currentLocale}
+                                                isWishlisted={wishlist.includes(product.id)}
+                                            />
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
                     </div>
                     </div>
                 </section>
                     
                 {/* View All Button */}
-                <div className="mt-4 md:mt-8 text-center">
+                <div className="mt-8 md:mt-12 text-center px-4">
                     <Link 
                         href="/collections" 
-                        className="inline-flex items-center px-6 py-2.5 text-sm border border-brandGold text-brandGold hover:bg-brandGold hover:text-white transition-colors rounded-full"
+                        className="inline-flex items-center px-8 py-3 text-sm md:text-base border border-brandGold text-brandGold hover:bg-brandGold hover:text-white transition-colors rounded-full"
                     >
                         <span>Voir toutes les collections</span>
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
