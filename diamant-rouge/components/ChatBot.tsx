@@ -256,12 +256,12 @@ export default function ChatBot() {
         } ${isOpen ? 'z-[60]' : getZIndex()}`}
         style={isMobile ? { 
           // Keep icon in original bottom-right position on mobile
-          bottom: 'calc(1rem + env(safe-area-inset-bottom))',
-          right: 'calc(1rem + env(safe-area-inset-right))',
+          bottom: 'calc(1.25rem + env(safe-area-inset-bottom))',
+          right: 'calc(1.25rem + env(safe-area-inset-right))',
         } : {
-          // Desktop positioning unchanged
-          bottom: '1.5rem',
-          right: '1.5rem',
+          // Desktop positioning with slightly more margin for larger size
+          bottom: '2rem',
+          right: '2rem',
         }}
         aria-label="Concierge Diamant Rouge"
       >
@@ -273,7 +273,7 @@ export default function ChatBot() {
           }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
           className={`relative bg-white rounded-full shadow-luxury border-2 border-brandGold hover:bg-brandGold/5 transition-all duration-300 overflow-hidden flex items-center justify-center ${
-            isMobile ? 'w-12 h-12' : 'w-14 h-14'
+            isMobile ? 'w-14 h-14' : 'w-16 h-16'
           }`}
         >
           <AnimatePresence mode="wait">
@@ -286,7 +286,7 @@ export default function ChatBot() {
                 transition={{ duration: 0.3, ease: "easeInOut" }}
                 className="absolute inset-0 bg-burgundy flex items-center justify-center rounded-full"
               >
-                <X size={isMobile ? 22 : 24} className="text-brandIvory font-bold" strokeWidth={3} />
+                <X size={isMobile ? 24 : 28} className="text-brandIvory font-bold" strokeWidth={3} />
               </motion.div>
             ) : (
               <motion.div
@@ -300,8 +300,8 @@ export default function ChatBot() {
                 <Image 
                   src="/images/icons/Diamond-spark-rotation-HD-BLACK-new-1.gif" 
                   alt="Diamant Rouge Concierge" 
-                  width={isMobile ? 48 : 56} 
-                  height={isMobile ? 48 : 56} 
+                  width={isMobile ? 56 : 64} 
+                  height={isMobile ? 56 : 64} 
                   className="object-cover rounded-full"
                   style={{
                     width: '100%',
@@ -325,11 +325,11 @@ export default function ChatBot() {
             className={`fixed overflow-hidden shadow-luxury flex flex-col ${getZIndex()} ${
               isMobile 
                 ? 'rounded-2xl safe-area-inset'
-                : 'bottom-24 right-6 w-96 max-h-[80vh] rounded-lg'
+                : 'bottom-28 right-6 w-96 max-h-[80vh] rounded-lg'
             }`}
             style={isMobile ? {
               top: 'calc(1rem + env(safe-area-inset-top))', // Start from top
-              bottom: 'calc(5rem + env(safe-area-inset-bottom))', // Leave space for icon at bottom
+              bottom: 'calc(5.5rem + env(safe-area-inset-bottom))', // Leave more space for larger icon at bottom
               left: 'calc(1rem + env(safe-area-inset-left))',
               right: 'calc(1rem + env(safe-area-inset-right))'
             } : {}}
