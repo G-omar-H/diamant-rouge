@@ -371,7 +371,7 @@ export default function HomePage({
                 viewport={{ once: true }}
             >
                 {/* Section title */}
-                <div className="text-center mb-12 md:mb-16 px-4">
+                <div className="text-center mb-6 md:mb-8 px-4">
                     <h2 className="text-2xl md:text-4xl lg:text-5xl font-serif text-brandGold mb-3 md:mb-4">
                         Collections Prestigieuses
                     </h2>
@@ -386,7 +386,7 @@ export default function HomePage({
                 <section className="relative py-12 md:py-20">
                     <div className="max-w-7xl mx-auto">
                         {/* Category Filter Buttons */}
-                <div className="relative mb-8 md:mb-10 px-4 md:px-0">
+                <div className="relative mb-4 md:mb-6 px-4 md:px-0">
                     <div className="flex justify-center">
                         <div ref={filterRef} className="relative w-full md:w-auto overflow-x-auto scrollbar-hide py-2 md:py-3 -mx-1 px-1 md:px-4">
                             <div className="flex space-x-2 md:space-x-4 min-w-max mx-auto">
@@ -425,35 +425,39 @@ export default function HomePage({
                                     </p>
                                 </div>
                             ) : (
-                                filteredProducts.map((product) => (
-                                    <div key={product.id} className="snap-start shrink-0">
-                                        <div className="w-56 sm:w-60 md:w-56 lg:w-60 xl:w-64">
-                                            <ProductCard
-                                                product={product}
-                                                locale={currentLocale}
-                                                isWishlisted={wishlist.includes(product.id)}
-                                            />
+                                <>
+                                    {filteredProducts.map((product) => (
+                                        <div key={product.id} className="snap-start shrink-0">
+                                            <div className="w-56 sm:w-60 md:w-56 lg:w-60 xl:w-64">
+                                                <ProductCard
+                                                    product={product}
+                                                    locale={currentLocale}
+                                                    isWishlisted={wishlist.includes(product.id)}
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                    
+                                    {/* Minimalistic "voir plus" link at the end of carousel */}
+                                    <div className="snap-start shrink-0 flex items-center justify-center">
+                                        <div className="w-56 sm:w-60 md:w-56 lg:w-60 xl:w-64 h-full flex items-center justify-center">
+                                            <Link 
+                                                href="/collections" 
+                                                className="text-platinumGray hover:text-brandGold transition-colors duration-300 underline underline-offset-4 decoration-1 hover:decoration-brandGold flex items-center gap-2 text-sm"
+                                            >
+                                                <span>voir plus</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </Link>
                                         </div>
                                     </div>
-                                ))
+                                </>
                             )}
                         </div>
                     </div>
                     </div>
                 </section>
-                    
-                {/* View All Button */}
-                <div className="mt-8 md:mt-12 text-center px-4">
-                    <Link 
-                        href="/collections" 
-                        className="inline-flex items-center px-8 py-3 text-sm md:text-base border border-brandGold text-brandGold hover:bg-brandGold hover:text-white transition-colors rounded-full"
-                    >
-                        <span>Voir toutes les collections</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                    </Link>
-                </div>
             </motion.section>
 
             {/* 
