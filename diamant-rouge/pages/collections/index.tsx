@@ -472,35 +472,15 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                     </div>
                     
                     <div className="container mx-auto relative h-full flex flex-col justify-end items-center pb-8 sm:pb-12 text-center px-4 sm:px-6">
-                        {/* Mobile: Minimalist version */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8 }}
-                            className="sm:hidden"
                         >
-                            <div className="px-4 py-3 rounded-lg border border-brandGold/30">
-                                <h1 className="text-2xl font-serif text-white drop-shadow-lg mb-1 text-shadow-strong">
-                                    Collections
-                                </h1>
-                                <div className="h-[1px] w-16 bg-brandGold mx-auto my-2"></div>
-                                <p className="text-white text-sm font-light text-shadow-md">
-                                    Pièces d'exception
-                                </p>
-                            </div>
-                        </motion.div>
-
-                        {/* Desktop: Full version */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8 }}
-                            className="hidden sm:block px-8 py-4 rounded-lg"
-                        >
-                            <h1 className="text-5xl md:text-6xl font-serif text-white drop-shadow-lg mb-4 text-shadow-strong">
+                            <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif text-white drop-shadow-lg mb-3 sm:mb-4 text-shadow-strong">
                                 Nos Collections
                             </h1>
-                            <p className="text-white text-lg md:text-xl max-w-2xl mx-auto font-medium drop-shadow-lg text-shadow-md">
+                            <p className="text-white text-base sm:text-lg md:text-xl max-w-2xl mx-auto font-medium text-shadow-md">
                                 Découvrez nos pièces intemporelles, façonnées dans l'excellence et le raffinement.
                             </p>
                         </motion.div>

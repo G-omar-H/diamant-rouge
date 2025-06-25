@@ -462,48 +462,26 @@ export default function AppointmentPage() {
         animate="visible"
         variants={fadeIn}
       >
-        {/* Mobile: Minimalist version */}
-        <div className="sm:hidden">
-          <div className="p-4 border border-brandGold/30 rounded-lg">
-            <h1 className="text-2xl font-serif text-white mb-2 leading-tight text-shadow-strong">
-              Rendez-vous <span className="text-brandGold">Privé</span>
-            </h1>
-            <div className="h-[1px] w-16 bg-brandGold my-2"></div>
-            <a 
-              href="#booking" 
-              className="inline-flex items-center text-sm border border-brandGold px-4 py-2 bg-transparent hover:bg-brandGold/20 text-brandGold transition-all duration-300"
-            >
-              <span className="font-medium">Réserver</span>
-              <span className="ml-2">→</span>
-            </a>
-          </div>
-        </div>
-
-        {/* Desktop: Full version */}
-        <div className="hidden sm:block">
-          <div className="p-8 border border-brandGold/20">
-            <h1 className="text-4xl md:text-6xl font-serif text-white mb-4 leading-tight text-shadow-strong">
-              Un Moment <span className="text-brandGold">d'Exception</span>
-            </h1>
-            <p className="mt-4 text-lg text-white font-light text-shadow-md">
-              Découvrez l'art de la haute joaillerie dans un cadre exclusif, où notre équipe d'experts vous accompagne dans votre quête de perfection.
-            </p>
-            <motion.div
-              className="mt-10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-            >
-              <a 
-                href="#booking" 
-                className="group inline-flex items-center border-2 border-brandGold px-7 py-3 bg-transparent hover:bg-brandGold/20 text-brandGold transition-all duration-500"
-              >
-                <span className="font-serif tracking-wider">Réserver votre rendez-vous</span>
-                <span className="ml-3 transform group-hover:translate-x-1 transition-transform duration-300">→</span>
-              </a>
-            </motion.div>
-          </div>
-        </div>
+        <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif text-white mb-3 sm:mb-4 leading-tight text-shadow-strong">
+          Un Moment <span className="text-brandGold">d'Exception</span>
+        </h1>
+        <p className="mt-2 sm:mt-4 text-sm sm:text-lg text-white font-light text-shadow-md">
+          Découvrez l'art de la haute joaillerie dans un cadre exclusif, où notre équipe d'experts vous accompagne dans votre quête de perfection.
+        </p>
+        <motion.div
+          className="mt-6 sm:mt-10"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.8 }}
+        >
+          <a 
+            href="#booking" 
+            className="group inline-flex items-center border-2 border-brandGold px-4 sm:px-7 py-2 sm:py-3 bg-transparent hover:bg-brandGold/20 text-brandGold transition-all duration-500"
+          >
+            <span className="font-serif tracking-wider text-sm sm:text-base">Réserver votre rendez-vous</span>
+            <span className="ml-2 sm:ml-3 transform group-hover:translate-x-1 transition-transform duration-300">→</span>
+          </a>
+        </motion.div>
       </motion.div>
     </div>
   </div>
@@ -865,7 +843,7 @@ export default function AppointmentPage() {
                                         value={selectedDate}
                                         onChange={(e) => setSelectedDate(e.target.value)}
                                     />
-                                    <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-transparent via-brandGold to-transparent group-hover:w-full transition-all duration-300"></div>
+                                    <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-brandGold to-transparent group-hover:w-full transition-all duration-300"></div>
                                 </div>
                                 <p className="mt-2 text-xs text-platinumGray italic">
                                     Notre showroom est ouvert du Mardi au Samedi
@@ -1097,7 +1075,7 @@ export default function AppointmentPage() {
                                                 className="w-full pl-10 py-3 bg-transparent border border-gray-200 rounded-sm focus:border-brandGold focus:ring-1 focus:ring-brandGold/20 hover:border-brandGold/50 transition-all duration-300"
                                                 placeholder="Votre nom complet"
                                             />
-                                            <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-transparent via-brandGold to-transparent group-hover:w-full transition-all duration-300"></div>
+                                            <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-brandGold to-transparent group-hover:w-full transition-all duration-300"></div>
                                         </div>
                                     </div>
                                 )}
@@ -1116,7 +1094,7 @@ export default function AppointmentPage() {
                                             className="w-full pl-10 py-3 bg-transparent border border-gray-200 rounded-sm focus:border-brandGold focus:ring-1 focus:ring-brandGold/20 hover:border-brandGold/50 transition-all duration-300"
                                             placeholder="Votre adresse email"
                                         />
-                                        <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-transparent via-brandGold to-transparent group-hover:w-full transition-all duration-300"></div>
+                                        <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-brandGold to-transparent group-hover:w-full transition-all duration-300"></div>
                                     </div>
                                 </div>
                                 
@@ -1145,7 +1123,7 @@ export default function AppointmentPage() {
                                                 <Eye size={18} />
                                             )}
                                         </button>
-                                        <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-transparent via-brandGold to-transparent group-hover:w-full transition-all duration-300"></div>
+                                        <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-brandGold to-transparent group-hover:w-full transition-all duration-300"></div>
                                     </div>
                                     {/* Password validation prompt for signup */}
                                     {authMode === "signup" && (
