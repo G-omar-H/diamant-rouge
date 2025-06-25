@@ -582,13 +582,13 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                                                 <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${!selectedCategory 
                                                     ? 'bg-gradient-to-br from-brandGold to-brandGold/80 text-white shadow-lg' 
                                                     : 'bg-brandIvory/60 text-platinumGray hover:bg-brandGold/5 hover:text-brandGold border border-brandGold/20'}`}>
-                                                    <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16m-7 6h7" />
-                                                        <rect x="5" y="8" width="3" height="3" rx="0.5" fill="currentColor" opacity="0.5" />
-                                                        <rect x="5" y="15" width="3" height="3" rx="0.5" fill="currentColor" opacity="0.5" />
-                                                        <rect x="11" y="8" width="3" height="3" rx="0.5" fill="currentColor" opacity="0.5" />
-                                                        <rect x="16" y="15" width="3" height="3" rx="0.5" fill="currentColor" opacity="0.5" />
-                                                    </svg>
+                                                    <Image 
+                                                        src="/images/icons/filter/all.png"
+                                                        alt="All"
+                                                        width={24}
+                                                        height={24}
+                                                        className="w-8 h-8"
+                                                    />
                                                 </div>
                                                 <span className="text-xs font-medium tracking-wide">Tous</span>
                                             </button>
@@ -603,15 +603,13 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                                                 <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${selectedCategory === "rings" 
                                                     ? "bg-gradient-to-br from-brandGold to-brandGold/80 text-white shadow-lg" 
                                                     : "bg-brandIvory/60 text-platinumGray hover:bg-brandGold/5 hover:text-brandGold border border-brandGold/20"}`}>
-                                                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <circle cx="12" cy="12" r="6" strokeWidth="1.5" />
-                                                        <circle cx="12" cy="12" r="3" strokeWidth="1.5" />
-                                                        <path d="M12 5L12 7" strokeWidth="1.2" strokeLinecap="round" />
-                                                        <path d="M12 17L12 19" strokeWidth="1.2" strokeLinecap="round" />
-                                                        <path d="M7 12L5 12" strokeWidth="1.2" strokeLinecap="round" />
-                                                        <path d="M19 12L17 12" strokeWidth="1.2" strokeLinecap="round" />
-                                                        <circle cx="12" cy="12" r="1" fill="currentColor" />
-                                                    </svg>
+                                                    <Image 
+                                                        src="/images/icons/filter/rings.png"
+                                                        alt="Rings"
+                                                        width={24}
+                                                        height={24}
+                                                        className="w-8 h-8"
+                                                    />
                                                 </div>
                                                 <span className="text-xs font-medium tracking-wide">Bagues</span>
                                             </button>
@@ -626,13 +624,13 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                                                 <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${selectedCategory === "necklaces" 
                                                     ? "bg-gradient-to-br from-brandGold to-brandGold/80 text-white shadow-lg" 
                                                     : "bg-brandIvory/60 text-platinumGray hover:bg-brandGold/5 hover:text-brandGold border border-brandGold/20"}`}>
-                                                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path d="M12 6C10.8954 6 10 5.10457 10 4C10 2.89543 10.8954 2 12 2C13.1046 2 14 2.89543 14 4C14 5.10457 13.1046 6 12 6Z" strokeWidth="1.2" />
-                                                        <path d="M12 22V6" strokeWidth="1.5" strokeLinecap="round" />
-                                                        <path d="M8 10L12 14L16 10" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                                        <path d="M6 17H18" strokeWidth="1.5" strokeLinecap="round" />
-                                                        <circle cx="12" cy="4" r="0.6" fill="currentColor" />
-                                                    </svg>
+                                                    <Image 
+                                                        src="/images/icons/filter/necklaces.png"
+                                                        alt="Necklaces"
+                                                        width={24}
+                                                        height={24}
+                                                        className="w-8 h-8"
+                                                    />
                                                 </div>
                                                 <span className="text-xs font-medium tracking-wide">Colliers</span>
                                             </button>
@@ -647,12 +645,13 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                                                 <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${selectedCategory === "bracelets" 
                                                     ? "bg-gradient-to-br from-brandGold to-brandGold/80 text-white shadow-lg" 
                                                     : "bg-brandIvory/60 text-platinumGray hover:bg-brandGold/5 hover:text-brandGold border border-brandGold/20"}`}>
-                                                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path d="M4 12C4 10.8954 7.58172 10 12 10C16.4183 10 20 10.8954 20 12C20 13.1046 16.4183 14 12 14C7.58172 14 4 13.1046 4 12Z" strokeWidth="1.5" />
-                                                        <circle cx="12" cy="12" r="8" strokeWidth="1.5" strokeDasharray="2 1.5" />
-                                                        <circle cx="12" cy="12" r="2" strokeWidth="1.2" />
-                                                        <circle cx="12" cy="12" r="0.8" fill="currentColor" />
-                                                    </svg>
+                                                    <Image 
+                                                        src="/images/icons/filter/bracelets.png"
+                                                        alt="Bracelets"
+                                                        width={24}
+                                                        height={24}
+                                                        className="w-8 h-8"
+                                                    />
                                                 </div>
                                                 <span className="text-xs font-medium tracking-wide">Bracelets</span>
                                             </button>
@@ -667,16 +666,13 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                                                 <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${selectedCategory === "earrings" 
                                                     ? "bg-gradient-to-br from-brandGold to-brandGold/80 text-white shadow-lg" 
                                                     : "bg-brandIvory/60 text-platinumGray hover:bg-brandGold/5 hover:text-brandGold border border-brandGold/20"}`}>
-                                                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path d="M8 4C8 2.89543 8.89543 2 10 2C11.1046 2 12 2.89543 12 4V6C12 7.10457 11.1046 8 10 8C8.89543 8 8 7.10457 8 6V4Z" strokeWidth="1.3" />
-                                                        <path d="M16 4C16 2.89543 16.8954 2 18 2C19.1046 2 20 2.89543 20 4V6C20 7.10457 19.1046 8 18 8C16.8954 8 16 7.10457 16 6V4Z" strokeWidth="1.3" />
-                                                        <path d="M10 8L10 18" strokeWidth="1.3" strokeLinecap="round" />
-                                                        <path d="M18 8L18 18" strokeWidth="1.3" strokeLinecap="round" />
-                                                        <circle cx="10" cy="4" r="0.8" fill="currentColor" />
-                                                        <circle cx="18" cy="4" r="0.8" fill="currentColor" />
-                                                        <path d="M6 12L10 16" strokeWidth="1" strokeLinecap="round" stroke-opacity="0.6" />
-                                                        <path d="M14 12L18 16" strokeWidth="1" strokeLinecap="round" stroke-opacity="0.6" />
-                                                    </svg>
+                                                    <Image 
+                                                        src="/images/icons/filter/earrings.png"
+                                                        alt="Earrings"
+                                                        width={24}
+                                                        height={24}
+                                                        className="w-8 h-8"
+                                                    />
                                                 </div>
                                                 <span className="text-xs font-medium tracking-wide">Boucles d'Oreilles</span>
                                             </button>
