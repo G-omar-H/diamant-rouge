@@ -579,16 +579,19 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                                                     ? 'opacity-100 scale-105' 
                                                     : 'opacity-70 hover:opacity-90 hover:scale-105'}`}
                                             >
-                                                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${!selectedCategory 
-                                                    ? 'bg-gradient-to-br from-brandGold to-brandGold/80 text-white shadow-lg' 
-                                                    : 'bg-brandIvory/60 text-platinumGray hover:bg-brandGold/5 hover:text-brandGold border border-brandGold/20'}`}>
-                                                    <Image 
-                                                        src="/images/icons/filter/all.png"
-                                                        alt="All"
-                                                        width={24}
-                                                        height={24}
-                                                        className="w-8 h-8"
-                                                    />
+                                                <div className="relative">
+                                                    <div className="w-16 h-16 rounded-full overflow-hidden">
+                                                        <Image 
+                                                            src="/images/icons/filter/all.png"
+                                                            alt="All"
+                                                            width={64}
+                                                            height={64}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    </div>
+                                                    {!selectedCategory && (
+                                                        <div className="absolute -inset-0.5 rounded-full border-2 border-brandGold/60 animate-pulse"></div>
+                                                    )}
                                                 </div>
                                                 <span className="text-xs font-medium tracking-wide">Tous</span>
                                             </button>
@@ -600,16 +603,19 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                                                     ? 'opacity-100 scale-105' 
                                                     : 'opacity-70 hover:opacity-90 hover:scale-105'}`}
                                             >
-                                                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${selectedCategory === "rings" 
-                                                    ? "bg-gradient-to-br from-brandGold to-brandGold/80 text-white shadow-lg" 
-                                                    : "bg-brandIvory/60 text-platinumGray hover:bg-brandGold/5 hover:text-brandGold border border-brandGold/20"}`}>
-                                                    <Image 
-                                                        src="/images/icons/filter/rings.png"
-                                                        alt="Rings"
-                                                        width={24}
-                                                        height={24}
-                                                        className="w-8 h-8"
-                                                    />
+                                                <div className="relative">
+                                                    <div className="w-16 h-16 rounded-full overflow-hidden">
+                                                        <Image 
+                                                            src="/images/icons/filter/rings.png"
+                                                            alt="Rings"
+                                                            width={64}
+                                                            height={64}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    </div>
+                                                    {selectedCategory === "rings" && (
+                                                        <div className="absolute -inset-0.5 rounded-full border-2 border-brandGold/60 animate-pulse"></div>
+                                                    )}
                                                 </div>
                                                 <span className="text-xs font-medium tracking-wide">Bagues</span>
                                             </button>
@@ -621,16 +627,19 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                                                     ? 'opacity-100 scale-105' 
                                                     : 'opacity-70 hover:opacity-90 hover:scale-105'}`}
                                             >
-                                                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${selectedCategory === "necklaces" 
-                                                    ? "bg-gradient-to-br from-brandGold to-brandGold/80 text-white shadow-lg" 
-                                                    : "bg-brandIvory/60 text-platinumGray hover:bg-brandGold/5 hover:text-brandGold border border-brandGold/20"}`}>
-                                                    <Image 
-                                                        src="/images/icons/filter/necklaces.png"
-                                                        alt="Necklaces"
-                                                        width={24}
-                                                        height={24}
-                                                        className="w-8 h-8"
-                                                    />
+                                                <div className="relative">
+                                                    <div className="w-16 h-16 rounded-full overflow-hidden">
+                                                        <Image 
+                                                            src="/images/icons/filter/necklaces.png"
+                                                            alt="Necklaces"
+                                                            width={64}
+                                                            height={64}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    </div>
+                                                    {selectedCategory === "necklaces" && (
+                                                        <div className="absolute -inset-0.5 rounded-full border-2 border-brandGold/60 animate-pulse"></div>
+                                                    )}
                                                 </div>
                                                 <span className="text-xs font-medium tracking-wide">Colliers</span>
                                             </button>
@@ -642,16 +651,19 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                                                     ? 'opacity-100 scale-105' 
                                                     : 'opacity-70 hover:opacity-90 hover:scale-105'}`}
                                             >
-                                                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${selectedCategory === "bracelets" 
-                                                    ? "bg-gradient-to-br from-brandGold to-brandGold/80 text-white shadow-lg" 
-                                                    : "bg-brandIvory/60 text-platinumGray hover:bg-brandGold/5 hover:text-brandGold border border-brandGold/20"}`}>
-                                                    <Image 
-                                                        src="/images/icons/filter/bracelets.png"
-                                                        alt="Bracelets"
-                                                        width={24}
-                                                        height={24}
-                                                        className="w-8 h-8"
-                                                    />
+                                                <div className="relative">
+                                                    <div className="w-16 h-16 rounded-full overflow-hidden">
+                                                        <Image 
+                                                            src="/images/icons/filter/bracelets.png"
+                                                            alt="Bracelets"
+                                                            width={64}
+                                                            height={64}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    </div>
+                                                    {selectedCategory === "bracelets" && (
+                                                        <div className="absolute -inset-0.5 rounded-full border-2 border-brandGold/60 animate-pulse"></div>
+                                                    )}
                                                 </div>
                                                 <span className="text-xs font-medium tracking-wide">Bracelets</span>
                                             </button>
@@ -663,16 +675,19 @@ export default function CollectionsPage({ products, categories, productTypes }: 
                                                     ? 'opacity-100 scale-105' 
                                                     : 'opacity-70 hover:opacity-90 hover:scale-105'}`}
                                             >
-                                                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${selectedCategory === "earrings" 
-                                                    ? "bg-gradient-to-br from-brandGold to-brandGold/80 text-white shadow-lg" 
-                                                    : "bg-brandIvory/60 text-platinumGray hover:bg-brandGold/5 hover:text-brandGold border border-brandGold/20"}`}>
-                                                    <Image 
-                                                        src="/images/icons/filter/earrings.png"
-                                                        alt="Earrings"
-                                                        width={24}
-                                                        height={24}
-                                                        className="w-8 h-8"
-                                                    />
+                                                <div className="relative">
+                                                    <div className="w-16 h-16 rounded-full overflow-hidden">
+                                                        <Image 
+                                                            src="/images/icons/filter/earrings.png"
+                                                            alt="Earrings"
+                                                            width={64}
+                                                            height={64}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    </div>
+                                                    {selectedCategory === "earrings" && (
+                                                        <div className="absolute -inset-0.5 rounded-full border-2 border-brandGold/60 animate-pulse"></div>
+                                                    )}
                                                 </div>
                                                 <span className="text-xs font-medium tracking-wide">Boucles d'Oreilles</span>
                                             </button>
