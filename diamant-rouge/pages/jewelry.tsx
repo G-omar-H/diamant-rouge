@@ -14,7 +14,7 @@ export default function HauteJoailleriePage() {
       {/* Hero Section */}
       <section className="relative h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[80vh] w-full overflow-hidden">
         <Image 
-          src="/images/home/herolarged_icons.avif" 
+          src="/images/home/largeherod_l2_hj_ra_4_prod.webp" 
           alt="Haute Joaillerie Diamant Rouge" 
           fill
           sizes="100vw"
