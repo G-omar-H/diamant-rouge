@@ -454,35 +454,55 @@ export default function AppointmentPage() {
   />
   
   {/* Hero Content - Positioned at bottom left to avoid covering the diamond */}
-  <div className="container mx-auto px-6 relative z-10 mb-16 md:mb-24">
-    <div className="max-w-lg">
+  <div className="container mx-auto px-4 sm:px-6 relative z-10 mb-8 sm:mb-16 md:mb-24">
+    <div className="max-w-xs sm:max-w-lg">
       <motion.div
         className="text-left"
         initial="hidden"
         animate="visible"
         variants={fadeIn}
       >
-        <div className="backdrop-blur-sm bg-richEbony/10 p-8 border border-brandGold/10 shadow-luxury">
-          <h1 className="text-4xl md:text-6xl font-serif text-brandIvory mb-4 leading-tight drop-shadow-md">
-            Un Moment <span className="text-brandGold">d'Exception</span>
-          </h1>
-          <p className="mt-4 text-lg text-brandIvory font-light drop-shadow-sm">
-            Découvrez l'art de la haute joaillerie dans un cadre exclusif, où notre équipe d'experts vous accompagne dans votre quête de perfection.
-          </p>
-          <motion.div
-            className="mt-10"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-          >
+        {/* Mobile: Minimalist version */}
+        <div className="sm:hidden">
+          <div className="backdrop-blur-sm bg-richEbony/20 p-4 border border-brandGold/20 shadow-lg rounded-lg">
+            <h1 className="text-2xl font-serif text-brandIvory mb-2 leading-tight drop-shadow-md">
+              Rendez-vous <span className="text-brandGold">Privé</span>
+            </h1>
+            <div className="h-[1px] w-16 bg-brandGold my-2"></div>
             <a 
               href="#booking" 
-              className="group inline-flex items-center border-2 border-brandGold px-7 py-3 bg-transparent hover:bg-brandGold/20 text-brandGold transition-all duration-500 shadow-sm"
+              className="inline-flex items-center text-sm border border-brandGold px-4 py-2 bg-transparent hover:bg-brandGold/20 text-brandGold transition-all duration-300"
             >
-              <span className="font-serif tracking-wider">Réserver votre rendez-vous</span>
-              <span className="ml-3 transform group-hover:translate-x-1 transition-transform duration-300">→</span>
+              <span className="font-medium">Réserver</span>
+              <span className="ml-2">→</span>
             </a>
-          </motion.div>
+          </div>
+        </div>
+
+        {/* Desktop: Full version */}
+        <div className="hidden sm:block">
+          <div className="backdrop-blur-sm bg-richEbony/10 p-8 border border-brandGold/10 shadow-luxury">
+            <h1 className="text-4xl md:text-6xl font-serif text-brandIvory mb-4 leading-tight drop-shadow-md">
+              Un Moment <span className="text-brandGold">d'Exception</span>
+            </h1>
+            <p className="mt-4 text-lg text-brandIvory font-light drop-shadow-sm">
+              Découvrez l'art de la haute joaillerie dans un cadre exclusif, où notre équipe d'experts vous accompagne dans votre quête de perfection.
+            </p>
+            <motion.div
+              className="mt-10"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+            >
+              <a 
+                href="#booking" 
+                className="group inline-flex items-center border-2 border-brandGold px-7 py-3 bg-transparent hover:bg-brandGold/20 text-brandGold transition-all duration-500 shadow-sm"
+              >
+                <span className="font-serif tracking-wider">Réserver votre rendez-vous</span>
+                <span className="ml-3 transform group-hover:translate-x-1 transition-transform duration-300">→</span>
+              </a>
+            </motion.div>
+          </div>
         </div>
       </motion.div>
     </div>
@@ -498,9 +518,9 @@ export default function AppointmentPage() {
     >
       <div className="w-16 h-16 border border-brandGold/50 rounded-full flex items-center justify-center">
         <div className="w-8 h-8 bg-brandGold/20 rounded-full"></div>
-                                                    </div>
+      </div>
     </motion.div>
-                                                    </div>
+  </div>
 </section>
             {/* Signature Experience Section */}
             <section className="bg-brandIvory py-24 px-6">
