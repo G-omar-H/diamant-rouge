@@ -147,7 +147,7 @@ export default function ProductCard({ product, locale, isWishlisted = false }: P
                             alt={getProductName()}
                             fill
                             sizes="(max-width: 768px) 100vw, 300px"
-                            className="object-cover z-10 transition-transform duration-700 ease-out"
+                            className="object-contain z-10 transition-transform duration-700 ease-out"
                             style={{
                                 transform: hovered ? 'scale(1.05)' : 'scale(1)'
                             }}

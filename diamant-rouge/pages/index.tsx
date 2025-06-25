@@ -333,12 +333,12 @@ export default function HomePage({
     // Position carousel initially to show products from center
     useEffect(() => {
         if (initialLoad && carouselRef.current && filteredProducts.length > 0) {
-            // Center the carousel at first load
+            // Start the carousel closer to the beginning for better exposure
             setTimeout(() => {
                 if (carouselRef.current) {
                     const firstScroll = Math.min(
-                        (carouselRef.current.scrollWidth - carouselRef.current.clientWidth) / 4,
-                        150
+                        (carouselRef.current.scrollWidth - carouselRef.current.clientWidth) / 8,
+                        80
                     );
                     carouselRef.current.scrollLeft = firstScroll;
                     setInitialLoad(false);
@@ -412,10 +412,10 @@ export default function HomePage({
                 </div>
 
                         {/* Products Display */}
-                    <div className="px-4 md:px-6">
+                    <div className="pl-4 md:pl-6 pr-0">
                         <div 
                             ref={carouselRef}
-                            className="flex overflow-x-auto pb-10 pt-6 scrollbar-hide gap-4 md:gap-6 lg:gap-8 snap-x scroll-smooth"
+                            className="flex overflow-x-auto pb-10 pt-6 scrollbar-hide gap-4 md:gap-6 lg:gap-8 snap-x scroll-smooth pr-4 md:pr-6"
                         >
                             {filteredProducts.length === 0 ? (
                                 <div className="flex justify-center items-center w-full h-48">
