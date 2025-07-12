@@ -1,0 +1,19 @@
+# Exclude large image directories from serverless function bundling
+# These will still be served statically
+public/images/**
+public/uploads/**
+public/videos/**
+
+# Development files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build artifacts that shouldn't be bundled
+.next/
+node_modules/
+*.tsbuildinfo
+
+# Test files
+pages/test-images.tsx 

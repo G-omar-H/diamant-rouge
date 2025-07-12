@@ -35,6 +35,22 @@ const nextConfig = {
         loader: process.env.NODE_ENV === 'production' ? 'custom' : 'default',
         loaderFile: process.env.NODE_ENV === 'production' ? './lib/imageLoader.js' : undefined,
     },
+    // Optimize serverless function sizes - moved to root level
+    outputFileTracingExcludes: {
+        '/api/images/optimize': ['./public/**/*'],
+    },
+    // Configure webpack to exclude large assets from API bundles
+    webpack: (config, { isServer, nextRuntime }) => {
+        // Optimize for edge runtime if available
+        if (isServer && nextRuntime === 'nodejs') {
+            // Exclude public directory from API function bundles
+            config.externals = config.externals || [];
+            config.externals.push({
+                'sharp': 'commonjs sharp'
+            });
+        }
+        return config;
+    },
     // other config if needed...
 }
 

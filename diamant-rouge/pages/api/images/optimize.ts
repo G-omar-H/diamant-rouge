@@ -1,7 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import sharp from 'sharp';
 import { promises as fs } from 'fs';
 import path from 'path';
+
+// Dynamic import to reduce bundle size
+const getSharp = async () => {
+  const sharp = await import('sharp');
+  return sharp.default;
+};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -31,7 +36,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Handle different URL types
-    let imagePath: string;
     let imageBuffer: Buffer;
 
     if (url.startsWith('http://') || url.startsWith('https://')) {
@@ -44,7 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } else {
       // Local file path - read from public directory
       const cleanUrl = url.startsWith('/') ? url.slice(1) : url;
-      imagePath = path.join(process.cwd(), 'public', cleanUrl);
+      const imagePath = path.join(process.cwd(), 'public', cleanUrl);
       
       try {
         imageBuffer = await fs.readFile(imagePath);
@@ -53,6 +57,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
+    // Dynamic import Sharp to reduce bundle size
+    const sharp = await getSharp();
+    
     // Process image with Sharp
     let sharpInstance = sharp(imageBuffer);
 
