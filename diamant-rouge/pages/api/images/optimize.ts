@@ -1,6 +1,4 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { promises as fs } from 'fs';
-import path from 'path';
 
 // Dynamic import to reduce bundle size
 const getSharp = async () => {
@@ -46,12 +44,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       imageBuffer = Buffer.from(await response.arrayBuffer());
     } else {
-      // Local file path - read from public directory
-      const cleanUrl = url.startsWith('/') ? url.slice(1) : url;
-      const imagePath = path.join(process.cwd(), 'public', cleanUrl);
+      // Local file path - use fetch to avoid filesystem bundling
+      const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+      const host = req.headers.host || 'www.diamond-rouge.com';
+      const protocol = host.includes('localhost') ? 'http' : 'https';
+      const baseUrl = `${protocol}://${host}`;
+      
+      const imageUrl = `${baseUrl}${cleanUrl}`;
       
       try {
-        imageBuffer = await fs.readFile(imagePath);
+        const response = await fetch(imageUrl);
+        if (!response.ok) {
+          return res.status(404).json({ error: 'Image not found' });
+        }
+        imageBuffer = Buffer.from(await response.arrayBuffer());
       } catch (error) {
         return res.status(404).json({ error: 'Image not found' });
       }

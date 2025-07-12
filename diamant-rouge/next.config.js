@@ -35,6 +35,24 @@ const nextConfig = {
         loader: process.env.NODE_ENV === 'production' ? 'custom' : 'default',
         loaderFile: process.env.NODE_ENV === 'production' ? './lib/imageLoader.js' : undefined,
     },
+    // Aggressive file tracing exclusions for image API
+    outputFileTracingExcludes: {
+        '/api/images/optimize': [
+            './public/**/*',
+            './public/images/**/*',
+            './public/uploads/**/*',
+            './public/videos/**/*',
+            './**/*.jpg',
+            './**/*.jpeg',
+            './**/*.png',
+            './**/*.gif',
+            './**/*.svg',
+            './**/*.webp',
+            './**/*.mp4',
+            './**/*.mov',
+            './**/*.avi'
+        ],
+    },
     // Configure webpack to optimize bundle size
     webpack: (config, { isServer, nextRuntime }) => {
         // Optimize for serverless functions
