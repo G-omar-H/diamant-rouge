@@ -31,6 +31,9 @@ const nextConfig = {
             }
         ],
         unoptimized: process.env.NODE_ENV === 'development',
+        // Custom loader for our image optimization API
+        loader: process.env.NODE_ENV === 'production' ? 'custom' : 'default',
+        loaderFile: process.env.NODE_ENV === 'production' ? './lib/imageLoader.js' : undefined,
     },
     // other config if needed...
 }
