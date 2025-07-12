@@ -5,8 +5,8 @@
   "outputDirectory": ".next",
   "functions": {
     "pages/api/images/optimize.ts": {
-      "maxDuration": 10,
-      "memory": 512
+      "maxDuration": 15,
+      "memory": 1024
     }
   },
   "trailingSlash": false
